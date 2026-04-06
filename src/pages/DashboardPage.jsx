@@ -75,7 +75,7 @@ export default function DashboardPage() {
   const [showLogModal, setShowLogModal] = useState(false);
   const [celebration, setCelebration] = useState(null);
   const timerCtx = useTimerContext();
-  const { session, startSession, stopSession, getTimerData, getElapsed, stopTimer, startTimer } = timerCtx ?? {};
+  const { session, startSession, stopSession, getTimerData, getElapsed, startTimer } = timerCtx ?? {};
   const [classWidget, setClassWidget] = useState(null);
   const [widgetLoading, setWidgetLoading] = useState(true);
   // Overdue count from previous week

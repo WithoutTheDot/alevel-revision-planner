@@ -63,7 +63,7 @@ export default function ClassesPage() {
     setCreating(true);
     setError('');
     try {
-      const { id, code } = await createClass(currentUser.uid, displayName, newClassName.trim(), newClassSubject);
+      const { code } = await createClass(currentUser.uid, displayName, newClassName.trim(), newClassSubject);
       setCreatedCode(code);
       await load();
     } catch (e) {

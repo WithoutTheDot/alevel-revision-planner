@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { analytics } from '../firebase/config';
 import { Link } from 'react-router-dom';
 import { useTutorial } from '../contexts/TutorialContext';
-import { format, startOfWeek, addDays, addWeeks } from 'date-fns';
+import { format, addDays, addWeeks } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubjects } from '../contexts/SubjectsContext';
 import {
   getTermCalendar, getWeekTemplates, getWeekTemplate,
   getPaperDurations, getRecentCompletedPapers, getAllCompletedPaperPaths,
@@ -135,17 +134,6 @@ export default function GeneratePage() {
     setWeekStart(snapToMonday(e.target.value));
   }
 
-  async function runGenerate(wStart, termCalendar, durations, customPapers, exams, template) {
-    const weekType = (termCalendar && termCalendar[wStart])?.weekType || templateId;
-    const [recent, allTimePaths] = await Promise.all([
-      getRecentCompletedPapers(currentUser.uid, wStart, 3),
-      getAllCompletedPaperPaths(currentUser.uid),
-    ]);
-    const { schedule, warnings: w } = generateWeeklySchedule(
-      currentUser.uid, wStart, weekType, template, recent, durations, customPapers, allTimePaths
-    );
-    return { schedule, warnings: w };
-  }
 
   async function handleGenerate() {
     setGenerating(true);
@@ -241,7 +229,7 @@ export default function GeneratePage() {
     setBatchSummary(null);
     setBatchProgress('');
     try {
-      const [template, durations, customPapers, exams, termCalendar] = await Promise.all([
+      const [template, durations, customPapers, , termCalendar] = await Promise.all([
         getWeekTemplate(currentUser.uid, templateId),
         getPaperDurations(currentUser.uid),
         getCustomPapers(currentUser.uid),

@@ -1,4 +1,3 @@
-import { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 
 // ── Icons ──────────────────────────────────────────────────────────────────────

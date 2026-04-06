@@ -4,7 +4,7 @@ import SubjectBadge from './SubjectBadge';
 import { GRADES, normaliseMarks } from '../lib/gradeUtils';
 import { inputCls as baseInputCls } from '../lib/styles';
 
-import { formatTime, secsToInput, inputToSecs } from '../lib/timeUtils';
+import { secsToInput, inputToSecs } from '../lib/timeUtils';
 
 export default function PaperCompleteModal({ paper, index, onSave, onClose, actualDurationSeconds }) {
   const [completed, setCompleted] = useState(paper.completed ?? false);
@@ -27,7 +27,7 @@ export default function PaperCompleteModal({ paper, index, onSave, onClose, actu
     }
   }
 
-  const { score, outOf, invalid: marksInvalid } = normaliseMarks(marksRaw);
+  const { score, outOf } = normaliseMarks(marksRaw);
   const percentage = score !== null && outOf ? Math.round(score / outOf * 100) : null;
 
   async function handleSave() {

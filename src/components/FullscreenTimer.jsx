@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTimerContext } from '../contexts/TimerContext';
 import { formatTime } from '../lib/timeUtils';
 import { updatePaper, recordCompletion, logAdhocPaper, getPaperPB } from '../firebase/db';
-import { xpToLevel } from '../lib/badges';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import PaperCompleteModal from './PaperCompleteModal';
@@ -44,6 +43,7 @@ export default function FullscreenTimer() {
   // Load PB when session's paper changes
   useEffect(() => {
     if (!currentUser?.uid || !session?.subject || !session?.paperPath) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPb(null);
       return;
     }

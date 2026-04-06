@@ -32,12 +32,11 @@ export default function CalendarPage() {
   const [completing, setCompleting] = useState(null); // { paper, index }
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef(null);
-  const gridRef = useRef(null);
   const todayDayIdx = DAYS.indexOf(['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]);
   const [activeDayIdx, setActiveDayIdx] = useState(todayDayIdx >= 0 ? todayDayIdx : 0);
 
   // Drag state
-  const { session, startSession, stopSession, getTimerData, getElapsed, stopTimer } = useTimerContext() ?? {};
+  const { session, startSession, stopSession, getTimerData, getElapsed } = useTimerContext() ?? {};
   const [startingTimer, setStartingTimer] = useState(null); // { paper, index }
 
   const [selectedPaper, setSelectedPaper] = useState(null); // paper detail panel
@@ -574,7 +573,7 @@ export default function CalendarPage() {
         const elapsedDisplay = elapsedMins != null
           ? `${Math.floor(elapsedMins)}:${String(Math.floor((elapsedMins % 1) * 60)).padStart(2, '0')}`
           : null;
-        const sm = subjectMeta[p.subject];
+        const _sm = subjectMeta[p.subject];
         const isOverdue = isPast && !p.completed;
 
         function close() { setSelectedPaper(null); }

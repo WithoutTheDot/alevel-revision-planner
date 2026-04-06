@@ -12,6 +12,7 @@ function CountUp({ target, suffix, inView, prefersReduced }) {
 
   useEffect(() => {
     if (!inView || prefersReduced) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCount(target);
       return;
     }

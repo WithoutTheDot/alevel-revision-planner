@@ -18,7 +18,7 @@ export default function HistoryPage() {
   const { currentUser } = useAuth();
   const { subjects, subjectMeta } = useSubjects();
   const [papers, setPapers] = useState([]);
-  const [totalFetched, setTotalFetched] = useState(0);
+  const [, setTotalFetched] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);

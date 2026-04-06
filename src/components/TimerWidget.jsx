@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import SubjectBadge from './SubjectBadge';
 import { formatTime } from '../lib/timeUtils';
 
-export default function TimerWidget({ nextPaper, weekId, getTimerData, getElapsed, startTimer, onComplete, onStartModal }) {
-  const [tick, setTick] = useState(0);
+export default function TimerWidget({ nextPaper, weekId, getTimerData, onComplete, onStartModal }) {
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
@@ -24,6 +24,7 @@ export default function TimerWidget({ nextPaper, weekId, getTimerData, getElapse
 
   const timerKey = `timer_${weekId}_${nextPaper._idx}`;
   const timerData = getTimerData(timerKey);
+  // eslint-disable-next-line react-hooks/purity
   const elapsedSecs = timerData ? Math.floor((Date.now() - timerData.startedAt) / 1000) : 0;
   const expectedSecs = timerData ? timerData.expectedMins * 60 : 0;
   const isRunning = !!timerData;

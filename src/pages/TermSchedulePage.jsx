@@ -32,6 +32,7 @@ export default function TermSchedulePage() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (data) setCalendar(data);
   }, [data]);
 

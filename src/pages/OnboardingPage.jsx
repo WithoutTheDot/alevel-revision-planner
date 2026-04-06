@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTutorial } from '../contexts/TutorialContext';
-import { saveUserProfile, addExamEntry, saveWeekTemplate, initPublicStats, updatePublicStats, updateDisplayName } from '../firebase/db';
+import { saveUserProfile, addExamEntry, saveWeekTemplate, updateDisplayName } from '../firebase/db';
 import { ALL_SUBJECTS, COLOR_PALETTE, DEFAULT_SUBJECTS } from '../lib/allSubjects';
 import WeekGridEditor from '../components/WeekGridEditor';
 

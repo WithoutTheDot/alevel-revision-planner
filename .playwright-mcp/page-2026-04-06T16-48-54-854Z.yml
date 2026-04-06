@@ -1,0 +1,125 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]: A-Level Planner
+    - navigation [ref=e11]:
+      - link "Dashboard" [ref=e12] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e13]
+        - text: Dashboard
+      - link "Calendar" [ref=e18] [cursor=pointer]:
+        - /url: /calendar
+        - img [ref=e19]
+        - text: Calendar
+      - link "Term Schedule" [active] [ref=e22] [cursor=pointer]:
+        - /url: /term-schedule
+        - img [ref=e23]
+        - text: Term Schedule
+      - link "Templates" [ref=e26] [cursor=pointer]:
+        - /url: /templates
+        - img [ref=e27]
+        - text: Templates
+      - link "Generate" [ref=e30] [cursor=pointer]:
+        - /url: /generate
+        - img [ref=e31]
+        - text: Generate
+      - link "History" [ref=e33] [cursor=pointer]:
+        - /url: /history
+        - img [ref=e34]
+        - text: History
+      - link "Classes" [ref=e37] [cursor=pointer]:
+        - /url: /classes
+        - img [ref=e38]
+        - text: Classes
+      - link "Badges" [ref=e40] [cursor=pointer]:
+        - /url: /badges
+        - img [ref=e41]
+        - text: Badges
+      - link "Settings" [ref=e43] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e44]
+        - text: Settings
+    - generic [ref=e47]:
+      - generic [ref=e48]: JO
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: Joshua
+        - button "Sign out" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - text: Sign out
+  - main [ref=e54]:
+    - generic [ref=e611]:
+      - generic [ref=e612]:
+        - heading "Term Schedule" [level=1] [ref=e613]
+        - generic [ref=e614]:
+          - button "Prev" [ref=e615] [cursor=pointer]
+          - button "Today" [ref=e616] [cursor=pointer]
+          - button "Next" [ref=e617] [cursor=pointer]
+      - generic [ref=e618]:
+        - generic [ref=e619]: "Paint as:"
+        - button "Week A" [ref=e620] [cursor=pointer]
+        - button "Week B" [ref=e621] [cursor=pointer]
+        - button "Holiday" [ref=e622] [cursor=pointer]
+        - button "Clear" [ref=e623] [cursor=pointer]
+      - generic [ref=e624]:
+        - generic [ref=e625]:
+          - heading "March 2026" [level=3] [ref=e626]
+          - generic [ref=e627]:
+            - button "w/c 23 Feb" [ref=e628] [cursor=pointer]:
+              - generic [ref=e629]: w/c 23 Feb
+            - button "w/c 2 Mar" [ref=e630] [cursor=pointer]:
+              - generic [ref=e631]: w/c 2 Mar
+            - button "w/c 9 MarWeek B" [ref=e632] [cursor=pointer]:
+              - generic [ref=e633]: w/c 9 Mar
+              - text: Week B
+            - button "w/c 16 MarWeek A" [ref=e634] [cursor=pointer]:
+              - generic [ref=e635]: w/c 16 Mar
+              - text: Week A
+            - button "w/c 23 MarWeek B" [ref=e636] [cursor=pointer]:
+              - generic [ref=e637]: w/c 23 Mar
+              - text: Week B
+            - button "w/c 30 MarWeek A" [ref=e638] [cursor=pointer]:
+              - generic [ref=e639]: w/c 30 Mar
+              - text: Week A
+        - generic [ref=e640]:
+          - heading "April 2026" [level=3] [ref=e641]
+          - generic [ref=e642]:
+            - button "w/c 30 MarWeek A" [ref=e643] [cursor=pointer]:
+              - generic [ref=e644]: w/c 30 Mar
+              - text: Week A
+            - button "w/c 6 AprHoliday" [ref=e645] [cursor=pointer]:
+              - generic [ref=e646]: w/c 6 Apr
+              - text: Holiday
+            - button "w/c 13 AprHoliday" [ref=e647] [cursor=pointer]:
+              - generic [ref=e648]: w/c 13 Apr
+              - text: Holiday
+            - button "w/c 20 AprWeek B" [ref=e649] [cursor=pointer]:
+              - generic [ref=e650]: w/c 20 Apr
+              - text: Week B
+            - button "w/c 27 AprWeek A" [ref=e651] [cursor=pointer]:
+              - generic [ref=e652]: w/c 27 Apr
+              - text: Week A
+        - generic [ref=e653]:
+          - heading "May 2026" [level=3] [ref=e654]
+          - generic [ref=e655]:
+            - button "w/c 27 AprWeek A" [ref=e656] [cursor=pointer]:
+              - generic [ref=e657]: w/c 27 Apr
+              - text: Week A
+            - button "w/c 4 May" [ref=e658] [cursor=pointer]:
+              - generic [ref=e659]: w/c 4 May
+            - button "w/c 11 May" [ref=e660] [cursor=pointer]:
+              - generic [ref=e661]: w/c 11 May
+            - button "w/c 18 May" [ref=e662] [cursor=pointer]:
+              - generic [ref=e663]: w/c 18 May
+            - button "w/c 25 May" [ref=e664] [cursor=pointer]:
+              - generic [ref=e665]: w/c 25 May
+      - generic [ref=e666]:
+        - generic [ref=e667]:
+          - generic [ref=e668]: Week A
+          - generic [ref=e669]: 4 weeks
+        - generic [ref=e670]:
+          - generic [ref=e671]: Week B
+          - generic [ref=e672]: 3 weeks
+        - generic [ref=e673]:
+          - generic [ref=e674]: Holiday
+          - generic [ref=e675]: 2 weeks
