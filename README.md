@@ -8,6 +8,16 @@ Built with React 19, Firebase, and Tailwind CSS.
 
 ---
 
+## Screenshots
+
+![Hero — landing page](docs/screenshots/screenshot-hero.png)
+
+![Features section](docs/screenshots/screenshot-features.png)
+
+![How it works](docs/screenshots/screenshot-howitworks.png)
+
+---
+
 ## Features
 
 ### Scheduling
