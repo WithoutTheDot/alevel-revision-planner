@@ -1,10 +1,18 @@
 # A-Level Revision Planner
 
+[![CI](https://github.com/WithoutTheDot/alevel-revision-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/WithoutTheDot/alevel-revision-planner/actions/workflows/ci.yml)
+
 **Live demo:** https://pastpapers-a8b7v6-f7f04.web.app/
 
 A full-stack web application that helps A-Level students build structured, personalised revision schedules — tracking every past paper they complete, visualising progress over time, and staying motivated through gamification.
 
 Built with React 19, Firebase, and Tailwind CSS.
+
+---
+
+## Motivation
+
+During A-Level revision I found myself manually deciding which past paper to do each day, losing track of what I'd already completed, and having no way to see whether my marks were improving. I built this to solve all three problems in one place — generating a weighted schedule based on actual exam board paper structures, logging every result, and surfacing the trends that matter.
 
 ---
 
@@ -190,3 +198,78 @@ users/{uid}
 classes/{classId}
   └── members, leaderboard entries
 ```
+
+---
+
+## Technical challenges
+
+### 1. Weighted paper selection with coverage-first deduplication
+
+The naive approach to picking a revision paper is random — but that means students repeat papers they just did, or never see rare paper types. The scheduler in `src/lib/generateSchedule.js` applies a graduated weight system:
+
+- **0** — already chosen this week (hard exclude, no duplicates)
+- **0.01** — completed in recent weeks (strongly deprioritised)
+- **0.05** — completed at any point in history (mildly deprioritised)
+- **1.0** — never attempted (full weight)
+
+This means the schedule naturally steers toward unseen papers without ever being rigid. If a student has genuinely done every paper, it falls back gracefully to equal weight rather than erroring.
+
+### 2. Encoding exam board paper structures as recursive decision trees
+
+Every exam board has a different paper structure — AQA Physics has Paper 3B with three variants (BA, BB, BC) each worth roughly 1/12 of its parent's weight, while OCR Maths has Pure/Statistics/Mechanics as equal siblings. Hard-coding these as flat lists would lose all structural information.
+
+Instead, `src/lib/paperTrees.js` encodes each subject as a recursive tree of weighted options. The scheduler walks the tree with `collectLeafPaths`, multiplying weights along each branch to compute correct end-to-end probabilities. AQA Physics Paper 3B variants naturally land at ~7.7% of total selections without any special-casing.
+
+### 3. Bin-packing papers into time blocks
+
+Once papers are selected, they need to fit into the student's available time blocks (e.g. "Monday 9am–12pm, Tuesday 2pm–5pm"). This is a variant of the bin-packing problem.
+
+The scheduler uses a two-pass approach in `schedulePapers`:
+1. **Longest-fit-decreasing** — sorts papers by duration descending and greedily places each into the first block with enough space, squeezing out inter-paper breaks when needed
+2. **Gap-fill pass** — any unscheduled papers (too long for the first pass) are retried shortest-first against remaining capacity
+
+This gets close-to-optimal packing without the exponential cost of a full search.
+
+### 4. Subcollection architecture to avoid Firestore document size limits
+
+An obvious data model puts the entire term calendar — 30+ weeks of A/B/Holiday entries — in the user's profile document. Firestore has a 1 MB document size limit, and a document that also holds subjects, exam dates, XP history, and settings would approach it quickly.
+
+Instead, `termCalendar` is a subcollection: `users/{uid}/termCalendar/{mondayDateStr}`. Each week is its own document. This keeps the profile document small and enables efficient per-week queries without reading the whole calendar.
+
+### 5. Probabilistic testing for the schedule generator
+
+The schedule generator uses randomness, which makes standard assertion-based tests inadequate — a single run might pass by luck. The test suite in `src/lib/__tests__/generateSchedule.test.js` runs each constraint check 100–200 times and asserts it holds on every run:
+
+```js
+it('Physics AQA Paper 3B variants appear ~1/4 of AQA paper selections', () => {
+  // Run 200 times, collect Paper 3B frequency, assert within expected range
+});
+```
+
+This catches weighting bugs that would be invisible to a one-shot test.
+
+---
+
+## Testing & CI
+
+**91 tests** across 5 suites, run with Vitest and Testing Library.
+
+| Suite | Tests | What it covers |
+|---|---|---|
+| `generateSchedule.test.js` | 8 | Schedule constraints, statistical paper weighting (100–200 iterations each) |
+| `pmtLinks.test.js` | 45 | Past paper URL generation for every subject/board/year combination |
+| `builtInFamilies.test.js` | 26 | Paper family structure and metadata validation |
+| `useAsyncData.test.js` | 5 | Custom hook loading/error/success states |
+| `Modal.test.jsx` | 7 | Component render, open/close, keyboard accessibility |
+
+A GitHub Actions CI pipeline runs lint → test → build on every push and pull request.
+
+---
+
+## What I'd build next
+
+- **Spaced repetition scoring** — weight paper selection not just by recency but by past grade, so papers where the student scored below a threshold come back more often
+- **Mark scheme integration** — link directly to official mark schemes alongside each paper
+- **Mobile app** — the scheduling and completion flow maps well to React Native; calendar notifications for scheduled papers would be the key addition
+- **Topic-level tracking** — break papers down by topic (e.g. "Integration", "Mechanics") so weak areas surface in analytics
+- **Shared class schedules** — teachers generating a schedule template that pushes recommended papers to all students in a class
