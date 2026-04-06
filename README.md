@@ -10,11 +10,29 @@ Built with React 19, Firebase, and Tailwind CSS.
 
 ## Screenshots
 
-![Hero — landing page](docs/screenshots/screenshot-hero.png)
+### Landing page
+![Hero](docs/screenshots/screenshot-hero.png)
 
-![Features section](docs/screenshots/screenshot-features.png)
+![Features](docs/screenshots/screenshot-features.png)
 
 ![How it works](docs/screenshots/screenshot-howitworks.png)
+
+### Dashboard
+![Dashboard — streak, XP, upcoming papers, exam countdown](docs/screenshots/screenshot-dashboard.png)
+
+### Weekly calendar
+![Calendar — hour-based weekly grid with paper blocks](docs/screenshots/screenshot-calendar.png)
+
+### Schedule generation
+![Generate — time block preview before generating a week](docs/screenshots/screenshot-generate.png)
+
+### History & analytics
+![History — filterable paper log with marks and grades](docs/screenshots/screenshot-history.png)
+
+![History charts — grade distribution and papers per week](docs/screenshots/screenshot-charts.png)
+
+### Badges & XP
+![Badges — milestone and streak achievements](docs/screenshots/screenshot-badges.png)
 
 ---
 
