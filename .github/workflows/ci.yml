@@ -36,4 +36,4 @@ jobs:
 
       - name: Deploy to Firebase Hosting
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: npx firebase-tools@latest deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}"
+        run: npx firebase-tools@latest deploy --only hosting --project pastpapers-a8b7v6-f7f04 --token "${{ secrets.FIREBASE_TOKEN }}"
