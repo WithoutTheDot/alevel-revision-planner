@@ -44,3 +44,9 @@ todo.txt
 
 # Coverage reports
 coverage/
+
+# Playwright MCP cache
+.playwright-mcp/
+
+# Stray screenshots
+screenshot-*.png
