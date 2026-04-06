@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Brand colour tokens (used by Tailwind brand-* classes) ─────────────── */
+:root {
+  --brand-bg:         255 255 255; /* white */
+  --brand-surface:    248 250 252; /* slate-50 */
+  --brand-border:     226 232 240; /* slate-200 */
+  --brand-accent:     124  58 237; /* violet-600 */
+  --brand-accent-dim: 109  40 217; /* violet-700 */
+  --brand-text:        15  23  42; /* slate-900 */
+  --brand-muted:      148 163 184; /* slate-400 */
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: var(--color-bg, #ffffff);
+}
+
+/* ── Confetti animation (XpCelebration) ─────────────────────────────────── */
+@keyframes confettiFall {
+  0%   { transform: translateY(-10px) rotate(0deg);   opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+.animate-confetti {
+  animation: confettiFall ease-in forwards;
+}

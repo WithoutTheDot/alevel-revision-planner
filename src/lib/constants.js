@@ -1,0 +1,4 @@
+export const CALENDAR_GRID_START_HOUR = 7;
+export const CALENDAR_GRID_END_HOUR = 22;
+export const DEFAULT_PAPER_DURATION_MINS = 90;
+export const TOAST_DURATION_MS = 4000;
