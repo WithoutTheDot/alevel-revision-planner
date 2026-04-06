@@ -1,5 +1,7 @@
 # A-Level Revision Planner
 
+**Live demo:** https://pastpapers-a8b7v6-f7f04.web.app/
+
 A full-stack web application that helps A-Level students build structured, personalised revision schedules — tracking every past paper they complete, visualising progress over time, and staying motivated through gamification.
 
 Built with React 19, Firebase, and Tailwind CSS.
@@ -78,7 +80,7 @@ Built with React 19, Firebase, and Tailwind CSS.
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/alevel-revision-planner.git
+git clone https://github.com/WithoutTheDot/alevel-revision-planner.git
 cd alevel-revision-planner
 npm install --legacy-peer-deps
 ```
