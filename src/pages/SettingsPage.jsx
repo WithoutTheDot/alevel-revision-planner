@@ -5,10 +5,10 @@ import { useSubjects } from '../contexts/SubjectsContext';
 import {
   getUserSettings, updateUserSettings,
   getPaperDurations, setPaperDuration,
-  exportAllUserData,
   getCustomPapers, saveCustomPaper, deleteCustomPaper,
   getExamTimetable, addExamEntry, updateExamEntry, deleteExamEntry,
-  updateDisplayName,
+  updateDisplayName, deleteAllUserData, exportAllUserData,
+  rebuildUserPublicStatsFromCompletedPapers, computeWeeklyRollups
 } from '../firebase/db';
 import { BUILT_IN_FAMILIES, BUILT_IN_FAMILIES_MAP, recomputePaths } from '../lib/builtInFamilies';
 import { getDefaultDurationForPath } from '../lib/generateSchedule';
@@ -95,6 +95,12 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [examModal, setExamModal] = useState(null); // null | { id?, data }
   const [examSaving, setExamSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const [reconciling, setReconciling] = useState(false);
+  const [reconcileResult, setReconcileResult] = useState(null);
 
   // Modal: null | { id, data, isBuiltIn }
   const [familyModal, setFamilyModal] = useState(null);
@@ -172,13 +178,30 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleReconcile() {
+    setReconciling(true);
+    setError('');
+    try {
+      const res = await rebuildUserPublicStatsFromCompletedPapers(currentUser.uid);
+      await computeWeeklyRollups(currentUser.uid);
+      setReconcileResult(res);
+      setTimeout(() => setReconcileResult(null), 5000);
+    } catch (e) {
+      setError('Failed to repair stats: ' + e.message);
+    } finally {
+      setReconciling(false);
+    }
+  }
+
   async function handleLogout() {
     try { await logout(); } catch (e) { setError('Logout failed: ' + e.message); }
   }
 
   async function handleDeleteAccount() {
-    if (!window.confirm('Are you sure you want to permanently delete your account? All your data will be lost. This cannot be undone.')) return;
+    if (deleteConfirmText !== 'DELETE') return;
+    setDeleteLoading(true);
     try {
+      await deleteAllUserData(currentUser.uid);
       await deleteUser(currentUser);
     } catch (e) {
       if (e.code === 'auth/requires-recent-login') {
@@ -186,6 +209,8 @@ export default function SettingsPage() {
       } else {
         setError('Failed to delete account: ' + e.message);
       }
+      setDeleteLoading(false);
+      setShowDeleteModal(false);
     }
   }
 
@@ -562,6 +587,21 @@ export default function SettingsPage() {
                     Download backup
                   </button>
                 </div>
+                <div className="border-t border-[var(--color-border)] pt-4">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Repair Stats</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mb-2">If your study minutes or paper counts seem wrong, this will recompute them from your history.</p>
+                  <div className="flex items-center gap-3">
+                    <button onClick={handleReconcile} disabled={reconciling}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                      {reconciling ? 'Repairing…' : 'Repair stats'}
+                    </button>
+                    {reconcileResult && (
+                      <span className="text-emerald-600 text-sm">
+                        Fixed! {reconcileResult.papersCompleted} papers, {reconcileResult.studyMinutes}m total.
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <div className="border-t border-[var(--color-border)] pt-3 space-y-3">
                   <button onClick={handleLogout}
                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
@@ -570,7 +610,7 @@ export default function SettingsPage() {
                   <div className="border-t border-[var(--color-border)] pt-3">
                     <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Danger zone</p>
                     <p className="text-xs text-[var(--color-text-muted)] mb-2">Permanently delete your account and all data. This cannot be undone.</p>
-                    <button onClick={handleDeleteAccount}
+                    <button onClick={() => { setDeleteConfirmText(''); setShowDeleteModal(true); }}
                       className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-red-50 transition-colors">
                       Delete account
                     </button>
@@ -684,6 +724,41 @@ export default function SettingsPage() {
           </div>
         )}
       </Modal>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-red-600">Delete your account</h2>
+            <p className="text-sm text-gray-600">
+              This will permanently delete <strong>all your data</strong> — schedules, completed papers, XP, badges, and settings. This cannot be undone.
+            </p>
+            <p className="text-sm text-gray-700">
+              Type <strong>DELETE</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+            <div className="flex gap-3 justify-end pt-1">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || deleteLoading}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 transition-colors">
+                {deleteLoading ? 'Deleting…' : 'Delete permanently'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

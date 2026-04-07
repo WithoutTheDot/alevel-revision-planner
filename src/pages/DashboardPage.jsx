@@ -5,11 +5,10 @@ import { getDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, getTermCalendar, updatePaper, recordCompletion, logAdhocPaper, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, addReviewTopics, getAllCompletedPapers, computeTopicFrequency } from '../firebase/db';
+import { getWeeklySchedule, getTermCalendar, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, getAllCompletedPapers, computeTopicFrequency, getTotalStudySecondsFromCompletedPapers, completePaper } from '../firebase/db';
 import SubjectBadge from '../components/SubjectBadge';
 import WeekTypeBadge from '../components/WeekTypeBadge';
-import PaperCompleteModal from '../components/PaperCompleteModal';
-import LogPaperModal from '../components/LogPaperModal';
+import CompletionDetailsModal from '../components/CompletionDetailsModal';
 import Toast from '../components/Toast';
 import LevelCard from '../components/LevelCard';
 import StatCard from '../components/StatCard';
@@ -90,13 +89,14 @@ export default function DashboardPage() {
     try {
       const prevMonday = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 1);
       const prevWId = format(prevMonday, 'yyyy-MM-dd');
-      const [s, cal, exams, statsSnap, prevSchedule, userSettings] = await Promise.all([
+      const [s, cal, exams, statsSnap, prevSchedule, userSettings, totalStudySeconds] = await Promise.all([
         getWeeklySchedule(currentUser.uid, weekId),
         getTermCalendar(currentUser.uid),
         getExamTimetable(currentUser.uid),
         getDoc(doc(db, 'userPublicStats', currentUser.uid)),
         getWeeklySchedule(currentUser.uid, prevWId),
         getUserSettings(currentUser.uid),
+        getTotalStudySecondsFromCompletedPapers(currentUser.uid),
       ]);
       const reviewEnabled = userSettings?.reviewModeEnabled ?? true;
       setReviewModeEnabled(reviewEnabled);
@@ -114,10 +114,10 @@ export default function DashboardPage() {
         const sd = statsSnap.data();
         setStreak(sd.currentStreak ?? 0);
         setLongestStreak(sd.longestStreak ?? 0);
-        setTotalStudyMins(sd.studyMinutes ?? 0);
         setXp(sd.xp ?? 0);
         setLevel(sd.level ?? 1);
       }
+      setTotalStudyMins(Math.round((totalStudySeconds ?? 0) / 60));
       // Overdue: incomplete papers from previous week
       setPrevWeekId(prevWId);
       if (prevSchedule && !prevSchedule.dismissedOverdue) {
@@ -167,49 +167,52 @@ export default function DashboardPage() {
   async function handleComplete(idx, updates) {
     try {
       const paper = schedule.papers[idx];
-      await updatePaper(currentUser.uid, weekId, idx, updates);
       if (updates.completed && !paper.completed) {
         const timerKey = `timer_${weekId}_${idx}`;
         const timerData = getTimerData(timerKey);
-        const actualDurationSeconds = timerData
-          ? Math.round((updates.actualDurationSeconds ?? session?.elapsedSeconds ?? 0))
-          : (updates.actualDurationSeconds ?? null);
+        // Use the value the user confirmed in the modal (which is pre-filled from the timer);
+        // fall back to session elapsed seconds if they somehow bypassed the field
+        const actualDurationSeconds = updates.actualDurationSeconds
+          ?? (session?.elapsedSeconds != null ? Math.round(session.elapsedSeconds) : null);
         const timeTaken = timerData ? getElapsed(timerKey) : null;
-        const expectedTime = timerData ? timerData.expectedMins : null;
-        if (timerData) await stopSession();
+        const expectedTime = timerData ? timerData.expectedMins : (paper.duration || 90);
+        if (session) await stopSession();
         const prevLevel = level;
-        const { xpEarned, newBadges, isPB, breakdown } = await recordCompletion(currentUser.uid, {
-          paperPath: paper.paperPath,
+
+        const { xpEarned, newBadges, isPB, breakdown } = await completePaper(currentUser.uid, {
+          source: 'scheduled',
           subject: paper.subject,
           displayName: paper.displayName,
+          paperPath: paper.paperPath,
           weekId,
+          paperIndex: idx,
           marks: updates.marks ?? null,
           grade: updates.grade ?? null,
           comment: updates.comment ?? null,
-          timeTaken,
-          expectedTime,
           actualDurationSeconds,
-          durationMins: paper.duration,
+          expectedTime,
+          timeTaken,
           reviewTopics: updates.reviewTopics ?? [],
         });
-        if (updates.reviewTopics?.length > 0) {
-          await addReviewTopics(currentUser.uid, updates.reviewTopics, paper.subject).catch(() => {});
+
+        // Keep the "Study hours" stat feeling live without relying on cached counters.
+        // Only increment when we have an explicit duration to avoid fabricating time.
+        if (actualDurationSeconds != null) {
+          setTotalStudyMins((m) => (m ?? 0) + Math.round(actualDurationSeconds / 60));
         }
         // Re-fetch accurate stats
-        try {
-          const statsSnap = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
-          if (statsSnap.exists()) {
-            const sd = statsSnap.data();
-            setStreak(sd.currentStreak ?? 0);
-            setLongestStreak(sd.longestStreak ?? 0);
-            setXp(sd.xp ?? 0);
-            setLevel(sd.level ?? 1);
-            const newLevel = sd.level ?? 1;
-            if (xpEarned > 0 || newBadges.length > 0 || isPB) {
-              setCelebration({ xpEarned, newBadges, prevLevel, newLevel, isPB, breakdown });
-            }
+        const statsSnap = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
+        if (statsSnap.exists()) {
+          const sd = statsSnap.data();
+          setStreak(sd.currentStreak ?? 0);
+          setLongestStreak(sd.longestStreak ?? 0);
+          setXp(sd.xp ?? 0);
+          setLevel(sd.level ?? 1);
+          const newLevel = sd.level ?? 1;
+          if (xpEarned > 0 || newBadges.length > 0 || isPB) {
+            setCelebration({ xpEarned, newBadges, prevLevel, newLevel, isPB, breakdown });
           }
-        } catch (_) { /* best-effort */ }
+        }
       }
       setSchedule((s) => {
         const papers = [...s.papers];
@@ -234,7 +237,16 @@ export default function DashboardPage() {
 
   async function handleLogPaper(paperData) {
     try {
-      const { xpEarned, newBadges, capReached } = await logAdhocPaper(currentUser.uid, paperData);
+      const { xpEarned, newBadges, capReached } = await completePaper(currentUser.uid, {
+        ...paperData,
+        source: 'adhoc',
+        expectedTime: paperData.durationMins,
+      });
+
+      if (paperData?.actualDurationSeconds != null) {
+        setTotalStudyMins((m) => (m ?? 0) + Math.round(paperData.actualDurationSeconds / 60));
+      }
+
       if (capReached) {
         setToast('Paper logged — daily XP limit reached for ad-hoc papers.');
       } else if (newBadges?.length > 0) {
@@ -246,14 +258,12 @@ export default function DashboardPage() {
       }
       setTimeout(() => setToast(''), 4000);
       // Refresh stats
-      try {
-        const statsSnap = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
-        if (statsSnap.exists()) {
-          const sd = statsSnap.data();
-          setXp(sd.xp ?? 0);
-          setLevel(sd.level ?? 1);
-        }
-      } catch (_) {}
+      const statsSnap = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
+      if (statsSnap.exists()) {
+        const sd = statsSnap.data();
+        setXp(sd.xp ?? 0);
+        setLevel(sd.level ?? 1);
+      }
     } catch (e) {
       setError('Failed to log paper: ' + e.message);
     }
@@ -396,8 +406,13 @@ export default function DashboardPage() {
           )}
 
           {!schedule ? (
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-8 text-center">
-              <p className="text-[var(--color-text-secondary)] mb-4 text-sm">No schedule for this week yet.</p>
+            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">No schedule for this week yet — here&apos;s how to get started:</p>
+              <ol className="text-sm text-[var(--color-text-secondary)] space-y-2 list-decimal list-inside">
+                <li>Go to <Link to="/term-schedule" className="text-[var(--color-accent)] underline font-medium">Term Schedule</Link> and paint your weeks as Week A, Week B, or Holiday.</li>
+                <li>Go to <Link to="/templates" className="text-[var(--color-accent)] underline font-medium">Templates</Link> and set up your study time blocks for Week A and Week B.</li>
+                <li>Come back here and click <strong>Generate</strong>, or head straight to <Link to="/generate" className="text-[var(--color-accent)] underline font-medium">Generate</Link>.</li>
+              </ol>
               <button
                 onClick={() => navigate('/generate')}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors"
@@ -568,15 +583,17 @@ export default function DashboardPage() {
       {completing && (() => {
         const timerKey = `timer_${weekId}_${completing.index}`;
         const timerData = getTimerData(timerKey);
-        const timerSecs = timerData ? Math.round(session?.elapsedSeconds ?? 0) : null;
+        // Prefer the new TimerContext session elapsed time; fall back to legacy localStorage timer
+        const timerSecs = session?.elapsedSeconds != null
+          ? Math.round(session.elapsedSeconds)
+          : (timerData ? Math.round(getElapsed(timerKey) * 60) : null);
         return (
-          <PaperCompleteModal
+          <CompletionDetailsModal
+            mode="scheduled"
             paper={completing.paper}
-            index={completing.index}
             actualDurationSeconds={timerSecs}
-            onSave={handleComplete}
+            onSubmit={(updates) => handleComplete(completing.index, updates)}
             onClose={() => setCompleting(null)}
-            reviewModeEnabled={reviewModeEnabled}
           />
         );
       })()}
@@ -601,17 +618,12 @@ export default function DashboardPage() {
       )}
 
       {showLogModal && (
-        <LogPaperModal
-          subjects={Object.entries(subjectMeta).map(([id, meta]) => ({ id, ...meta }))}
-          onSave={handleLogPaper}
+        <CompletionDetailsModal
+          mode="adhoc"
+          paper={{ subject: Object.keys(subjectMeta)?.[0] ?? '', displayName: '', marks: null, grade: null, comment: null }}
+          onSubmit={handleLogPaper}
           onClose={() => setShowLogModal(false)}
-          onStartTimer={({ subject, displayName }) => {
-            setShowLogModal(false);
-            setStartingTimer({
-              paper: { subject, displayName, source: 'adhoc', paperPath: 'adhoc' },
-              index: null,
-            });
-          }}
+          submitLabel="Log Paper"
         />
       )}
 

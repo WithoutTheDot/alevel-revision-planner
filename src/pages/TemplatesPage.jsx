@@ -126,22 +126,34 @@ export default function TemplatesPage() {
                 onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, templateName: e.target.value } }))} />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Max papers per subject">
-                <input type="number" min="1" max="20" className={inputCls} value={editing.data.maxPapersPerSubject}
-                  onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, maxPapersPerSubject: Number(e.target.value) } }))} />
-              </Field>
-              <Field label="Most common per subject">
-                <input type="number" min="1" max="20" className={inputCls} value={editing.data.mostCommonPapersPerSubject}
-                  onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, mostCommonPapersPerSubject: Number(e.target.value) } }))} />
-              </Field>
-              <Field label="Max total papers">
-                <input type="number" min="1" max="50" className={inputCls} value={editing.data.maxTotalPapers}
-                  onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, maxTotalPapers: Number(e.target.value) } }))} />
-              </Field>
-              <Field label="Break duration (min)">
-                <input type="number" min="0" max="60" className={inputCls} value={editing.data.breakDuration}
-                  onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, breakDuration: Number(e.target.value) } }))} />
-              </Field>
+              <div>
+                <Field label="Max papers per subject">
+                  <input type="number" min="1" max="20" className={inputCls} value={editing.data.maxPapersPerSubject}
+                    onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, maxPapersPerSubject: Number(e.target.value) } }))} />
+                </Field>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Hard cap — no subject gets more than this many papers in a week.</p>
+              </div>
+              <div>
+                <Field label="Typical papers per session">
+                  <input type="number" min="1" max="20" className={inputCls} value={editing.data.mostCommonPapersPerSubject}
+                    onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, mostCommonPapersPerSubject: Number(e.target.value) } }))} />
+                </Field>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">How many papers per subject the generator aims for each week.</p>
+              </div>
+              <div>
+                <Field label="Max total papers">
+                  <input type="number" min="1" max="50" className={inputCls} value={editing.data.maxTotalPapers}
+                    onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, maxTotalPapers: Number(e.target.value) } }))} />
+                </Field>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Weekly cap across all subjects combined.</p>
+              </div>
+              <div>
+                <Field label="Break duration (min)">
+                  <input type="number" min="0" max="60" className={inputCls} value={editing.data.breakDuration}
+                    onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, breakDuration: Number(e.target.value) } }))} />
+                </Field>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Gap between papers when scheduling on the calendar.</p>
+              </div>
             </div>
             <Field label="Subjects">
               <div className="flex flex-wrap gap-2 mt-1">
@@ -162,10 +174,13 @@ export default function TemplatesPage() {
                 })}
               </div>
             </Field>
-            <Field label="Time Blocks">
-              <WeekGridEditor value={editing.data.timeBlocks || []}
-                onChange={(blocks) => setEditing((s) => ({ ...s, data: { ...s.data, timeBlocks: blocks } }))} />
-            </Field>
+            <div>
+              <Field label="Time Blocks">
+                <p className="text-xs text-[var(--color-text-muted)] mb-2">Click and drag on the grid to mark your available study hours. Each block represents one hour.</p>
+                <WeekGridEditor value={editing.data.timeBlocks || []}
+                  onChange={(blocks) => setEditing((s) => ({ ...s, data: { ...s.data, timeBlocks: blocks } }))} />
+              </Field>
+            </div>
             <div className="flex justify-end gap-3 pt-2">
               <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]">Cancel</button>
               <button onClick={handleSave} disabled={saving}

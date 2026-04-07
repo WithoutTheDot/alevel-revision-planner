@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import LoginCard from '../components/homepage/LoginCard';
+import { friendlyAuthError } from '../lib/authErrors';
 
 export default function LoginPage() {
   const [tab, setTab] = useState('login');
@@ -26,7 +27,7 @@ export default function LoginPage() {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError(friendlyAuthError(err));
     } finally {
       setLoading(false);
     }

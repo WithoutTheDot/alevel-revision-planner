@@ -18,8 +18,40 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config';
 import { updateStreak, awardXpAndBadges } from './social';
+import { syncReviewQueueForCompletionEdit } from './review';
 
 // ─── Completed Papers ───────────────────────────────────────────────────────
+
+/**
+ * Computes total study seconds from the canonical completion history.
+ * This intentionally does NOT use cached/incremental counters in userPublicStats.
+ *
+ * Rules:
+ * - Only sums finite numeric actualDurationSeconds values > 0
+ * - Missing/invalid/null values count as 0 (we don't fabricate study time)
+ */
+export async function getTotalStudySecondsFromCompletedPapers(userId) {
+  const colRef = collection(db, 'users', userId, 'completedPapers');
+  let total = 0;
+  let lastDoc = null;
+
+  while (true) {
+    const q = lastDoc
+      ? query(colRef, orderBy('__name__'), startAfter(lastDoc), limit(1000))
+      : query(colRef, orderBy('__name__'), limit(1000));
+
+    const snap = await getDocs(q);
+    for (const d of snap.docs) {
+      const secs = d.data()?.actualDurationSeconds;
+      if (typeof secs === 'number' && Number.isFinite(secs) && secs > 0) total += secs;
+    }
+    if (snap.docs.length < 1000) break;
+    lastDoc = snap.docs[snap.docs.length - 1] ?? null;
+    if (!lastDoc) break;
+  }
+
+  return total;
+}
 
 export async function deleteCompletedPaper(userId, paperId) {
   await deleteDoc(doc(db, 'users', userId, 'completedPapers', paperId));
@@ -27,11 +59,27 @@ export async function deleteCompletedPaper(userId, paperId) {
 
 export async function updateCompletion(userId, paperId, updates) {
   const ref = doc(db, 'users', userId, 'completedPapers', paperId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+
+  const prevData = snap.data();
   const updateData = { marks: updates.marks ?? null, grade: updates.grade ?? null, comment: updates.comment ?? null };
   if ('actualDurationSeconds' in updates) {
     updateData.actualDurationSeconds = updates.actualDurationSeconds ?? null;
   }
+  if ('reviewTopics' in updates) {
+    updateData.reviewTopics = Array.isArray(updates.reviewTopics) ? updates.reviewTopics : [];
+  }
   await updateDoc(ref, updateData);
+
+  // Sync review queue if topics changed
+  if ('reviewTopics' in updates) {
+    await syncReviewQueueForCompletionEdit(userId, {
+      subject: prevData.subject,
+      prevTopics: prevData.reviewTopics,
+      nextTopics: updates.reviewTopics,
+    }).catch((e) => console.warn('Review queue sync failed (best-effort):', e));
+  }
 }
 
 /**
@@ -89,6 +137,7 @@ export async function recordCompletion(userId, paperData) {
     xpAwarded: true,
     source: paperData.source ?? 'scheduled',
     actualDurationSeconds: paperData.actualDurationSeconds ?? null,
+    reviewTopics: Array.isArray(paperData.reviewTopics) ? paperData.reviewTopics : [],
   });
 
   const studyMinutesAdd = paperData.actualDurationSeconds != null
@@ -115,27 +164,23 @@ export async function recordCompletion(userId, paperData) {
     return { xpEarned: 0, newBadges: [] };
   }
 
-  // Streak update needs a read first, so it runs separately (best-effort)
-  await updateStreak(userId).catch((e) => { console.warn('Streak update failed (best-effort):', e); });
+  // Streak update needs a read first, so it runs separately
+  await updateStreak(userId);
 
-  // Award XP + badges (best-effort, read updated stats first)
+  // Award XP + badges (read updated stats first)
   let xpResult = { xpEarned: 0, newBadges: [] };
-  try {
-    const updatedSnap = await getDoc(doc(db, 'userPublicStats', userId));
-    const updatedStats = updatedSnap.exists() ? updatedSnap.data() : {};
-    const effectiveTimeTaken = paperData.actualDurationSeconds != null
-      ? paperData.actualDurationSeconds / 60
-      : paperData.timeTaken;
-    xpResult = await awardXpAndBadges(userId, { ...paperData, timeTaken: effectiveTimeTaken }, updatedStats);
-  } catch (e) { console.warn('XP/badge award failed (best-effort):', e); }
+  const updatedSnap = await getDoc(doc(db, 'userPublicStats', userId));
+  const updatedStats = updatedSnap.exists() ? updatedSnap.data() : {};
+  const effectiveTimeTaken = paperData.actualDurationSeconds != null
+    ? paperData.actualDurationSeconds / 60
+    : paperData.timeTaken;
+  xpResult = await awardXpAndBadges(userId, { ...paperData, timeTaken: effectiveTimeTaken }, updatedStats);
 
-  // Update personal best (best-effort)
+  // Update personal best
   let isPB = false;
-  try {
-    if (paperData.actualDurationSeconds && paperData.subject && paperData.paperPath) {
-      isPB = await maybeUpdatePB(userId, paperData.subject, paperData.paperPath, paperData.actualDurationSeconds);
-    }
-  } catch (e) { console.warn('PB update failed (best-effort):', e); }
+  if (paperData.actualDurationSeconds && paperData.subject && paperData.paperPath) {
+    isPB = await maybeUpdatePB(userId, paperData.subject, paperData.paperPath, paperData.actualDurationSeconds);
+  }
 
   return { ...xpResult, isPB };
 }
@@ -172,11 +217,13 @@ export async function logAdhocPaper(userId, paperData) {
     xpAwarded: todayCount < 3,
     source: 'adhoc',
     actualDurationSeconds: paperData.actualDurationSeconds ?? null,
+    reviewTopics: Array.isArray(paperData.reviewTopics) ? paperData.reviewTopics : [],
   });
 
+  // Only count real timer/entered time. No duration → 0 (don't fabricate study time).
   const studyMinutesAdd = paperData.actualDurationSeconds != null
     ? Math.round(paperData.actualDurationSeconds / 60)
-    : (paperData.durationMins ?? 90);
+    : 0;
 
   const statsRef = doc(db, 'userPublicStats', userId);
   const statsData = {
@@ -198,24 +245,20 @@ export async function logAdhocPaper(userId, paperData) {
     return { xpEarned: 0, newBadges: [], capReached: true };
   }
 
-  await updateStreak(userId).catch((e) => { console.warn('Streak update failed (best-effort):', e); });
+  await updateStreak(userId);
 
   let xpResult = { xpEarned: 0, newBadges: [] };
-  try {
-    const updatedSnap = await getDoc(doc(db, 'userPublicStats', userId));
-    const updatedStats = updatedSnap.exists() ? updatedSnap.data() : {};
-    const effectiveTimeTaken = paperData.actualDurationSeconds != null
-      ? paperData.actualDurationSeconds / 60
-      : paperData.timeTaken;
-    xpResult = await awardXpAndBadges(userId, { ...paperData, timeTaken: effectiveTimeTaken }, updatedStats);
-  } catch (e) { console.warn('XP/badge award failed (best-effort):', e); }
+  const updatedSnap = await getDoc(doc(db, 'userPublicStats', userId));
+  const updatedStats = updatedSnap.exists() ? updatedSnap.data() : {};
+  const effectiveTimeTaken = paperData.actualDurationSeconds != null
+    ? paperData.actualDurationSeconds / 60
+    : paperData.timeTaken;
+  xpResult = await awardXpAndBadges(userId, { ...paperData, timeTaken: effectiveTimeTaken }, updatedStats);
 
   let isPB = false;
-  try {
-    if (paperData.actualDurationSeconds && paperData.subject && paperData.paperPath) {
-      isPB = await maybeUpdatePB(userId, paperData.subject, paperData.paperPath, paperData.actualDurationSeconds);
-    }
-  } catch (e) { console.warn('PB update failed (best-effort):', e); }
+  if (paperData.actualDurationSeconds && paperData.subject && paperData.paperPath) {
+    isPB = await maybeUpdatePB(userId, paperData.subject, paperData.paperPath, paperData.actualDurationSeconds);
+  }
 
   return { ...xpResult, capReached: false, isPB };
 }

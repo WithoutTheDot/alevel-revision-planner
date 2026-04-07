@@ -25,6 +25,7 @@ export default function TermSchedulePage() {
   const [calendar, setCalendar] = useState({});
   const [viewDate, setViewDate] = useState(new Date());
   const [selected, setSelected] = useState('week-a');
+  const [showHelp, setShowHelp] = useState(false);
 
   const { loading, error, data } = useAsyncData(
     () => getTermCalendar(currentUser.uid),
@@ -100,6 +101,26 @@ export default function TermSchedulePage() {
             Next
           </button>
         </div>
+      </div>
+
+      <div className="mb-4">
+        <button
+          onClick={() => setShowHelp((h) => !h)}
+          className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          How does this work?
+        </button>
+        {showHelp && (
+          <div className="mt-2 p-3 bg-sky-50 border border-sky-200 rounded-[var(--radius-md)] text-xs text-sky-800 space-y-1">
+            <p><strong>Week A</strong> — Your busier study week. Uses the Week A template when generating a schedule.</p>
+            <p><strong>Week B</strong> — Your lighter week. Uses the Week B template.</p>
+            <p><strong>Holiday</strong> — Time off. The schedule generator skips these weeks entirely.</p>
+            <p className="text-sky-600 pt-1">Select a type above, then click on weeks to paint them. You can change them any time.</p>
+          </div>
+        )}
       </div>
 
       <div data-tutorial-id="term-schedule-paint-controls" className="flex flex-wrap gap-2 mb-5">

@@ -3,6 +3,7 @@ import {
   getAllPublicStats, getAllClasses,
   adminGetUserCompletions, adminOverrideUserStats,
   adminAddUserToClass, adminRemoveUserFromClass, adminRegenerateClassCode,
+  deleteAllUserData,
 } from '../firebase/db';
 import { formatTime } from '../lib/timeUtils';
 
@@ -21,10 +22,24 @@ function StatCard({ label, value }) {
 
 // ─── User Detail Modal ────────────────────────────────────────────────────────
 
-function UserDetailModal({ user, onClose }) {
+function UserDetailModal({ user, onClose, onDeleted }) {
   const [completions, setCompletions] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  async function handleDeleteUserData() {
+    setDeleteLoading(true);
+    try {
+      await deleteAllUserData(user.uid);
+      onDeleted(user.uid);
+      onClose();
+    } catch (e) {
+      setError('Failed to delete: ' + e.message);
+      setDeleteLoading(false);
+    }
+  }
 
   async function loadCompletions() {
     setLoading(true);
@@ -94,6 +109,38 @@ function UserDetailModal({ user, onClose }) {
               )}
             </div>
           )}
+
+          <div className="border-t border-red-100 pt-4 mt-2">
+            <p className="text-xs font-semibold text-red-600 uppercase mb-1">Danger zone</p>
+            <p className="text-xs text-gray-500 mb-3">
+              Deletes all Firestore data for this user. Their login account remains but the app will be unusable.
+            </p>
+            {!confirmDelete ? (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 border border-red-300 hover:bg-red-50 transition-colors"
+              >
+                Delete user data
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-red-700 font-medium">Are you sure?</span>
+                <button
+                  onClick={handleDeleteUserData}
+                  disabled={deleteLoading}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {deleteLoading ? 'Deleting…' : 'Yes, delete'}
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -236,8 +283,10 @@ function OverviewTab({ stats, classes }) {
 function UsersTab({ stats }) {
   const [search, setSearch] = useState('');
   const [viewUser, setViewUser] = useState(null);
+  const [deletedUids, setDeletedUids] = useState(new Set());
   const filtered = stats.filter((u) =>
-    !search || (u.displayName || '').toLowerCase().includes(search.toLowerCase())
+    !deletedUids.has(u.uid) &&
+    (!search || (u.displayName || '').toLowerCase().includes(search.toLowerCase()))
   );
   return (
     <div className="space-y-4">
@@ -284,7 +333,11 @@ function UsersTab({ stats }) {
         </div>
       </div>
       {viewUser && (
-        <UserDetailModal user={viewUser} onClose={() => setViewUser(null)} />
+        <UserDetailModal
+          user={viewUser}
+          onClose={() => setViewUser(null)}
+          onDeleted={(uid) => { setDeletedUids((prev) => new Set([...prev, uid])); }}
+        />
       )}
     </div>
   );

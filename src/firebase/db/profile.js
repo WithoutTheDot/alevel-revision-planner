@@ -9,6 +9,7 @@ import {
   addDoc,
   query,
   orderBy,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../config';
 import { DEFAULT_SUBJECTS } from '../../lib/allSubjects';
@@ -98,7 +99,47 @@ export async function setPaperDuration(userId, paperPath, minutes) {
 export async function initDefaultDurations(userId) {
   const ref = doc(db, 'users', userId, 'settings', 'durations');
   const snap = await getDoc(ref);
-  if (!snap.exists()) {
+  if (snap.exists()) {
     await setDoc(ref, { _default: 120 });
   }
+}
+
+// ─── Active Session (Live Timer State) ───────────────────────────────────────
+// Subcollection: users/{uid}/profile/activeSession
+
+export async function getActiveSession(userId) {
+  const snap = await getDoc(doc(db, 'users', userId, 'profile', 'activeSession'));
+  return snap.exists() ? snap.data() : null;
+}
+
+export async function startActiveSession(userId, sessionData) {
+  await setDoc(doc(db, 'users', userId, 'profile', 'activeSession'), {
+    ...sessionData,
+    isRunning: true,
+    isPaused: false,
+    startedAt: serverTimestamp(),
+    elapsedSeconds: 0,
+  });
+}
+
+export async function pauseActiveSession(userId, elapsedSeconds) {
+  await updateDoc(doc(db, 'users', userId, 'profile', 'activeSession'), {
+    isRunning: false,
+    isPaused: true,
+    elapsedSeconds,
+    startedAt: null,
+  });
+}
+
+export async function resumeActiveSession(userId, currentElapsed) {
+  await updateDoc(doc(db, 'users', userId, 'profile', 'activeSession'), {
+    isRunning: true,
+    isPaused: false,
+    startedAt: serverTimestamp(),
+    elapsedSeconds: currentElapsed,
+  });
+}
+
+export async function clearActiveSession(userId) {
+  await deleteDoc(doc(db, 'users', userId, 'profile', 'activeSession'));
 }

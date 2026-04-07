@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getAllCompletedPapers, updateCompletion, deleteCompletedPaper, pbKey } from '../firebase/db';
+import { getAllCompletedPapers, updateCompletion, deleteCompletedPaper, pbKey, syncReviewQueueForCompletionEdit } from '../firebase/db';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { format, parseISO, startOfWeek } from 'date-fns';
-import { secsToInput, inputToSecs } from '../lib/timeUtils';
 import HistoryCharts from '../components/HistoryCharts';
 import HistoryFilters from '../components/HistoryFilters';
 import HistoryTable from '../components/HistoryTable';
+import CompletionDetailsModal from '../components/CompletionDetailsModal';
 
 const ALL_GRADES = ['A*', 'A', 'B', 'C', 'D', 'E', 'U'];
 
@@ -30,13 +30,7 @@ export default function HistoryPage() {
   const [view, setView] = useState('table'); // 'table' | 'charts'
   const [personalBests, setPersonalBests] = useState({});
 
-  // Inline edit state
-  const [editingId, setEditingId] = useState(null);
-  const [editMarks, setEditMarks] = useState('');
-  const [editGrade, setEditGrade] = useState('');
-  const [editComment, setEditComment] = useState('');
-  const [editActualDuration, setEditActualDuration] = useState('');
-  const [editSaving, setEditSaving] = useState(false);
+  const [editingPaper, setEditingPaper] = useState(null);
   const [editError, setEditError] = useState('');
 
   const load = useCallback(async () => {
@@ -160,16 +154,7 @@ export default function HistoryPage() {
   }
 
   function startEdit(p) {
-    setEditingId(p.id);
-    setEditMarks(p.marks ?? '');
-    setEditGrade(p.grade ?? '');
-    setEditComment(p.comment ?? '');
-    setEditActualDuration(p.actualDurationSeconds != null ? secsToInput(p.actualDurationSeconds) : '');
-    setEditError('');
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
+    setEditingPaper(p);
     setEditError('');
   }
 
@@ -183,23 +168,20 @@ export default function HistoryPage() {
     }
   }
 
-  async function saveEdit(p) {
-    setEditSaving(true);
+  async function saveEdit(updates) {
+    if (!editingPaper) return;
     setEditError('');
     try {
-      const updates = {
-        marks: editMarks.trim() || null,
-        grade: editGrade || null,
-        comment: editComment.trim() || null,
-        actualDurationSeconds: inputToSecs(editActualDuration),
-      };
-      await updateCompletion(currentUser.uid, p.id, updates);
-      setPapers((prev) => prev.map((pp) => pp.id === p.id ? { ...pp, ...updates } : pp));
-      setEditingId(null);
+      await updateCompletion(currentUser.uid, editingPaper.id, updates);
+      setPapers((prev) => prev.map((pp) => pp.id === editingPaper.id ? { ...pp, ...updates } : pp));
+      await syncReviewQueueForCompletionEdit(currentUser.uid, {
+        subject: editingPaper.subject,
+        prevTopics: editingPaper.reviewTopics ?? [],
+        nextTopics: updates.reviewTopics ?? [],
+      }).catch(() => {});
+      setEditingPaper(null);
     } catch (e) {
       setEditError('Failed to save: ' + e.message);
-    } finally {
-      setEditSaving(false);
     }
   }
 
@@ -265,24 +247,27 @@ export default function HistoryPage() {
               hasMore={hasMore}
               loadingMore={loadingMore}
               onLoadMore={loadMore}
-              editingId={editingId}
-              editMarks={editMarks}
-              editGrade={editGrade}
-              editComment={editComment}
-              editError={editError}
-              editSaving={editSaving}
-              onStartEdit={startEdit}
-              onCancelEdit={cancelEdit}
-              onSaveEdit={saveEdit}
-              onEditMarksChange={setEditMarks}
-              onEditGradeChange={setEditGrade}
-              onEditCommentChange={setEditComment}
-              editActualDuration={editActualDuration}
-              onEditActualDurationChange={setEditActualDuration}
+              onEdit={startEdit}
               onDelete={handleDelete}
             />
           )}
         </>
+      )}
+
+      {editingPaper && (
+        <CompletionDetailsModal
+          mode="history"
+          paper={editingPaper}
+          onClose={() => setEditingPaper(null)}
+          onSubmit={saveEdit}
+          submitLabel="Save"
+        />
+      )}
+
+      {editError && (
+        <div className="fixed bottom-4 right-4 z-50 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm border border-red-200">
+          {editError}
+        </div>
       )}
     </div>
   );

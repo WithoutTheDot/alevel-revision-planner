@@ -346,12 +346,14 @@ export default function GeneratePage() {
                     <span className="text-[var(--color-text-muted)]">(auto-detected)</span>
                   </div>
                 ) : (
-                  <p className="text-sm text-amber-600">This week is not in your term calendar. Select a template manually.</p>
+                  <p className="text-sm text-amber-600">
+                    This week isn&apos;t marked in your <Link to="/term-schedule" className="underline font-medium">Term Schedule</Link> — select a template manually below.
+                  </p>
                 )
               )}
 
               {Object.keys(templates).length === 0 ? (
-                <p className="text-sm text-red-600">No templates found. Create one in the Templates page first.</p>
+                <p className="text-sm text-red-600">No templates found. <Link to="/templates" className="underline font-medium">Create one in Templates</Link> first.</p>
               ) : (
                 <div>
                   <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Template</label>
@@ -361,6 +363,7 @@ export default function GeneratePage() {
                       <option key={id} value={id}>{t.templateName}</option>
                     ))}
                   </select>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">Templates define your daily study time slots. <Link to="/templates" className="underline">Edit in Templates.</Link></p>
                 </div>
               )}
 

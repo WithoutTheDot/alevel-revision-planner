@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTimerContext } from '../contexts/TimerContext';
 import { formatTime } from '../lib/timeUtils';
-import { updatePaper, recordCompletion, logAdhocPaper, getPaperPB } from '../firebase/db';
+import { getPaperPB, getUserSettings, completePaper } from '../firebase/db';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import PaperCompleteModal from './PaperCompleteModal';
+import CompletionDetailsModal from './CompletionDetailsModal';
 import XpCelebration from './XpCelebration';
 import PbBadge from './PbBadge';
 import SubjectBadge from './SubjectBadge';
@@ -39,6 +39,14 @@ export default function FullscreenTimer() {
   const [completing, setCompleting] = useState(false);
   const [celebration, setCelebration] = useState(null);
   const [error, setError] = useState('');
+  const [reviewModeEnabled, setReviewModeEnabled] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    getUserSettings(currentUser.uid)
+      .then((s) => setReviewModeEnabled(s?.reviewModeEnabled ?? true))
+      .catch(() => setReviewModeEnabled(true));
+  }, [currentUser?.uid]);
 
   // Load PB when session's paper changes
   useEffect(() => {
@@ -75,7 +83,7 @@ export default function FullscreenTimer() {
     );
   }
 
-  // ── Completion handler (called from PaperCompleteModal) ────────────────────
+  // ── Completion handler (called from CompletionDetailsModal) ────────────────────
   async function handleComplete(paperIndex, updates) {
     setError('');
     try {
@@ -84,41 +92,21 @@ export default function FullscreenTimer() {
       const statsSnapBefore = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
       const prevLevel = statsSnapBefore.exists() ? (statsSnapBefore.data().level ?? 1) : 1;
 
-      let completionResult;
-      if (session.source === 'adhoc') {
-        completionResult = await logAdhocPaper(currentUser.uid, {
-          paperPath: 'adhoc',
-          subject: session.subject,
-          displayName: session.displayName,
-          marks: updates.marks ?? null,
-          grade: updates.grade ?? null,
-          comment: updates.comment ?? null,
-          actualDurationSeconds,
-          durationMins: session.expectedMins,
-          timeTaken: actualDurationSeconds / 60,
-          expectedTime: session.expectedMins,
-        });
-      } else {
-        if (session.weekId && session.paperIndex != null) {
-          await updatePaper(currentUser.uid, session.weekId, session.paperIndex, {
-            ...updates,
-            completed: true,
-          });
-        }
-        completionResult = await recordCompletion(currentUser.uid, {
-          paperPath: session.paperPath,
-          subject: session.subject,
-          displayName: session.displayName,
-          weekId: session.weekId,
-          marks: updates.marks ?? null,
-          grade: updates.grade ?? null,
-          comment: updates.comment ?? null,
-          actualDurationSeconds,
-          durationMins: session.expectedMins,
-          timeTaken: actualDurationSeconds / 60,
-          expectedTime: session.expectedMins,
-        });
-      }
+      const completionResult = await completePaper(currentUser.uid, {
+        source: session.source,
+        subject: session.subject,
+        displayName: session.displayName,
+        paperPath: session.paperPath,
+        weekId: session.weekId,
+        paperIndex: session.paperIndex,
+        marks: updates.marks ?? null,
+        grade: updates.grade ?? null,
+        comment: updates.comment ?? null,
+        actualDurationSeconds,
+        expectedTime: session.expectedMins,
+        reviewTopics: updates.reviewTopics ?? [],
+      });
+
       const { xpEarned, newBadges, isPB, breakdown } = completionResult;
 
       await stopSession();
@@ -237,7 +225,8 @@ export default function FullscreenTimer() {
       </div>
 
       {completing && (
-        <PaperCompleteModal
+        <CompletionDetailsModal
+          mode="scheduled"
           paper={{
             subject: session.subject,
             displayName: session.displayName,
@@ -246,10 +235,11 @@ export default function FullscreenTimer() {
             marks: null,
             grade: null,
             comment: null,
+            reviewTopics: [],
           }}
-          index={session.paperIndex}
           actualDurationSeconds={elapsedSecs}
-          onSave={handleComplete}
+          showReviewTopics={reviewModeEnabled}
+          onSubmit={(updates) => handleComplete(session.paperIndex, updates)}
           onClose={() => setCompleting(false)}
         />
       )}

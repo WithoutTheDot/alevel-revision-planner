@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, updatePaper, deletePaper, getAllCompletedPapers, recordCompletion, getExamTimetable, getUserSettings, addReviewTopics, getReviewQueue, updateReviewQueueItem } from '../firebase/db';
+import { getWeeklySchedule, getExamTimetable, getUserSettings, getReviewQueue, deletePaper, updatePaper, getAllCompletedPapers, updateReviewQueueItem, completePaper } from '../firebase/db';
 import { selectPaper } from '../lib/generateSchedule';
 import { downloadIcs, downloadPdf } from '../lib/exportCalendar';
 import SubjectBadge from '../components/SubjectBadge';
 import Modal from '../components/Modal';
-import PaperCompleteModal from '../components/PaperCompleteModal';
+import CompletionDetailsModal from '../components/CompletionDetailsModal';
 import { getMondayStr, timeToOffset, offsetToTime, PX_PER_MIN, TOTAL_MINS } from '../lib/dateUtils';
 import { CALENDAR_GRID_START_HOUR as START_HOUR, CALENDAR_GRID_END_HOUR as END_HOUR } from '../lib/constants';
 import { useAsyncData } from '../hooks/useAsyncData';
@@ -48,7 +48,6 @@ export default function CalendarPage() {
 
   const weekId = getMondayStr(weekDate);
 
-  const [reviewModeEnabled, setReviewModeEnabled] = useState(false);
   const [reviewSessions, setReviewSessions] = useState([]); // items from reviewQueue for this week
   const [reviewConfirm, setReviewConfirm] = useState(null); // { id, topic }
 
@@ -68,7 +67,6 @@ export default function CalendarPage() {
     if (loadedData) {
       setSchedule(loadedData.schedule);
       setExamEntries(loadedData.examEntries);
-      setReviewModeEnabled(loadedData.settings?.reviewModeEnabled ?? true);
       setReviewSessions(
         (loadedData.queue ?? []).filter((item) => item.scheduledWeekId === weekId && item.status !== 'done')
       );
@@ -80,7 +78,6 @@ export default function CalendarPage() {
   async function handleComplete(paperIndex, updates) {
     try {
       const paper = schedule.papers[paperIndex];
-      await updatePaper(currentUser.uid, weekId, paperIndex, updates);
       // If marking complete, record to completedPapers for history + repeat-avoidance
       if (updates.completed && !paper.completed) {
         const timerKey = `timer_${weekId}_${paperIndex}`;
@@ -89,25 +86,27 @@ export default function CalendarPage() {
           ? Math.round(updates.actualDurationSeconds ?? session?.elapsedSeconds ?? 0)
           : (updates.actualDurationSeconds ?? null);
         const timeTaken = timerData ? getElapsed(timerKey) : null;
-        const expectedTime = timerData ? timerData.expectedMins : null;
+        const expectedTime = timerData ? timerData.expectedMins : (paper.duration || 90);
         if (timerData) await stopSession();
-        await recordCompletion(currentUser.uid, {
-          paperPath: paper.paperPath,
+
+        await completePaper(currentUser.uid, {
+          source: 'scheduled',
           subject: paper.subject,
           displayName: paper.displayName,
+          paperPath: paper.paperPath,
           weekId,
+          paperIndex,
           marks: updates.marks ?? null,
           grade: updates.grade ?? null,
           comment: updates.comment ?? null,
-          timeTaken,
-          expectedTime,
           actualDurationSeconds,
-          durationMins: paper.duration,
+          expectedTime,
+          timeTaken,
           reviewTopics: updates.reviewTopics ?? [],
         });
-        if (updates.reviewTopics?.length > 0) {
-          await addReviewTopics(currentUser.uid, updates.reviewTopics, paper.subject).catch(() => {});
-        }
+      } else {
+        // Just updating other fields (marks/grade/etc) without marking complete
+        await updatePaper(currentUser.uid, weekId, paperIndex, updates);
       }
       setSchedule((s) => {
         const papers = [...s.papers];
@@ -583,13 +582,12 @@ export default function CalendarPage() {
         const timerData = getTimerData(timerKey);
         const timerSecs = timerData ? Math.round(session?.elapsedSeconds ?? 0) : null;
         return (
-          <PaperCompleteModal
+          <CompletionDetailsModal
+            mode="scheduled"
             paper={completing.paper}
-            index={completing.index}
             actualDurationSeconds={timerSecs}
-            onSave={handleComplete}
+            onSubmit={(updates) => handleComplete(completing.index, updates)}
             onClose={() => setCompleting(null)}
-            reviewModeEnabled={reviewModeEnabled}
           />
         );
       })()}
