@@ -68,7 +68,7 @@ export default function CalendarPage() {
     if (loadedData) {
       setSchedule(loadedData.schedule);
       setExamEntries(loadedData.examEntries);
-      setReviewModeEnabled(loadedData.settings?.reviewModeEnabled ?? false);
+      setReviewModeEnabled(loadedData.settings?.reviewModeEnabled ?? true);
       setReviewSessions(
         (loadedData.queue ?? []).filter((item) => item.scheduledWeekId === weekId && item.status !== 'done')
       );

@@ -85,7 +85,7 @@ export default function SettingsPage() {
   const [displayNameSaving, setDisplayNameSaving] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
   const [settings, setSettings] = useState({
-    defaultPaperDuration: 90, breakDuration: 10, calendarStartHour: 6, calendarEndHour: 23, reviewModeEnabled: false,
+    defaultPaperDuration: 90, breakDuration: 10, calendarStartHour: 6, calendarEndHour: 23, reviewModeEnabled: true,
   });
   const [durations, setDurations] = useState({ _default: 90 });
   const [firestoreFamilies, setFirestoreFamilies] = useState({}); // raw Firestore map

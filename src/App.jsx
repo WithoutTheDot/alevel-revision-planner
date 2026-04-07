@@ -20,6 +20,7 @@ const TermSchedulePage = lazy(() => import('./pages/TermSchedulePage'));
 const TemplatesPage    = lazy(() => import('./pages/TemplatesPage'));
 const SettingsPage     = lazy(() => import('./pages/SettingsPage'));
 const HistoryPage      = lazy(() => import('./pages/HistoryPage'));
+const ReviewPage       = lazy(() => import('./pages/ReviewPage'));
 const GeneratePage     = lazy(() => import('./pages/GeneratePage'));
 const OnboardingPage   = lazy(() => import('./pages/OnboardingPage'));
 const ClassesPage      = lazy(() => import('./pages/ClassesPage'));
@@ -117,6 +118,7 @@ export default function App() {
                     <Route path="/templates"        element={<Suspense fallback={<PageLoader />}><TemplatesPage /></Suspense>} />
                     <Route path="/settings"         element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
                     <Route path="/history"          element={<Suspense fallback={<PageLoader />}><HistoryPage /></Suspense>} />
+                    <Route path="/review"           element={<Suspense fallback={<PageLoader />}><ReviewPage /></Suspense>} />
                     <Route path="/generate"         element={<Suspense fallback={<PageLoader />}><GeneratePage /></Suspense>} />
                     <Route path="/classes"          element={<Suspense fallback={<PageLoader />}><ClassesPage /></Suspense>} />
                     <Route path="/classes/:classId" element={<Suspense fallback={<PageLoader />}><LeaderboardPage /></Suspense>} />

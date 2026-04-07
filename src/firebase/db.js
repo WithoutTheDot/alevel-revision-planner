@@ -78,6 +78,7 @@ export async function getUserSettings(userId) {
     breakDuration: 10,
     calendarStartHour: 6,
     calendarEndHour: 23,
+    reviewModeEnabled: true,
   };
 }
 

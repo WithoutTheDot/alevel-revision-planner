@@ -45,6 +45,13 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6v4l2.5 2.5" />
     </svg>
   ),
+  Review: (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-[18px] h-[18px] flex-shrink-0">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v0H9v0Z" />
+      <path strokeLinecap="round" d="M7 10h6M7 13h4" />
+    </svg>
+  ),
   Classes: (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-[18px] h-[18px] flex-shrink-0">
       <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
@@ -90,6 +97,7 @@ const NAV_ITEMS = [
   { to: '/templates',     label: 'Templates',     icon: Icons.Templates },
   { to: '/generate',      label: 'Generate',      icon: Icons.Generate },
   { to: '/history',       label: 'History',       icon: Icons.History },
+  { to: '/review',        label: 'Review',        icon: Icons.Review },
   { to: '/classes',       label: 'Classes',       icon: Icons.Classes },
   { to: '/badges',        label: 'Badges',        icon: Icons.Badges },
   { to: '/settings',      label: 'Settings',      icon: Icons.Settings },

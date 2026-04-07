@@ -81,7 +81,7 @@ export default function DashboardPage() {
   // Overdue count from previous week
   const [overdueCount, setOverdueCount] = useState(0);
   const [prevWeekId, setPrevWeekId] = useState('');
-  const [reviewModeEnabled, setReviewModeEnabled] = useState(false);
+  const [reviewModeEnabled, setReviewModeEnabled] = useState(true);
   const [topReviewTopic, setTopReviewTopic] = useState(null); // { topic, count, subject }
 
   const load = useCallback(async () => {
@@ -98,7 +98,7 @@ export default function DashboardPage() {
         getWeeklySchedule(currentUser.uid, prevWId),
         getUserSettings(currentUser.uid),
       ]);
-      const reviewEnabled = userSettings?.reviewModeEnabled ?? false;
+      const reviewEnabled = userSettings?.reviewModeEnabled ?? true;
       setReviewModeEnabled(reviewEnabled);
       if (reviewEnabled) {
         try {
