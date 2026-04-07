@@ -12,7 +12,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
   return (
     <div className="space-y-6">
       {/* Grade distribution */}
-      <div className="bg-white rounded-xl border p-5">
+      {gradeChartData.length > 0 && <div className="bg-white rounded-xl border p-5">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">Grade Distribution</h2>
         {gradeChartData.some((d) => d.count > 0) ? (
           <>
@@ -39,10 +39,10 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
         ) : (
           <p className="text-gray-400 text-sm">No graded papers yet.</p>
         )}
-      </div>
+      </div>}
 
       {/* Papers per week */}
-      <div className="bg-white rounded-xl border p-5">
+      {weekChartData.length > 0 && <div className="bg-white rounded-xl border p-5">
         <h2 className="text-sm font-semibold text-gray-700 mb-0.5">Papers Completed per Week</h2>
         <p className="text-xs text-gray-400 mb-4">Last 12 weeks</p>
         {weekChartData.length > 0 ? (
@@ -64,10 +64,8 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
               </table>
             </details>
           </>
-        ) : (
-          <p className="text-gray-400 text-sm">No data yet.</p>
-        )}
-      </div>
+        ) : null}
+      </div>}
 
       {/* Subject breakdown */}
       {subjectChartData.length > 0 && (
@@ -151,7 +149,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
         </div>
       )}
 
-      {total === 0 && <p className="text-gray-400 text-sm">No data to chart yet.</p>}
+      {total === 0 && gradeChartData.length > 0 && <p className="text-gray-400 text-sm">No data to chart yet.</p>}
     </div>
   );
 }

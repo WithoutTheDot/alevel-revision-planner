@@ -195,6 +195,9 @@ export default function ReviewPage() {
           {/* Topic frequency chart */}
           {topicChartData.length > 0 && (
             <HistoryCharts
+              gradeChartData={[]}
+              weekChartData={[]}
+              subjectChartData={[]}
               topicChartData={topicChartData}
               subjectMeta={subjectMeta}
               total={0}
