@@ -436,6 +436,7 @@ export async function recordCompletion(userId, paperData) {
     xpAwarded: true,
     source: paperData.source ?? 'scheduled',
     actualDurationSeconds: paperData.actualDurationSeconds ?? null,
+    reviewTopics: paperData.reviewTopics ?? [],
   });
 
   const studyMinutesAdd = paperData.actualDurationSeconds != null
@@ -909,6 +910,82 @@ export async function adminRegenerateClassCode(classId) {
   const code = generateClassCode();
   await updateDoc(doc(db, 'classes', classId), { code });
   return code;
+}
+
+// ─── Review Queue ─────────────────────────────────────────────────────────────
+// Subcollection: users/{uid}/reviewQueue/{autoId}
+// Schema: { topic, subject, addedAt, status, scheduledWeekId, completedAt }
+
+/**
+ * Upsert review topics into the queue after paper completion.
+ * If a topic+subject combo already exists with status "pending", skip duplicate.
+ */
+export async function addReviewTopics(userId, topics, subject) {
+  if (!topics || topics.length === 0) return;
+  // Fetch existing pending items to avoid duplicates
+  const existingSnap = await getDocs(
+    query(
+      collection(db, 'users', userId, 'reviewQueue'),
+      where('status', '==', 'pending'),
+      where('subject', '==', subject)
+    )
+  );
+  const existingTopics = new Set(existingSnap.docs.map((d) => d.data().topic));
+  const batch = writeBatch(db);
+  for (const topic of topics) {
+    if (existingTopics.has(topic)) continue;
+    const ref = doc(collection(db, 'users', userId, 'reviewQueue'));
+    batch.set(ref, {
+      topic,
+      subject,
+      addedAt: new Date().toISOString(),
+      status: 'pending',
+      scheduledWeekId: null,
+      completedAt: null,
+    });
+  }
+  await batch.commit();
+}
+
+export async function getReviewQueue(userId) {
+  const snap = await getDocs(
+    query(collection(db, 'users', userId, 'reviewQueue'), orderBy('addedAt', 'desc'))
+  );
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function updateReviewQueueItem(userId, itemId, updates) {
+  await updateDoc(doc(db, 'users', userId, 'reviewQueue', itemId), updates);
+}
+
+export async function deleteReviewQueueItem(userId, itemId) {
+  await deleteDoc(doc(db, 'users', userId, 'reviewQueue', itemId));
+}
+
+/**
+ * Compute topic frequency from an array of completed paper objects.
+ * Returns topics sorted by count descending: [{ topic, subject, count }]
+ * Optionally filter by subject.
+ */
+export function computeTopicFrequency(papers, subjectFilter) {
+  const counts = {};
+  const subjectCount = {};
+  for (const paper of papers) {
+    if (!Array.isArray(paper.reviewTopics) || paper.reviewTopics.length === 0) continue;
+    if (subjectFilter && paper.subject !== subjectFilter) continue;
+    for (const topic of paper.reviewTopics) {
+      counts[topic] = (counts[topic] ?? 0) + 1;
+      if (!subjectCount[topic]) subjectCount[topic] = {};
+      subjectCount[topic][paper.subject] = (subjectCount[topic][paper.subject] ?? 0) + 1;
+    }
+  }
+  return Object.entries(counts)
+    .map(([topic, count]) => {
+      const subjectEntries = Object.entries(subjectCount[topic] ?? {});
+      const dominantSubject = subjectEntries.sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      return { topic, count, subject: dominantSubject };
+    })
+    .sort((a, b) => b.count - a.count);
 }
 
 // ─── Data Export ─────────────────────────────────────────────────────────────

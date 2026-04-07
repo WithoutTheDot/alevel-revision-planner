@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, updatePaper, deletePaper, getAllCompletedPapers, recordCompletion, getExamTimetable } from '../firebase/db';
+import { getWeeklySchedule, updatePaper, deletePaper, getAllCompletedPapers, recordCompletion, getExamTimetable, getUserSettings, addReviewTopics, getReviewQueue, updateReviewQueueItem } from '../firebase/db';
 import { selectPaper } from '../lib/generateSchedule';
 import { downloadIcs, downloadPdf } from '../lib/exportCalendar';
 import SubjectBadge from '../components/SubjectBadge';
@@ -48,11 +48,17 @@ export default function CalendarPage() {
 
   const weekId = getMondayStr(weekDate);
 
+  const [reviewModeEnabled, setReviewModeEnabled] = useState(false);
+  const [reviewSessions, setReviewSessions] = useState([]); // items from reviewQueue for this week
+  const [reviewConfirm, setReviewConfirm] = useState(null); // { id, topic }
+
   const { loading, error, data: loadedData } = useAsyncData(
     () => Promise.all([
       getWeeklySchedule(currentUser.uid, weekId),
       getExamTimetable(currentUser.uid),
-    ]).then(([s, exams]) => ({ schedule: s, examEntries: exams })),
+      getUserSettings(currentUser.uid),
+      getReviewQueue(currentUser.uid),
+    ]).then(([s, exams, settings, queue]) => ({ schedule: s, examEntries: exams, settings, queue })),
     [currentUser.uid, weekId]
   );
 
@@ -62,8 +68,12 @@ export default function CalendarPage() {
     if (loadedData) {
       setSchedule(loadedData.schedule);
       setExamEntries(loadedData.examEntries);
+      setReviewModeEnabled(loadedData.settings?.reviewModeEnabled ?? false);
+      setReviewSessions(
+        (loadedData.queue ?? []).filter((item) => item.scheduledWeekId === weekId && item.status !== 'done')
+      );
     }
-  }, [loadedData]);
+  }, [loadedData, weekId]);
 
   const displayError = localError || error;
 
@@ -93,7 +103,11 @@ export default function CalendarPage() {
           expectedTime,
           actualDurationSeconds,
           durationMins: paper.duration,
+          reviewTopics: updates.reviewTopics ?? [],
         });
+        if (updates.reviewTopics?.length > 0) {
+          await addReviewTopics(currentUser.uid, updates.reviewTopics, paper.subject).catch(() => {});
+        }
       }
       setSchedule((s) => {
         const papers = [...s.papers];
@@ -491,6 +505,34 @@ export default function CalendarPage() {
             </div>
           </div>
 
+          {/* Review sessions this week */}
+          {reviewSessions.length > 0 && (
+            <div className="mt-4 bg-white rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border)] p-4">
+              <h3 className="font-medium text-[var(--color-text-secondary)] mb-3 text-sm">Review sessions ({reviewSessions.length})</h3>
+              <div className="space-y-1">
+                {reviewSessions.map((item) => {
+                  const sm = subjectMeta[item.subject];
+                  const borderCls = sm?.color ? sm.color.replace('bg-', 'border-') : 'border-gray-400';
+                  return (
+                    <div key={item.id}
+                      className={`flex items-center justify-between py-2 px-3 rounded-[var(--radius-md)] border-2 border-dashed gap-3 ${borderCls}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <SubjectBadge subject={item.subject} />
+                        <span className="text-sm text-[var(--color-text-primary)] truncate">{item.topic}</span>
+                        <span className="text-xs text-[var(--color-text-muted)] flex-shrink-0">30 min · review</span>
+                      </div>
+                      <button
+                        onClick={() => setReviewConfirm({ id: item.id, topic: item.topic })}
+                        className="shrink-0 text-xs font-medium text-emerald-600 hover:text-emerald-700 px-2 py-1 rounded-[var(--radius-sm)] hover:bg-emerald-50 transition-colors">
+                        Mark done
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Unscheduled papers */}
           {unscheduled.length > 0 && (
             <div className="mt-4 bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4">
@@ -547,9 +589,37 @@ export default function CalendarPage() {
             actualDurationSeconds={timerSecs}
             onSave={handleComplete}
             onClose={() => setCompleting(null)}
+            reviewModeEnabled={reviewModeEnabled}
           />
         );
       })()}
+
+      {reviewConfirm && (
+        <Modal open onClose={() => setReviewConfirm(null)} title="Mark review done?">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-5">
+            Mark <strong>{reviewConfirm.topic}</strong> as reviewed?
+          </p>
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setReviewConfirm(null)}
+              className="px-4 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]">
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                const { id } = reviewConfirm;
+                setReviewConfirm(null);
+                setReviewSessions((prev) => prev.filter((s) => s.id !== id));
+                await updateReviewQueueItem(currentUser.uid, id, {
+                  status: 'done',
+                  completedAt: new Date().toISOString(),
+                }).catch(() => {});
+              }}
+              className="px-4 py-2 rounded-[var(--radius-md)] bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+              Mark done
+            </button>
+          </div>
+        </Modal>
+      )}
 
       {startingTimer && (
         <StartTimerModal

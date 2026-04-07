@@ -5,7 +5,7 @@ import { getDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, getTermCalendar, updatePaper, recordCompletion, logAdhocPaper, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek } from '../firebase/db';
+import { getWeeklySchedule, getTermCalendar, updatePaper, recordCompletion, logAdhocPaper, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, addReviewTopics, getAllCompletedPapers, computeTopicFrequency } from '../firebase/db';
 import SubjectBadge from '../components/SubjectBadge';
 import WeekTypeBadge from '../components/WeekTypeBadge';
 import PaperCompleteModal from '../components/PaperCompleteModal';
@@ -81,6 +81,8 @@ export default function DashboardPage() {
   // Overdue count from previous week
   const [overdueCount, setOverdueCount] = useState(0);
   const [prevWeekId, setPrevWeekId] = useState('');
+  const [reviewModeEnabled, setReviewModeEnabled] = useState(false);
+  const [topReviewTopic, setTopReviewTopic] = useState(null); // { topic, count, subject }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -88,13 +90,23 @@ export default function DashboardPage() {
     try {
       const prevMonday = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 1);
       const prevWId = format(prevMonday, 'yyyy-MM-dd');
-      const [s, cal, exams, statsSnap, prevSchedule] = await Promise.all([
+      const [s, cal, exams, statsSnap, prevSchedule, userSettings] = await Promise.all([
         getWeeklySchedule(currentUser.uid, weekId),
         getTermCalendar(currentUser.uid),
         getExamTimetable(currentUser.uid),
         getDoc(doc(db, 'userPublicStats', currentUser.uid)),
         getWeeklySchedule(currentUser.uid, prevWId),
+        getUserSettings(currentUser.uid),
       ]);
+      const reviewEnabled = userSettings?.reviewModeEnabled ?? false;
+      setReviewModeEnabled(reviewEnabled);
+      if (reviewEnabled) {
+        try {
+          const { papers: completedPapers } = await getAllCompletedPapers(currentUser.uid, { limit: 100 });
+          const freq = computeTopicFrequency(completedPapers);
+          setTopReviewTopic(freq[0] ?? null);
+        } catch (_) { /* best-effort */ }
+      }
       setSchedule(s);
       setWeekEntry(cal[weekId] || null);
       setExamEntries(exams);
@@ -178,7 +190,11 @@ export default function DashboardPage() {
           expectedTime,
           actualDurationSeconds,
           durationMins: paper.duration,
+          reviewTopics: updates.reviewTopics ?? [],
         });
+        if (updates.reviewTopics?.length > 0) {
+          await addReviewTopics(currentUser.uid, updates.reviewTopics, paper.subject).catch(() => {});
+        }
         // Re-fetch accurate stats
         try {
           const statsSnap = await getDoc(doc(db, 'userPublicStats', currentUser.uid));
@@ -310,7 +326,7 @@ export default function DashboardPage() {
       ) : (
         <div className="space-y-5">
           {/* Stat cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className={`grid gap-3 ${reviewModeEnabled ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
             <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
               <p className="text-xs text-[var(--color-text-muted)] mb-1">Streak</p>
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{streak || '—'}</p>
@@ -331,6 +347,22 @@ export default function DashboardPage() {
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{level}</p>
               <p className="text-xs text-[var(--color-text-muted)] mt-1">{xp} XP</p>
             </div>
+            {reviewModeEnabled && (
+              <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+                <p className="text-xs text-[var(--color-text-muted)] mb-1">Top review topic</p>
+                {topReviewTopic ? (
+                  <>
+                    <p className="text-base font-semibold text-[var(--color-text-primary)] leading-tight truncate">{topReviewTopic.topic}</p>
+                    <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                      {topReviewTopic.subject ? (subjectMeta[topReviewTopic.subject]?.label ?? topReviewTopic.subject) + ' · ' : ''}
+                      {topReviewTopic.count}×
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-[var(--color-text-muted)] mt-1">No topics tagged yet</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Timer widget */}
@@ -544,6 +576,7 @@ export default function DashboardPage() {
             actualDurationSeconds={timerSecs}
             onSave={handleComplete}
             onClose={() => setCompleting(null)}
+            reviewModeEnabled={reviewModeEnabled}
           />
         );
       })()}

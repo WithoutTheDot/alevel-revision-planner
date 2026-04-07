@@ -85,7 +85,7 @@ export default function SettingsPage() {
   const [displayNameSaving, setDisplayNameSaving] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
   const [settings, setSettings] = useState({
-    defaultPaperDuration: 90, breakDuration: 10, calendarStartHour: 6, calendarEndHour: 23,
+    defaultPaperDuration: 90, breakDuration: 10, calendarStartHour: 6, calendarEndHour: 23, reviewModeEnabled: false,
   });
   const [durations, setDurations] = useState({ _default: 90 });
   const [firestoreFamilies, setFirestoreFamilies] = useState({}); // raw Firestore map
@@ -422,6 +422,21 @@ export default function SettingsPage() {
                     value={settings.calendarEndHour}
                     onChange={(e) => setSettings((s) => ({ ...s, calendarEndHour: Number(e.target.value) }))} />
                 </Field>
+              </div>
+              <div className="flex items-start justify-between gap-4 py-1">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Review mode</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">After each paper, tag topics that need work. They&apos;ll appear in your review queue.</p>
+                </div>
+                <button
+                  role="switch"
+                  aria-checked={settings.reviewModeEnabled}
+                  onClick={() => setSettings((s) => ({ ...s, reviewModeEnabled: !s.reviewModeEnabled }))}
+                  className={'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
+                    (settings.reviewModeEnabled ? 'bg-[var(--color-accent)]' : 'bg-gray-200')}>
+                  <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform ' +
+                    (settings.reviewModeEnabled ? 'translate-x-5' : 'translate-x-0')} />
+                </button>
               </div>
               <div className="flex items-center gap-3 pt-2">
                 <button onClick={saveSettings} disabled={saving}

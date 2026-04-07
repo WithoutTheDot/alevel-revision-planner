@@ -56,6 +56,7 @@ During A-Level revision I found myself manually deciding which past paper to do 
 - Mark any paper complete, enter your raw marks and grade
 - Full history table with search, subject/grade filters, and date range filtering
 - Progress charts — marks over time (line), grade distribution (bar) per subject
+- **Review mode** — tag weak topics after each paper (e.g. "integration", "chain rule"); topics go into a review queue, can be scheduled to a specific week, and appear as distinct review blocks in the calendar; a topic frequency chart surfaces your most-struggled areas
 
 ### Gamification
 - **XP & levels** — earn XP for every paper completed, level up over time
@@ -194,7 +195,8 @@ users/{uid}
   ├── termCalendar/{mondayDateStr}   — week type (A/B/Holiday)
   ├── templates/{id}   — time block templates
   ├── schedule/{id}    — generated paper slots
-  └── completedPapers/{id}          — marks, grade, timestamp
+  ├── completedPapers/{id}          — marks, grade, timestamp, reviewTopics[]
+  └── reviewQueue/{id}              — topic review tasks (pending/scheduled/done)
 classes/{classId}
   └── members, leaderboard entries
 ```
@@ -271,5 +273,5 @@ A GitHub Actions CI pipeline runs lint → test → build on every push and pull
 - **Spaced repetition scoring** — weight paper selection not just by recency but by past grade, so papers where the student scored below a threshold come back more often
 - **Mark scheme integration** — link directly to official mark schemes alongside each paper
 - **Mobile app** — the scheduling and completion flow maps well to React Native; calendar notifications for scheduled papers would be the key addition
-- **Topic-level tracking** — break papers down by topic (e.g. "Integration", "Mechanics") so weak areas surface in analytics
+- ~~**Topic-level tracking**~~ — shipped as review mode (tag topics after papers, queue for review, charts in History)
 - **Shared class schedules** — teachers generating a schedule template that pushes recommended papers to all students in a class
