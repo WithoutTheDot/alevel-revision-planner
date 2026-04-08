@@ -10,7 +10,7 @@ const WEEK_TYPES = [
   { value: 'week-a',  label: 'Week A',  templateId: 'week-a',  color: 'bg-sky-100 hover:bg-sky-200 border-sky-300' },
   { value: 'week-b',  label: 'Week B',  templateId: 'week-b',  color: 'bg-[var(--color-success-bg)] hover:bg-emerald-200 border-emerald-300' },
   { value: 'holiday', label: 'Holiday', templateId: 'holiday', color: 'bg-[var(--color-warning-bg)] hover:bg-amber-200 border-amber-300' },
-  { value: null,      label: 'Clear',   templateId: null,      color: 'bg-[var(--color-surface)] hover:bg-gray-200 border-gray-300' },
+  { value: null,      label: 'Clear',   templateId: null,      color: 'bg-[var(--color-surface)] hover:bg-[var(--color-border)] border-[var(--color-border-strong)]' },
 ];
 
 const TYPE_CELL_COLORS = {

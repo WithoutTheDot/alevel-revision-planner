@@ -15,7 +15,7 @@ function CopyButton({ text }) {
     <button
       onClick={handleCopy}
       className={`ml-2 text-xs px-2 py-0.5 rounded-lg border transition-colors ${
-        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-gray-300 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}

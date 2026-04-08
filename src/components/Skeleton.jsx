@@ -1,5 +1,5 @@
 export function SkeletonLine({ width = 'w-full', height = 'h-4' }) {
-  return <div className={`${width} ${height} bg-gray-200 rounded animate-pulse`} />;
+  return <div className={`${width} ${height} bg-[var(--color-border)] rounded animate-pulse`} />;
 }
 
 export function SkeletonCard({ lines = 3 }) {
@@ -35,7 +35,7 @@ export function DashboardSkeleton() {
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-2xl h-24 bg-gray-200 animate-pulse" />
+          <div key={i} className="rounded-2xl h-24 bg-[var(--color-border)] animate-pulse" />
         ))}
       </div>
       <SkeletonCard lines={4} />
@@ -63,10 +63,10 @@ export function CalendarSkeleton() {
               </div>
               <div className="p-1 space-y-2">
                 {i % 2 === 0 && (
-                  <div className="h-16 bg-gray-200 animate-pulse rounded" />
+                  <div className="h-16 bg-[var(--color-border)] animate-pulse rounded" />
                 )}
                 {i % 3 === 0 && (
-                  <div className="h-12 bg-gray-200 animate-pulse rounded mt-20" />
+                  <div className="h-12 bg-[var(--color-border)] animate-pulse rounded mt-20" />
                 )}
               </div>
             </div>

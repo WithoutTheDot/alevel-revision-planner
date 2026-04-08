@@ -44,7 +44,6 @@ export function TutorialProvider({ children }) {
       const step = TUTORIAL_STEPS[saved.currentStep ?? 0];
       if (step?.route) pendingNavRef.current = step.route;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // mount only — intentionally no deps
 
   // Guard: if Firestore says tutorial is done, clear everything

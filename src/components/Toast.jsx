@@ -20,7 +20,7 @@ export default function Toast({ message, onDismiss }) {
       <p className="flex-1 text-sm font-medium text-[var(--color-text-primary)]">{message}</p>
       <button
         onClick={onDismiss}
-        className="text-gray-300 hover:text-[var(--color-text-muted)] text-lg leading-none ml-1"
+        className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] text-lg leading-none ml-1"
         aria-label="Dismiss"
       >
         ×

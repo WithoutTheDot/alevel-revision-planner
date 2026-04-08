@@ -16,7 +16,7 @@ function CopyButton({ text }) {
     <button
       onClick={handleCopy}
       className={`ml-2 text-xs px-2 py-0.5 rounded-lg border transition-colors ${
-        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-gray-300 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}
@@ -43,7 +43,7 @@ function NudgeButton({ toUid, fromDisplayName }) {
       onClick={handleNudge}
       disabled={cooldown}
       className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${
-        sent ? 'bg-[var(--color-success-bg)] text-[var(--color-success-text)]' : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-gray-200'
+        sent ? 'bg-[var(--color-success-bg)] text-[var(--color-success-text)]' : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
       } disabled:opacity-50`}
     >
       {sent ? 'Sent' : 'Nudge'}

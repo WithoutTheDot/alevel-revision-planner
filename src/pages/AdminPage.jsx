@@ -134,7 +134,7 @@ function UserDetailModal({ user, onClose, onDeleted }) {
                 </button>
                 <button
                   onClick={() => setConfirmDelete(false)}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
+                  className="px-3 py-1.5 text-xs rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
                 >
                   Cancel
                 </button>

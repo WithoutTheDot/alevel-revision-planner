@@ -152,8 +152,8 @@ const AppLogo = () => (
 );
 
 export default function Layout() {
-  const { logout, isAdmin, profile, currentUser } = useAuth();
-  const { nudges } = useNudges();
+  const { logout, profile, currentUser } = useAuth();
+  const { nudges, dismiss } = useNudges();
   const { theme, setTheme } = useTheme();
   const dark = theme === 'dark';
   const [drawerOpen, setDrawerOpen] = useState(false);

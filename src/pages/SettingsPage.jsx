@@ -454,7 +454,7 @@ export default function SettingsPage() {
 
               <div className="pt-2 border-t border-[var(--color-border)]">
                 <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className={`w-10 h-6 rounded-full transition-colors relative ${dark ? 'bg-[var(--color-accent)]' : 'bg-gray-200'}`}>
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${dark ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]'}`}>
                     <input type="checkbox" className="sr-only" checked={dark} onChange={() => setTheme(dark ? 'light' : 'dark')} />
                     <div className={`absolute top-1 left-1 w-4 h-4 bg-[var(--color-surface)] rounded-full transition-transform ${dark ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
                   aria-checked={settings.reviewModeEnabled}
                   onClick={() => setSettings((s) => ({ ...s, reviewModeEnabled: !s.reviewModeEnabled }))}
                   className={'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
-                    (settings.reviewModeEnabled ? 'bg-[var(--color-accent)]' : 'bg-gray-200')}>
+                    (settings.reviewModeEnabled ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]')}>
                   <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-[var(--color-surface)] shadow transform transition-transform ' +
                     (settings.reviewModeEnabled ? 'translate-x-5' : 'translate-x-0')} />
                 </button>
@@ -756,13 +756,13 @@ export default function SettingsPage() {
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               placeholder="DELETE"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
             />
             <div className="flex gap-3 justify-end pt-1">
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={deleteLoading}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                className="px-4 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                 Cancel
               </button>
               <button
