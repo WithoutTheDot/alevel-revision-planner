@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNudges } from '../contexts/NudgeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Toast from './Toast';
 import FullscreenTimer from './FullscreenTimer';
 
@@ -88,6 +89,16 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12" />
     </svg>
   ),
+  Sun: (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+      <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75ZM15.75 10a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM2 10a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5A.75.75 0 0 1 2 10ZM14.066 14.066a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 1 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.06ZM3.813 3.813a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061L3.813 4.874a.75.75 0 0 1 0-1.061ZM14.066 5.934a.75.75 0 0 1 0-1.06l1.061-1.061a.75.75 0 1 1 1.06 1.06L15.127 5.934a.75.75 0 0 1-1.06 0ZM3.813 16.187a.75.75 0 0 1 0-1.06l1.061-1.061a.75.75 0 1 1 1.06 1.06l-1.061 1.06a.75.75 0 0 1-1.06 0ZM10 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+    </svg>
+  ),
+  Moon: (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+      <path fillRule="evenodd" d="M7.455 2.67A6.5 6.5 0 1 0 17.33 12.545a6.5 6.5 0 0 1-9.875-9.875Z" clipRule="evenodd" />
+    </svg>
+  ),
 };
 
 const NAV_ITEMS = [
@@ -141,8 +152,10 @@ const AppLogo = () => (
 );
 
 export default function Layout() {
-  const { currentUser, profile, logout } = useAuth();
-  const { nudges, dismiss } = useNudges();
+  const { logout, isAdmin, profile, currentUser } = useAuth();
+  const { nudges } = useNudges();
+  const { theme, setTheme } = useTheme();
+  const dark = theme === 'dark';
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const displayName = profile?.displayName || currentUser?.email?.split('@')[0] || 'You';
@@ -154,7 +167,16 @@ export default function Layout() {
         {initials}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{displayName}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{displayName}</p>
+          <button
+            onClick={() => setTheme(dark ? 'light' : 'dark')}
+            className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] transition-colors flex-shrink-0"
+            aria-label="Toggle dark mode"
+          >
+            {dark ? Icons.Sun : Icons.Moon}
+          </button>
+        </div>
         <button
           onClick={async () => { try { await logout(); onClose?.(); } catch {} }}
           className="flex items-center gap-1 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-danger)] font-medium mt-0.5 transition-colors"
@@ -192,14 +214,14 @@ export default function Layout() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[var(--color-surface)]">
+    <div className="flex flex-col md:flex-row h-screen bg-[var(--color-bg)]">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-56 bg-white border-r border-[var(--color-border)] flex-col flex-shrink-0">
+      <aside className="hidden md:flex w-56 bg-[var(--color-bg)] border-r border-[var(--color-border)] flex-col flex-shrink-0">
         {sidebarContent(null)}
       </aside>
 
       {/* Mobile top bar */}
-      <div className="flex md:hidden h-13 bg-white border-b border-[var(--color-border)] items-center px-4 gap-3 flex-shrink-0">
+      <div className="flex md:hidden h-13 bg-[var(--color-bg)] border-b border-[var(--color-border)] items-center px-4 gap-3 flex-shrink-0">
         <button
           onClick={() => setDrawerOpen(true)}
           className="p-1.5 rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
@@ -213,7 +235,7 @@ export default function Layout() {
       {/* Mobile drawer */}
       <Dialog open={drawerOpen} onClose={() => setDrawerOpen(false)} className="relative z-50 md:hidden">
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" aria-hidden="true" />
-        <div className="fixed inset-y-0 left-0 w-56 bg-white border-r border-[var(--color-border)] flex flex-col shadow-[var(--shadow-md)]">
+        <div className="fixed inset-y-0 left-0 w-56 bg-[var(--color-bg)] border-r border-[var(--color-border)] flex flex-col shadow-[var(--shadow-md)]">
           <DialogPanel className="flex flex-col h-full">
             <div className="px-4 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
               <AppLogo />

@@ -10,7 +10,7 @@ import { inputCls as baseInputCls } from '../lib/styles';
 function Field({ label, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">{label}</label>
       {children}
     </div>
   );
@@ -99,7 +99,7 @@ export default function TemplatesPage() {
         <div data-tutorial-id="templates-list" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {Object.entries(templates).map(([id, t], idx) => (
             <div key={id} {...(idx === 0 ? { 'data-tutorial-id': 'template-card-week-a' } : {})}
-              className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-strong)] transition-colors">
+              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-strong)] transition-colors">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{t.templateName}</h3>
                 <div className="flex gap-3 flex-shrink-0 ml-2">
@@ -120,7 +120,7 @@ export default function TemplatesPage() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? 'Edit Template' : 'New Template'} maxWidth="max-w-2xl">
         {editing && (
           <div className="space-y-4">
-            {error && <div className="p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+            {error && <div className="p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
             <Field label="Template Name">
               <input className={inputCls} value={editing.data.templateName}
                 onChange={(e) => setEditing((s) => ({ ...s, data: { ...s.data, templateName: e.target.value } }))} />

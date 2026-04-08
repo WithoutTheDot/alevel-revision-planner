@@ -9,7 +9,7 @@ const StarIcon = () => (
 export default function PbBadge({ seconds }) {
   if (!seconds && seconds !== 0) return null;
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-warning-text)] bg-[var(--color-warning-bg)] border border-amber-200 rounded-full px-2 py-0.5">
       <StarIcon />
       {seconds === 0 ? 'No PB yet' : `PB: ${formatTime(seconds)}`}
     </span>

@@ -11,8 +11,8 @@ export default function LevelCard({ xp, level }) {
       </div>
       <p className="text-2xl font-extrabold leading-none">Lv.{level}</p>
       <p className="text-sm mt-1 font-medium opacity-75">{current} / {total} XP</p>
-      <div className="mt-2 h-1.5 bg-white/30 rounded-full overflow-hidden">
-        <div className="h-1.5 bg-white rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+      <div className="mt-2 h-1.5 bg-[var(--color-surface)]/30 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-[var(--color-surface)] rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

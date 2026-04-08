@@ -4,7 +4,7 @@ export function SkeletonLine({ width = 'w-full', height = 'h-4' }) {
 
 export function SkeletonCard({ lines = 3 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-3">
+    <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-5 shadow-sm space-y-3">
       {Array.from({ length: lines }, (_, i) => (
         <SkeletonLine key={i} width={i === 0 ? 'w-1/2' : i % 2 === 0 ? 'w-3/4' : 'w-full'} />
       ))}
@@ -14,7 +14,7 @@ export function SkeletonCard({ lines = 3 }) {
 
 export function SkeletonTable({ rows = 5, cols = 4 }) {
   return (
-    <div className="bg-white rounded-xl border overflow-hidden">
+    <div className="bg-[var(--color-surface)] rounded-xl border overflow-hidden">
       <div className="grid gap-0">
         {Array.from({ length: rows }, (_, r) => (
           <div key={r} className="flex gap-4 px-4 py-3 border-b">
@@ -50,15 +50,15 @@ export function DashboardSkeleton() {
 export function CalendarSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border px-4 py-3">
+      <div className="bg-[var(--color-surface)] rounded-xl border px-4 py-3">
         <SkeletonLine height="h-2" />
       </div>
-      <div className="bg-white rounded-xl border overflow-hidden">
+      <div className="bg-[var(--color-surface)] rounded-xl border overflow-hidden">
         <div className="flex">
-          <div className="w-14 bg-gray-50 border-r" style={{ height: 540 }} />
+          <div className="w-14 bg-[var(--color-surface)] border-r" style={{ height: 540 }} />
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex-1 border-r last:border-r-0">
-              <div className="px-2 py-2 border-b bg-gray-50">
+              <div className="px-2 py-2 border-b bg-[var(--color-surface)]">
                 <SkeletonLine height="h-3" width="w-1/2" />
               </div>
               <div className="p-1 space-y-2">

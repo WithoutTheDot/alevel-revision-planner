@@ -66,7 +66,7 @@ export default function XpCelebration({ xpEarned, newBadges, prevLevel, newLevel
 
       {/* Card */}
       <div
-        className="relative bg-white rounded-3xl p-8 shadow-2xl text-center max-w-sm w-full mx-4 z-10"
+        className="relative bg-[var(--color-surface)] rounded-3xl p-8 shadow-2xl text-center max-w-sm w-full mx-4 z-10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-6xl font-extrabold text-indigo-600 mb-3">
@@ -74,7 +74,7 @@ export default function XpCelebration({ xpEarned, newBadges, prevLevel, newLevel
         </div>
 
         {breakdown && (
-          <div className="mb-3 text-xs text-gray-500 space-y-0.5">
+          <div className="mb-3 text-xs text-[var(--color-text-muted)] space-y-0.5">
             <p>Base: +{breakdown.base}</p>
             {breakdown.grade > 0 && <p>Grade bonus: +{breakdown.grade}</p>}
             {breakdown.time > 0 && <p>Speed bonus: +{breakdown.time}</p>}
@@ -91,7 +91,7 @@ export default function XpCelebration({ xpEarned, newBadges, prevLevel, newLevel
         {newBadges && newBadges.length > 0 && (
           <div className="mb-3 space-y-1">
             {newBadges.map((b) => (
-              <div key={b.id} className="flex items-center justify-center gap-2 text-sm font-semibold text-amber-700 bg-amber-50 rounded-lg px-3 py-1.5">
+              <div key={b.id} className="flex items-center justify-center gap-2 text-sm font-semibold text-[var(--color-warning-text)] bg-[var(--color-warning-bg)] rounded-lg px-3 py-1.5">
                 <span className="text-base">{b.icon || '★'}</span>
                 <span>{b.label}</span>
                 <span className="text-xs text-amber-500">+{b.xpReward} XP</span>
@@ -107,7 +107,7 @@ export default function XpCelebration({ xpEarned, newBadges, prevLevel, newLevel
           </div>
         )}
 
-        <p className="text-xs text-gray-400 mt-2">Tap to continue</p>
+        <p className="text-xs text-[var(--color-text-muted)] mt-2">Tap to continue</p>
       </div>
     </div>
   );

@@ -326,7 +326,7 @@ export default function CalendarPage() {
                 Export ▾
               </button>
               {exportOpen && (
-                <div className="absolute right-0 mt-1 w-44 bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] z-20 py-1">
+                <div className="absolute right-0 mt-1 w-44 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] z-20 py-1">
                   {[
                     { label: 'Copy to clipboard', action: () => { exportText(); setExportOpen(false); } },
                     { label: 'Export ICS', action: () => { downloadIcs(schedule, weekId); setExportOpen(false); } },
@@ -347,11 +347,11 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {displayError && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{displayError}</div>}
+      {displayError && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{displayError}</div>}
 
       {/* a. Overdue banner for past weeks */}
       {isPast && overduePapers.length > 0 && schedule && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-[var(--radius-md)] text-sm text-red-700">
+        <div className="mb-4 p-3 bg-[var(--color-danger-bg)] border border-red-200 rounded-[var(--radius-md)] text-sm text-[var(--color-danger-text)]">
           {overduePapers.length} incomplete paper{overduePapers.length > 1 ? 's' : ''} in this past week.
         </div>
       )}
@@ -359,14 +359,14 @@ export default function CalendarPage() {
       {loading ? (
         <p className="text-[var(--color-text-muted)] text-sm">Loading…</p>
       ) : !schedule ? (
-        <div className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] p-8 text-center text-[var(--color-text-muted)]">
+        <div className="bg-[var(--color-bg)] rounded-[var(--radius-lg)] border border-[var(--color-border)] p-8 text-center text-[var(--color-text-muted)]">
           <p className="mb-2">No schedule for this week.</p>
           <p className="text-sm">Go to <a href="/generate" className="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]">Generate</a> to create one.</p>
         </div>
       ) : (
         <>
           {/* Progress */}
-          <div className="mb-4 bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] px-4 py-3 flex items-center gap-4">
+          <div className="mb-4 bg-[var(--color-bg)] rounded-[var(--radius-lg)] border border-[var(--color-border)] px-4 py-3 flex items-center gap-4">
             <div className="flex-1">
               <div className="flex justify-between text-xs text-[var(--color-text-muted)] mb-1">
                 <span>Progress</span>
@@ -395,7 +395,7 @@ export default function CalendarPage() {
                       ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
                       : isToday
                       ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent-text)] border-[var(--color-accent-subtle)]'
-                      : 'bg-white text-[var(--color-text-secondary)] border-[var(--color-border)]'
+                      : 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] border-[var(--color-border)]'
                   }`}
                 >
                   <div>{day.slice(0, 1)}</div>
@@ -410,7 +410,7 @@ export default function CalendarPage() {
             data-tutorial-id="calendar-grid"
             role="grid"
             aria-label="Weekly study schedule"
-            className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden"
+            className="bg-[var(--color-bg)] rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden"
           >
             <div className="overflow-x-auto">
               <div className="flex md:min-w-[900px]">
@@ -437,13 +437,13 @@ export default function CalendarPage() {
                         <div>{day.slice(0, 3)}</div>
                         <div className={`text-sm font-bold ${isToday ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-primary)]'}`}>{format(date, 'd')}</div>
                         {examsByDay[day]?.map((e) => (
-                          <div key={e.id} className="mt-1 bg-red-500 text-white rounded-[var(--radius-sm)] px-1 py-0.5 text-[10px] font-semibold leading-tight">
+                          <div key={e.id} className="mt-1 bg-[var(--color-danger-bg)]0 text-white rounded-[var(--radius-sm)] px-1 py-0.5 text-[10px] font-semibold leading-tight">
                             EXAM: {e.paperLabel}
                           </div>
                         ))}
                       </div>
                       <div
-                        className="relative"
+                        className="relative bg-[var(--color-bg)]"
                         style={{ height: totalHeight }}
                         onMouseMove={(e) => handleGridMouseMove(e, day)}
                         onMouseUp={() => handleGridMouseUp(day)}
@@ -485,7 +485,7 @@ export default function CalendarPage() {
                                 <div className="text-[10px] opacity-75 truncate">{sm?.label || p.subject}</div>
                               )}
                               {timerData && elapsedDisplay && (
-                                <div className="text-[9px] font-mono bg-white/20 rounded px-1 mt-0.5 inline-block">{elapsedDisplay}</div>
+                                <div className="text-[9px] font-mono bg-[var(--color-surface)]/20 rounded px-1 mt-0.5 inline-block">{elapsedDisplay}</div>
                               )}
                               {p.completed && (
                                 <div className="text-[9px] opacity-90 mt-0.5">✓{p.grade ? ` ${p.grade}` : ''}</div>
@@ -506,7 +506,7 @@ export default function CalendarPage() {
 
           {/* Review sessions this week */}
           {reviewSessions.length > 0 && (
-            <div className="mt-4 bg-white rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border)] p-4">
+            <div className="mt-4 bg-[var(--color-surface)] rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border)] p-4">
               <h3 className="font-medium text-[var(--color-text-secondary)] mb-3 text-sm">Review sessions ({reviewSessions.length})</h3>
               <div className="space-y-1">
                 {reviewSessions.map((item) => {
@@ -522,7 +522,7 @@ export default function CalendarPage() {
                       </div>
                       <button
                         onClick={() => setReviewConfirm({ id: item.id, topic: item.topic })}
-                        className="shrink-0 text-xs font-medium text-emerald-600 hover:text-emerald-700 px-2 py-1 rounded-[var(--radius-sm)] hover:bg-emerald-50 transition-colors">
+                        className="shrink-0 text-xs font-medium text-[var(--color-success-text)] hover:text-[var(--color-success-text)] px-2 py-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-success-bg)] transition-colors">
                         Mark done
                       </button>
                     </div>
@@ -534,7 +534,7 @@ export default function CalendarPage() {
 
           {/* Unscheduled papers */}
           {unscheduled.length > 0 && (
-            <div className="mt-4 bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4">
+            <div className="mt-4 bg-[var(--color-surface)] rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4">
               <h3 className="font-medium text-[var(--color-text-secondary)] mb-3 text-sm">Unscheduled ({unscheduled.length})</h3>
               <div className="space-y-1">
                 {unscheduled.map((p) => {
@@ -556,7 +556,7 @@ export default function CalendarPage() {
                         <span className="text-sm text-[var(--color-text-primary)] truncate">{p.displayName}</span>
                         <span className="text-xs text-[var(--color-text-muted)] flex-shrink-0">{p.duration}min</span>
                         {isOverdue && (
-                          <span className="text-xs font-semibold bg-red-100 text-red-700 px-2 py-0.5 rounded-[var(--radius-sm)] flex-shrink-0">Overdue</span>
+                          <span className="text-xs font-semibold bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] px-2 py-0.5 rounded-[var(--radius-sm)] flex-shrink-0">Overdue</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0 ml-2">
@@ -564,7 +564,7 @@ export default function CalendarPage() {
                           <span className="text-xs font-mono text-[var(--color-accent)]">{elapsedDisplay}</span>
                         )}
                         {p.completed && (
-                          <span className="text-xs text-emerald-600 font-medium">✓{p.grade ? ` ${p.grade}` : ''}</span>
+                          <span className="text-xs text-[var(--color-success-text)] font-medium">✓{p.grade ? ` ${p.grade}` : ''}</span>
                         )}
                         <span className="text-xs text-[var(--color-text-muted)]">›</span>
                       </div>
@@ -658,7 +658,7 @@ export default function CalendarPage() {
                 </span>
               )}
               {isOverdue && (
-                <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-[var(--radius-sm)]">Overdue</span>
+                <span className="bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] text-xs font-semibold px-2 py-0.5 rounded-[var(--radius-sm)]">Overdue</span>
               )}
             </div>
 
@@ -670,9 +670,9 @@ export default function CalendarPage() {
               </div>
             )}
             {p.completed && (
-              <div className="mb-4 flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-[var(--radius-md)]">
-                <span className="text-emerald-700 font-semibold text-sm">Completed</span>
-                {p.grade && <span className="text-sm text-emerald-600 font-medium">{p.grade}</span>}
+              <div className="mb-4 flex items-center gap-2 px-3 py-2 bg-[var(--color-success-bg)] rounded-[var(--radius-md)]">
+                <span className="text-[var(--color-success-text)] font-semibold text-sm">Completed</span>
+                {p.grade && <span className="text-sm text-[var(--color-success-text)] font-medium">{p.grade}</span>}
                 {p.marks && <span className="text-xs text-[var(--color-text-muted)]">{p.marks}</span>}
               </div>
             )}
@@ -702,7 +702,7 @@ export default function CalendarPage() {
               {!p.completed && (
                 <button
                   onClick={() => { close(); setCompleting({ paper: p, index: p._idx }); }}
-                  className={`w-full px-4 py-2.5 rounded-[var(--radius-md)] text-sm font-semibold transition-colors ${timerData ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'}`}
+                  className={`w-full px-4 py-2.5 rounded-[var(--radius-md)] text-sm font-semibold transition-colors ${timerData ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'}`}
                 >
                   Mark Complete
                 </button>
@@ -711,13 +711,13 @@ export default function CalendarPage() {
                 <>
                   <button
                     onClick={() => { close(); setCompleting({ paper: p, index: p._idx }); }}
-                    className="w-full px-4 py-2.5 bg-white border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
                   >
                     Edit result
                   </button>
                   <button
                     onClick={() => { handleComplete(p._idx, { completed: false, marks: null, grade: null }); close(); }}
-                    className="w-full px-4 py-2.5 bg-white border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] transition-colors"
                   >
                     Mark incomplete
                   </button>
@@ -727,13 +727,13 @@ export default function CalendarPage() {
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={() => { handleRerollPaper(p); close(); }}
-                    className="flex-1 px-3 py-2 bg-white border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
+                    className="flex-1 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
                   >
                     Re-roll
                   </button>
                   <button
                     onClick={() => { handleDeletePaper(p._idx); close(); }}
-                    className="flex-1 px-3 py-2 bg-white border border-[var(--color-danger)]/30 rounded-[var(--radius-md)] text-sm text-[var(--color-danger)] hover:bg-red-50 transition-colors"
+                    className="flex-1 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-danger)]/30 rounded-[var(--radius-md)] text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors"
                   >
                     Delete
                   </button>

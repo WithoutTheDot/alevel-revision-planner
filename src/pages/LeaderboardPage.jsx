@@ -16,7 +16,7 @@ function CopyButton({ text }) {
     <button
       onClick={handleCopy}
       className={`ml-2 text-xs px-2 py-0.5 rounded-lg border transition-colors ${
-        copied ? 'border-emerald-300 text-emerald-600 bg-emerald-50' : 'border-gray-300 text-gray-500 hover:bg-gray-50'
+        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-gray-300 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}
@@ -43,7 +43,7 @@ function NudgeButton({ toUid, fromDisplayName }) {
       onClick={handleNudge}
       disabled={cooldown}
       className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${
-        sent ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        sent ? 'bg-[var(--color-success-bg)] text-[var(--color-success-text)]' : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-gray-200'
       } disabled:opacity-50`}
     >
       {sent ? 'Sent' : 'Nudge'}
@@ -130,13 +130,13 @@ export default function LeaderboardPage() {
             {loading ? 'Loading…' : 'Refresh'}
           </button>
           <button onClick={handleLeave}
-            className="px-3 py-1.5 rounded-[var(--radius-md)] border border-[var(--color-danger)]/30 text-[var(--color-danger)] text-sm hover:bg-red-50 transition-colors">
+            className="px-3 py-1.5 rounded-[var(--radius-md)] border border-[var(--color-danger)]/30 text-[var(--color-danger)] text-sm hover:bg-[var(--color-danger-bg)] transition-colors">
             Leave
           </button>
         </div>
       </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
       {!loading && leaderboard.length === 0 && !error && (
         <p className="text-[var(--color-text-muted)] text-sm">No members found.</p>
       )}
@@ -150,14 +150,14 @@ export default function LeaderboardPage() {
                 className={`px-3 py-1.5 rounded-[var(--radius-md)] text-sm font-medium transition-colors ${
                   sortBy === s
                     ? 'bg-[var(--color-accent)] text-white'
-                    : 'bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'
+                    : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'
                 }`}>
                 {s === 'papers' ? 'Papers' : 'XP'}
               </button>
             ))}
           </div>
 
-          <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--color-border)] text-left">
@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
               <tbody>
                 {sortedLeaderboard.map((entry, i) => {
                   const isMe = entry.uid === currentUser.uid;
-                  const rankColors = ['text-amber-500', 'text-[var(--color-text-muted)]', 'text-amber-700'];
+                  const rankColors = ['text-amber-500', 'text-[var(--color-text-muted)]', 'text-[var(--color-warning-text)]'];
                   const streak = entry.currentStreak ?? 0;
                   const entryXp = entry.xp ?? 0;
                   const entryLevel = entry.level ?? xpToLevel(entryXp);

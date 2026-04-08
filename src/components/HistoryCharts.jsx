@@ -12,8 +12,8 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
   return (
     <div className="space-y-6">
       {/* Grade distribution */}
-      {gradeChartData.length > 0 && <div className="bg-white rounded-xl border p-5">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">Grade Distribution</h2>
+      {gradeChartData.length > 0 && <div className="bg-[var(--color-surface)] rounded-xl border p-5">
+        <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-4">Grade Distribution</h2>
         {gradeChartData.some((d) => d.count > 0) ? (
           <>
             <ResponsiveContainer width="100%" height={220}>
@@ -29,7 +29,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
               </BarChart>
             </ResponsiveContainer>
             <details className="mt-2">
-              <summary className="text-xs text-gray-400 cursor-pointer">Show data table</summary>
+              <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer">Show data table</summary>
               <table className="mt-2 text-xs w-full border-collapse">
                 <thead><tr>{gradeChartData.map((d) => <th key={d.grade} className="border px-2 py-1 text-left">{d.grade}</th>)}</tr></thead>
                 <tbody><tr>{gradeChartData.map((d) => <td key={d.grade} className="border px-2 py-1">{d.count}</td>)}</tr></tbody>
@@ -37,14 +37,14 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
             </details>
           </>
         ) : (
-          <p className="text-gray-400 text-sm">No graded papers yet.</p>
+          <p className="text-[var(--color-text-muted)] text-sm">No graded papers yet.</p>
         )}
       </div>}
 
       {/* Papers per week */}
-      {weekChartData.length > 0 && <div className="bg-white rounded-xl border p-5">
-        <h2 className="text-sm font-semibold text-gray-700 mb-0.5">Papers Completed per Week</h2>
-        <p className="text-xs text-gray-400 mb-4">Last 12 weeks</p>
+      {weekChartData.length > 0 && <div className="bg-[var(--color-surface)] rounded-xl border p-5">
+        <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-0.5">Papers Completed per Week</h2>
+        <p className="text-xs text-[var(--color-text-muted)] mb-4">Last 12 weeks</p>
         {weekChartData.length > 0 ? (
           <>
             <ResponsiveContainer width="100%" height={220}>
@@ -57,7 +57,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
               </LineChart>
             </ResponsiveContainer>
             <details className="mt-2">
-              <summary className="text-xs text-gray-400 cursor-pointer">Show data table</summary>
+              <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer">Show data table</summary>
               <table className="mt-2 text-xs w-full border-collapse">
                 <thead><tr>{weekChartData.map((d) => <th key={d.week} className="border px-2 py-1 text-left">{d.week}</th>)}</tr></thead>
                 <tbody><tr>{weekChartData.map((d) => <td key={d.week} className="border px-2 py-1">{d.count}</td>)}</tr></tbody>
@@ -69,8 +69,8 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
 
       {/* Subject breakdown */}
       {subjectChartData.length > 0 && (
-        <div className="bg-white rounded-xl border p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Papers by Subject</h2>
+        <div className="bg-[var(--color-surface)] rounded-xl border p-5">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-4">Papers by Subject</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={subjectChartData} margin={{ top: 4, right: 16, bottom: 4, left: 0 }}>
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
@@ -80,7 +80,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
             </BarChart>
           </ResponsiveContainer>
           <details className="mt-2">
-            <summary className="text-xs text-gray-400 cursor-pointer">Show data table</summary>
+            <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer">Show data table</summary>
             <table className="mt-2 text-xs w-full border-collapse">
               <thead><tr><th className="border px-2 py-1 text-left">Subject</th><th className="border px-2 py-1 text-left">Count</th></tr></thead>
               <tbody>{subjectChartData.map((d) => <tr key={d.name}><td className="border px-2 py-1">{d.name}</td><td className="border px-2 py-1">{d.count}</td></tr>)}</tbody>
@@ -91,9 +91,9 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
 
       {/* Study hours per week */}
       {studyHoursPerWeekData && studyHoursPerWeekData.length > 0 && (
-        <div className="bg-white rounded-xl border p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-0.5">Study Hours per Week</h2>
-          <p className="text-xs text-gray-400 mb-4">Last 12 weeks (timed papers only)</p>
+        <div className="bg-[var(--color-surface)] rounded-xl border p-5">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-0.5">Study Hours per Week</h2>
+          <p className="text-xs text-[var(--color-text-muted)] mb-4">Last 12 weeks (timed papers only)</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={studyHoursPerWeekData} margin={{ top: 4, right: 16, bottom: 4, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -104,7 +104,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
             </LineChart>
           </ResponsiveContainer>
           <details className="mt-2">
-            <summary className="text-xs text-gray-400 cursor-pointer">Show data table</summary>
+            <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer">Show data table</summary>
             <table className="mt-2 text-xs w-full border-collapse">
               <thead><tr>{studyHoursPerWeekData.map((d) => <th key={d.week} className="border px-2 py-1 text-left">{d.week}</th>)}</tr></thead>
               <tbody><tr>{studyHoursPerWeekData.map((d) => <td key={d.week} className="border px-2 py-1">{d.hours}h</td>)}</tr></tbody>
@@ -115,9 +115,9 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
 
       {/* Topics to review */}
       {topicChartData && topicChartData.length > 0 && (
-        <div className="bg-white rounded-xl border p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-0.5">Topics to Review</h2>
-          <p className="text-xs text-gray-400 mb-4">Top 10 most-tagged topics after papers</p>
+        <div className="bg-[var(--color-surface)] rounded-xl border p-5">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-0.5">Topics to Review</h2>
+          <p className="text-xs text-[var(--color-text-muted)] mb-4">Top 10 most-tagged topics after papers</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={topicChartData} margin={{ top: 4, right: 16, bottom: 40, left: 0 }}>
               <XAxis dataKey="topic" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" interval={0} />
@@ -140,7 +140,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
             </BarChart>
           </ResponsiveContainer>
           <details className="mt-2">
-            <summary className="text-xs text-gray-400 cursor-pointer">Show data table</summary>
+            <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer">Show data table</summary>
             <table className="mt-2 text-xs w-full border-collapse">
               <thead><tr><th className="border px-2 py-1 text-left">Topic</th><th className="border px-2 py-1 text-left">Count</th></tr></thead>
               <tbody>{topicChartData.map((d) => <tr key={d.topic}><td className="border px-2 py-1">{d.topic}</td><td className="border px-2 py-1">{d.count}</td></tr>)}</tbody>
@@ -149,7 +149,7 @@ export default function HistoryCharts({ gradeChartData, weekChartData, subjectCh
         </div>
       )}
 
-      {total === 0 && gradeChartData.length > 0 && <p className="text-gray-400 text-sm">No data to chart yet.</p>}
+      {total === 0 && gradeChartData.length > 0 && <p className="text-[var(--color-text-muted)] text-sm">No data to chart yet.</p>}
     </div>
   );
 }

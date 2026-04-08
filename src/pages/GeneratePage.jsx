@@ -306,11 +306,11 @@ export default function GeneratePage() {
     <div data-tutorial-id="generate-page-root" className="max-w-3xl">
       <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">Generate Schedule</h1>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
       {/* ── Step 1: Select week ─────────────────────────────── */}
       {step === 'select' && (
-        <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5 space-y-5">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5 space-y-5">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={batchMode} onChange={(e) => setBatchMode(e.target.checked)} className="w-4 h-4 rounded text-[var(--color-accent)]" />
             <span className="text-sm font-medium text-[var(--color-text-primary)]">Batch generate (multiple weeks)</span>
@@ -320,14 +320,14 @@ export default function GeneratePage() {
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">{batchMode ? 'Start Monday' : 'Week starting (Monday)'}</label>
               <input data-tutorial-id="generate-week-picker" type="date" value={weekStart} onChange={handleDateChange}
-                className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-white text-[var(--color-text-primary)]" />
+                className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-[var(--color-surface)] text-[var(--color-text-primary)]" />
               {!batchMode && <p className="text-xs text-[var(--color-text-muted)] mt-1">Any date is snapped to that week's Monday.</p>}
             </div>
             {batchMode && (
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">End Monday</label>
                 <input type="date" value={batchEnd} onChange={(e) => setBatchEnd(snapToMonday(e.target.value))}
-                  className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-white text-[var(--color-text-primary)]" />
+                  className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-[var(--color-surface)] text-[var(--color-text-primary)]" />
               </div>
             )}
           </div>
@@ -358,7 +358,7 @@ export default function GeneratePage() {
                 <div>
                   <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Template</label>
                   <select value={templateId} onChange={(e) => { setTemplateId(e.target.value); setLocalBlocks(templates[e.target.value]?.timeBlocks ?? []); }}
-                    className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-white text-[var(--color-text-primary)]">
+                    className="border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-[var(--color-surface)] text-[var(--color-text-primary)]">
                     {Object.entries(templates).map(([id, t]) => (
                       <option key={id} value={id}>{t.templateName}</option>
                     ))}
@@ -385,7 +385,7 @@ export default function GeneratePage() {
 
               {batchMode && batchProgress && <p className="text-sm text-[var(--color-accent)]">{batchProgress}</p>}
               {batchSummary && (
-                <div className="p-3 bg-emerald-50 text-emerald-700 rounded-[var(--radius-md)] text-sm">
+                <div className="p-3 bg-[var(--color-success-bg)] text-[var(--color-success-text)] rounded-[var(--radius-md)] text-sm">
                   Batch complete: {batchSummary.saved} week(s) generated, {batchSummary.skipped} skipped.
                 </div>
               )}
@@ -405,7 +405,7 @@ export default function GeneratePage() {
       {step === 'preview' && preview && (
         <div className="space-y-4">
           {warnings.length > 0 && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-[var(--radius-md)] text-sm text-amber-700 space-y-1">
+            <div className="p-3 bg-[var(--color-warning-bg)] border border-amber-200 rounded-[var(--radius-md)] text-sm text-[var(--color-warning-text)] space-y-1">
               {warnings.map((w, i) => <p key={i}>{w}</p>)}
             </div>
           )}
@@ -417,13 +417,13 @@ export default function GeneratePage() {
             </div>
           )}
           {preview.papers.some((p) => p.duration < 60) && (
-            <div className="p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-[var(--radius-md)] text-sm">
+            <div className="p-3 bg-[var(--color-warning-bg)] border border-amber-200 text-[var(--color-warning-text)] rounded-[var(--radius-md)] text-sm">
               One or more papers have a duration under 60 min.{' '}
               <Link to="/settings" className="underline font-medium hover:text-amber-900">Check Settings → Papers</Link>
             </div>
           )}
 
-          <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between">
             <div>
               <p className="font-medium text-[var(--color-text-primary)]">Week of {weekStart}</p>
               <p className="text-sm text-[var(--color-text-muted)]">{preview.papers.length} papers</p>
@@ -443,11 +443,11 @@ export default function GeneratePage() {
           {byDay && DAYS_ORDER.filter((d) => byDay[d]).map((day) => {
             const dayExams = examEntries.filter((e) => p_isExamOnDay(weekStart, day, e.date));
             return (
-              <div key={day} className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+              <div key={day} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                 <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center gap-2 bg-[var(--color-surface)]">
                   <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{day}</h3>
                   {dayExams.map((e) => (
-                    <span key={e.id} className="text-xs font-medium bg-red-100 text-red-700 px-2 py-0.5 rounded-[var(--radius-sm)]">
+                    <span key={e.id} className="text-xs font-medium bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] px-2 py-0.5 rounded-[var(--radius-sm)]">
                       EXAM: {e.paperLabel}
                     </span>
                   ))}
@@ -469,8 +469,8 @@ export default function GeneratePage() {
                           <span className="text-sm text-[var(--color-text-primary)]">{p.displayName}</span>
                           <span className="text-xs text-[var(--color-text-muted)]">{p.duration}min</span>
                           {p.scheduledStart && <span className="text-xs text-[var(--color-accent)]">{p.scheduledStart}–{p.scheduledEnd}</span>}
-                          {level === 'red' && <span className="text-xs font-medium bg-red-100 text-red-700 px-2 py-0.5 rounded-[var(--radius-sm)]">Exam conflict (0–1 days)</span>}
-                          {level === 'amber' && <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-[var(--radius-sm)]">Exam nearby (2–5 days)</span>}
+                          {level === 'red' && <span className="text-xs font-medium bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] px-2 py-0.5 rounded-[var(--radius-sm)]">Exam conflict (0–1 days)</span>}
+                          {level === 'amber' && <span className="text-xs font-medium bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] px-2 py-0.5 rounded-[var(--radius-sm)]">Exam nearby (2–5 days)</span>}
                         </div>
                         <button onClick={() => removePaper(p._idx)} className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] ml-2 flex-shrink-0 text-lg leading-none">✕</button>
                       </div>
@@ -495,14 +495,14 @@ export default function GeneratePage() {
 
       {/* ── Step 3: Saved ────────────────────────────────────── */}
       {step === 'saved' && (
-        <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-8 text-center">
-          <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-8 text-center">
+          <div className="w-10 h-10 rounded-full bg-[var(--color-success-bg)] text-[var(--color-success-text)] flex items-center justify-center mx-auto mb-3">
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-8 8a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 1.414-1.414L8 12.586l7.293-7.293a1 1 0 0 1 1.414 0Z" clipRule="evenodd"/></svg>
           </div>
           <p className="text-base font-semibold text-[var(--color-text-primary)] mb-1">Schedule saved</p>
           <p className="text-sm text-[var(--color-text-muted)] mb-6">View it on the Calendar page.</p>
           <button onClick={() => { setStep('select'); setPreview(null); setWarnings([]); }}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
             Generate another
           </button>
         </div>

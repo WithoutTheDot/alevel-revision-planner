@@ -144,11 +144,11 @@ export default function OnboardingPage() {
   }
 
   const selectedSubjectIds = [...selectedIds];
-  const inputCls = 'w-full border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)] transition-shadow';
+  const inputCls = 'w-full border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)] transition-shadow';
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center p-6">
-      <div className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] w-full max-w-2xl p-8">
+      <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] w-full max-w-2xl p-8">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Welcome! Let's get you set up.</h1>
           <p className="text-sm text-[var(--color-text-muted)] mt-1">This only takes a minute.</p>
@@ -156,7 +156,7 @@ export default function OnboardingPage() {
 
         <StepIndicator current={step} />
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+        {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
         {/* ── Step 1: Choose subjects ── */}
         {step === 0 && (
@@ -183,7 +183,7 @@ export default function OnboardingPage() {
                     className={`text-left px-3 py-2 rounded-[var(--radius-md)] border text-sm transition-colors ${
                       checked
                         ? 'bg-[var(--color-accent-subtle)] border-[var(--color-accent)] text-[var(--color-accent-text)] font-medium'
-                        : 'bg-white border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)]'
+                        : 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)]'
                     }`}
                   >
                     {checked && <span className="mr-1 text-[var(--color-accent)]">✓</span>}{s.label}
@@ -213,7 +213,7 @@ export default function OnboardingPage() {
               {examRows.map((row, i) => (
                 <div key={i} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:items-center">
                   <div className="flex gap-2 sm:contents">
-                    <select className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+                    <select className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
                       value={row.subject}
                       onChange={(e) => setExamRows((rows) => rows.map((r, j) => j === i ? { ...r, subject: e.target.value } : r))}>
                       <option value="">Subject</option>
@@ -222,20 +222,20 @@ export default function OnboardingPage() {
                         return <option key={id} value={id}>{sub?.label || id}</option>;
                       })}
                     </select>
-                    <input className="flex-1 sm:col-span-4 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)]"
+                    <input className="flex-1 sm:col-span-4 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)]"
                       placeholder="Paper label" value={row.paperLabel}
                       onChange={(e) => setExamRows((rows) => rows.map((r, j) => j === i ? { ...r, paperLabel: e.target.value } : r))} />
-                    <input type="date" className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+                    <input type="date" className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
                       value={row.date}
                       onChange={(e) => setExamRows((rows) => rows.map((r, j) => j === i ? { ...r, date: e.target.value } : r))} />
                     <button onClick={() => setExamRows((rows) => rows.filter((_, j) => j !== i))}
                       className="sm:col-span-1 text-[var(--color-text-muted)] hover:text-[var(--color-danger)] text-lg leading-none px-1">×</button>
                   </div>
                   <div className="flex gap-2 sm:contents">
-                    <input type="time" className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+                    <input type="time" className="flex-1 sm:col-span-3 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
                       value={row.time}
                       onChange={(e) => setExamRows((rows) => rows.map((r, j) => j === i ? { ...r, time: e.target.value } : r))} />
-                    <input type="number" min="1" max="300" placeholder="mins" className="w-24 sm:col-span-2 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)]"
+                    <input type="number" min="1" max="300" placeholder="mins" className="w-24 sm:col-span-2 border border-[var(--color-border)] rounded-[var(--radius-md)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent placeholder:text-[var(--color-text-muted)]"
                       value={row.durationMins}
                       onChange={(e) => setExamRows((rows) => rows.map((r, j) => j === i ? { ...r, durationMins: Number(e.target.value) } : r))} />
                   </div>

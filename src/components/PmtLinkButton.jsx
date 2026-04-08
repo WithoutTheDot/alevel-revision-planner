@@ -4,7 +4,7 @@ export default function PmtLinkButton({ href, label }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
+      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border border-indigo-200 text-indigo-600 bg-[var(--color-surface)] hover:bg-indigo-50 transition-colors"
     >
       {label}
       <svg

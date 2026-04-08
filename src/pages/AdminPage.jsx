@@ -13,9 +13,9 @@ const TABS = ['Overview', 'Users', 'Classes', 'Membership', 'Override'];
 
 function StatCard({ label, value }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+    <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-5 shadow-sm">
       <p className="text-3xl font-extrabold text-indigo-600">{value}</p>
-      <p className="text-sm text-gray-500 mt-1">{label}</p>
+      <p className="text-sm text-[var(--color-text-muted)] mt-1">{label}</p>
     </div>
   );
 }
@@ -55,24 +55,24 @@ function UserDetailModal({ user, onClose, onDeleted }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+      <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
         <div className="px-5 py-4 border-b flex items-center justify-between">
-          <h2 className="font-bold text-gray-800">{user.displayName || user.uid.slice(0, 8)}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+          <h2 className="font-bold text-[var(--color-text-primary)]">{user.displayName || user.uid.slice(0, 8)}</h2>
+          <button onClick={onClose} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] text-xl leading-none">&times;</button>
         </div>
         <div className="p-5 overflow-auto flex-1 space-y-4">
           <div className="grid grid-cols-3 gap-3 text-center text-sm">
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-[var(--color-surface)] rounded-xl p-3">
               <p className="text-lg font-bold text-indigo-600">{user.papersCompleted ?? 0}</p>
-              <p className="text-xs text-gray-500">Papers</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Papers</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-[var(--color-surface)] rounded-xl p-3">
               <p className="text-lg font-bold text-indigo-600">{user.xp ?? 0}</p>
-              <p className="text-xs text-gray-500">XP</p>
+              <p className="text-xs text-[var(--color-text-muted)]">XP</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-[var(--color-surface)] rounded-xl p-3">
               <p className="text-lg font-bold text-indigo-600">{((user.studyMinutes ?? 0) / 60).toFixed(1)}h</p>
-              <p className="text-xs text-gray-500">Study</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Study</p>
             </div>
           </div>
 
@@ -90,15 +90,15 @@ function UserDetailModal({ user, onClose, onDeleted }) {
 
           {completions && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Last 10 completions</h3>
+              <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase mb-2">Last 10 completions</h3>
               {completions.length === 0 ? (
-                <p className="text-sm text-gray-400">None yet</p>
+                <p className="text-sm text-[var(--color-text-muted)]">None yet</p>
               ) : (
                 <ul className="divide-y text-sm">
                   {completions.map((c) => (
                     <li key={c.id} className="py-2 flex items-center justify-between">
-                      <span className="text-gray-800 truncate max-w-[200px]">{c.displayName}</span>
-                      <div className="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
+                      <span className="text-[var(--color-text-primary)] truncate max-w-[200px]">{c.displayName}</span>
+                      <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] flex-shrink-0">
                         {c.grade && <span className="font-semibold text-indigo-600">{c.grade}</span>}
                         {c.actualDurationSeconds != null && <span className="font-mono">{formatTime(c.actualDurationSeconds)}</span>}
                         <span>{c.completedAt ? new Date(c.completedAt).toLocaleDateString() : '—'}</span>
@@ -112,19 +112,19 @@ function UserDetailModal({ user, onClose, onDeleted }) {
 
           <div className="border-t border-red-100 pt-4 mt-2">
             <p className="text-xs font-semibold text-red-600 uppercase mb-1">Danger zone</p>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-[var(--color-text-muted)] mb-3">
               Deletes all Firestore data for this user. Their login account remains but the app will be unusable.
             </p>
             {!confirmDelete ? (
               <button
                 onClick={() => setConfirmDelete(true)}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 border border-red-300 hover:bg-red-50 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 border border-red-300 hover:bg-[var(--color-danger-bg)] transition-colors"
               >
                 Delete user data
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-red-700 font-medium">Are you sure?</span>
+                <span className="text-xs text-[var(--color-danger-text)] font-medium">Are you sure?</span>
                 <button
                   onClick={handleDeleteUserData}
                   disabled={deleteLoading}
@@ -134,7 +134,7 @@ function UserDetailModal({ user, onClose, onDeleted }) {
                 </button>
                 <button
                   onClick={() => setConfirmDelete(false)}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -200,11 +200,11 @@ function ClassDetailModal({ cls, allUsers, onClose, onUpdate }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+      <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
         <div className="px-5 py-4 border-b flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-gray-800">{cls.name}</h2>
-            <p className="text-xs text-gray-500 font-mono">Code: {code}</p>
+            <h2 className="font-bold text-[var(--color-text-primary)]">{cls.name}</h2>
+            <p className="text-xs text-[var(--color-text-muted)] font-mono">Code: {code}</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -214,24 +214,24 @@ function ClassDetailModal({ cls, allUsers, onClose, onUpdate }) {
             >
               Regen Code
             </button>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            <button onClick={onClose} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] text-xl leading-none">&times;</button>
           </div>
         </div>
         <div className="p-5 overflow-auto flex-1 space-y-4">
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Members ({memberStats.length})</h3>
+            <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase mb-2">Members ({memberStats.length})</h3>
             <ul className="divide-y text-sm">
               {memberStats.map((m) => (
                 <li key={m.uid} className="py-2 flex items-center justify-between">
                   <div>
-                    <span className="text-gray-800">{m.displayName || m.uid.slice(0, 8)}</span>
-                    <span className="ml-2 text-xs text-gray-400">{m.papersCompleted ?? 0} papers</span>
+                    <span className="text-[var(--color-text-primary)]">{m.displayName || m.uid.slice(0, 8)}</span>
+                    <span className="ml-2 text-xs text-[var(--color-text-muted)]">{m.papersCompleted ?? 0} papers</span>
                   </div>
                   <button
                     onClick={() => handleRemove(m.uid)}
                     disabled={saving}
-                    className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50"
+                    className="text-xs text-red-500 hover:text-[var(--color-danger-text)] disabled:opacity-50"
                   >
                     Remove
                   </button>
@@ -297,11 +297,11 @@ function UsersTab({ stats }) {
         onChange={(e) => setSearch(e.target.value)}
         className="w-full max-w-xs border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
       />
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs text-gray-400 uppercase border-b bg-gray-50">
+              <tr className="text-xs text-[var(--color-text-muted)] uppercase border-b bg-[var(--color-surface)]">
                 <th className="px-5 py-2 text-left font-medium">Name</th>
                 <th className="px-5 py-2 text-right font-medium">Papers</th>
                 <th className="px-5 py-2 text-right font-medium">XP</th>
@@ -310,14 +310,14 @@ function UsersTab({ stats }) {
                 <th className="px-5 py-2 text-right font-medium"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-[var(--color-border)]">
               {filtered.map((u) => (
                 <tr key={u.uid}>
-                  <td className="px-5 py-2.5 text-gray-800">{u.displayName || u.uid.slice(0, 8)}</td>
-                  <td className="px-5 py-2.5 text-right text-gray-700">{u.papersCompleted ?? 0}</td>
-                  <td className="px-5 py-2.5 text-right text-gray-700">{u.xp ?? 0}</td>
-                  <td className="px-5 py-2.5 text-right text-gray-700">{u.level ?? 1}</td>
-                  <td className="px-5 py-2.5 text-right text-gray-700">{((u.studyMinutes ?? 0) / 60).toFixed(1)}</td>
+                  <td className="px-5 py-2.5 text-[var(--color-text-primary)]">{u.displayName || u.uid.slice(0, 8)}</td>
+                  <td className="px-5 py-2.5 text-right text-[var(--color-text-secondary)]">{u.papersCompleted ?? 0}</td>
+                  <td className="px-5 py-2.5 text-right text-[var(--color-text-secondary)]">{u.xp ?? 0}</td>
+                  <td className="px-5 py-2.5 text-right text-[var(--color-text-secondary)]">{u.level ?? 1}</td>
+                  <td className="px-5 py-2.5 text-right text-[var(--color-text-secondary)]">{((u.studyMinutes ?? 0) / 60).toFixed(1)}</td>
                   <td className="px-5 py-2.5 text-right">
                     <button
                       onClick={() => setViewUser(u)}
@@ -349,11 +349,11 @@ function ClassesTab({ classes, allUsers, onUpdate }) {
   const [viewClass, setViewClass] = useState(null);
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs text-gray-400 uppercase border-b bg-gray-50">
+              <tr className="text-xs text-[var(--color-text-muted)] uppercase border-b bg-[var(--color-surface)]">
                 <th className="px-5 py-2 text-left font-medium">Name</th>
                 <th className="px-5 py-2 text-left font-medium">Code</th>
                 <th className="px-5 py-2 text-left font-medium">Subject</th>
@@ -361,13 +361,13 @@ function ClassesTab({ classes, allUsers, onUpdate }) {
                 <th className="px-5 py-2 text-right font-medium"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-[var(--color-border)]">
               {classes.map((c) => (
                 <tr key={c.id}>
-                  <td className="px-5 py-2.5 text-gray-800">{c.name}</td>
-                  <td className="px-5 py-2.5 font-mono text-gray-600">{c.code}</td>
-                  <td className="px-5 py-2.5 text-gray-600">{c.subject || '—'}</td>
-                  <td className="px-5 py-2.5 text-right text-gray-700">{(c.members ?? []).length}</td>
+                  <td className="px-5 py-2.5 text-[var(--color-text-primary)]">{c.name}</td>
+                  <td className="px-5 py-2.5 font-mono text-[var(--color-text-secondary)]">{c.code}</td>
+                  <td className="px-5 py-2.5 text-[var(--color-text-secondary)]">{c.subject || '—'}</td>
+                  <td className="px-5 py-2.5 text-right text-[var(--color-text-secondary)]">{(c.members ?? []).length}</td>
                   <td className="px-5 py-2.5 text-right">
                     <button
                       onClick={() => setViewClass(c)}
@@ -439,16 +439,16 @@ function MembershipTab({ classes, allUsers, onUpdate }) {
 
       {cls && (
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Members ({members.length})</h3>
+          <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Members ({members.length})</h3>
             <ul className="space-y-1">
               {members.map((u) => (
                 <li key={u.uid} className="flex items-center justify-between py-1">
-                  <span className="text-sm text-gray-800">{u.displayName || u.uid.slice(0, 8)}</span>
+                  <span className="text-sm text-[var(--color-text-primary)]">{u.displayName || u.uid.slice(0, 8)}</span>
                   <button
                     onClick={() => toggle(u.uid, true)}
                     disabled={saving}
-                    className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50"
+                    className="text-xs text-red-500 hover:text-[var(--color-danger-text)] disabled:opacity-50"
                   >
                     Remove
                   </button>
@@ -456,12 +456,12 @@ function MembershipTab({ classes, allUsers, onUpdate }) {
               ))}
             </ul>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Non-members ({nonMembers.length})</h3>
+          <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Non-members ({nonMembers.length})</h3>
             <ul className="space-y-1">
               {nonMembers.map((u) => (
                 <li key={u.uid} className="flex items-center justify-between py-1">
-                  <span className="text-sm text-gray-800">{u.displayName || u.uid.slice(0, 8)}</span>
+                  <span className="text-sm text-[var(--color-text-primary)]">{u.displayName || u.uid.slice(0, 8)}</span>
                   <button
                     onClick={() => toggle(u.uid, false)}
                     disabled={saving}
@@ -539,16 +539,16 @@ function OverrideTab({ stats }) {
 
       {selectedUser && (
         <>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+          <div className="bg-[var(--color-warning-bg)] border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
             Warning: This directly overwrites the user's stats. Values are SET, not incremented.
           </div>
 
           {error && <p className="text-xs text-red-600">{error}</p>}
-          {success && <p className="text-xs text-emerald-600 font-medium">{success}</p>}
+          {success && <p className="text-xs text-[var(--color-success-text)] font-medium">{success}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">XP</label>
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">XP</label>
               <input
                 type="number" min="0" value={xp}
                 onChange={(e) => setXp(e.target.value)}
@@ -556,7 +556,7 @@ function OverrideTab({ stats }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Study Minutes</label>
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Study Minutes</label>
               <input
                 type="number" min="0" value={studyMinutes}
                 onChange={(e) => setStudyMinutes(e.target.value)}
@@ -564,7 +564,7 @@ function OverrideTab({ stats }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Papers Completed</label>
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Papers Completed</label>
               <input
                 type="number" min="0" value={papersCompleted}
                 onChange={(e) => setPapersCompleted(e.target.value)}
@@ -609,14 +609,14 @@ export default function AdminPage() {
   useEffect(() => { loadAll(); }, [loadAll]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-[var(--color-surface)] p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-extrabold text-gray-900">Admin Panel</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Platform overview</p>
+          <h1 className="text-2xl font-extrabold text-[var(--color-text-primary)]">Admin Panel</h1>
+          <p className="text-sm text-[var(--color-text-muted)] mt-0.5">Platform overview</p>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-xl text-sm">{error}</div>}
+        {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-xl text-sm">{error}</div>}
 
         {/* Tab bar */}
         <div className="flex gap-1 mb-6 border-b">
@@ -627,7 +627,7 @@ export default function AdminPage() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab
                   ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'
               }`}
             >
               {tab}
@@ -636,7 +636,7 @@ export default function AdminPage() {
         </div>
 
         {loading ? (
-          <p className="text-gray-400 text-sm">Loading…</p>
+          <p className="text-[var(--color-text-muted)] text-sm">Loading…</p>
         ) : (
           <>
             {activeTab === 'Overview' && <OverviewTab stats={stats} classes={classes} />}

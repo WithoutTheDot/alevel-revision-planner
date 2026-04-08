@@ -132,7 +132,7 @@ export default function FullscreenTimer() {
         {/* Minimise button */}
         <button
           onClick={() => setFullscreen(false)}
-          className="absolute top-4 right-4 p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+          className="absolute top-4 right-4 p-2.5 rounded-xl bg-[var(--color-surface)]/10 hover:bg-[var(--color-surface)]/20 transition-colors"
           aria-label="Minimise timer"
         >
           <MinimiseIcon />
@@ -169,9 +169,9 @@ export default function FullscreenTimer() {
 
         {/* Progress bar */}
         {!isOvertime && expectedSecs > 0 && (
-          <div className="w-64 h-1.5 bg-white/20 rounded-full overflow-hidden mb-4">
+          <div className="w-64 h-1.5 bg-[var(--color-surface)]/20 rounded-full overflow-hidden mb-4">
             <div
-              className="h-1.5 bg-white rounded-full transition-all duration-1000"
+              className="h-1.5 bg-[var(--color-surface)] rounded-full transition-all duration-1000"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -187,7 +187,7 @@ export default function FullscreenTimer() {
         {/* Complete Paper */}
         <button
           onClick={() => setCompleting(true)}
-          className="px-8 py-3 bg-white text-indigo-700 rounded-xl font-bold text-sm hover:bg-white/90 transition-all shadow-lg active:scale-95 mb-4"
+          className="px-8 py-3 bg-[var(--color-surface)] text-indigo-700 rounded-xl font-bold text-sm hover:bg-[var(--color-surface)]/90 transition-all shadow-lg active:scale-95 mb-4"
         >
           Complete Paper
         </button>
@@ -197,7 +197,7 @@ export default function FullscreenTimer() {
           {session.isRunning ? (
             <button
               onClick={pauseSession}
-              className="flex items-center gap-2 px-6 py-3 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl font-semibold text-sm transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--color-surface)]/15 hover:bg-[var(--color-surface)]/25 border border-white/20 rounded-xl font-semibold text-sm transition-all"
             >
               <PauseIcon />
               Pause
@@ -205,7 +205,7 @@ export default function FullscreenTimer() {
           ) : (
             <button
               onClick={resumeSession}
-              className="flex items-center gap-2 px-6 py-3 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl font-semibold text-sm transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--color-surface)]/15 hover:bg-[var(--color-surface)]/25 border border-white/20 rounded-xl font-semibold text-sm transition-all"
             >
               <PlayIcon />
               Resume
@@ -221,7 +221,7 @@ export default function FullscreenTimer() {
           Stop timer
         </button>
 
-        {error && <p className="mt-3 text-xs text-rose-200 bg-white/10 rounded px-3 py-1">{error}</p>}
+        {error && <p className="mt-3 text-xs text-rose-200 bg-[var(--color-surface)]/10 rounded px-3 py-1">{error}</p>}
       </div>
 
       {completing && (

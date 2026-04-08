@@ -195,6 +195,6 @@ export const SUBJECT_TREES = { maths, furtherMaths, physics, computerScience };
 export const SUBJECT_META = {
   maths:          { label: 'Maths',          color: 'bg-blue-500',   text: 'text-blue-700',   light: 'bg-blue-100' },
   furtherMaths:   { label: 'Further Maths',  color: 'bg-indigo-500', text: 'text-indigo-700', light: 'bg-indigo-100' },
-  physics:        { label: 'Physics',         color: 'bg-red-500',    text: 'text-red-700',    light: 'bg-red-100' },
+  physics:        { label: 'Physics',         color: 'bg-[var(--color-danger-bg)]0',    text: 'text-[var(--color-danger-text)]',    light: 'bg-[var(--color-danger-bg)]' },
   computerScience:{ label: 'Computer Science',color: 'bg-green-500',  text: 'text-green-700',  light: 'bg-green-100' },
 };

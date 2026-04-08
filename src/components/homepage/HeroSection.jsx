@@ -87,7 +87,7 @@ export default function HeroSection() {
             variants={prefersReduced ? {} : item}
             className="animate-float mx-auto max-w-md relative"
           >
-            <div className="bg-white border border-brand-border rounded-[var(--radius-lg)] p-5 text-left shadow-[var(--shadow-md)]">
+            <div className="bg-[var(--color-surface)] border border-brand-border rounded-[var(--radius-lg)] p-5 text-left shadow-[var(--shadow-md)]">
               {/* Card header */}
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs text-brand-muted font-display font-semibold uppercase tracking-widest">

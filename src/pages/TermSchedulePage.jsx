@@ -8,9 +8,9 @@ import { useAsyncData } from '../hooks/useAsyncData';
 
 const WEEK_TYPES = [
   { value: 'week-a',  label: 'Week A',  templateId: 'week-a',  color: 'bg-sky-100 hover:bg-sky-200 border-sky-300' },
-  { value: 'week-b',  label: 'Week B',  templateId: 'week-b',  color: 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300' },
-  { value: 'holiday', label: 'Holiday', templateId: 'holiday', color: 'bg-amber-100 hover:bg-amber-200 border-amber-300' },
-  { value: null,      label: 'Clear',   templateId: null,      color: 'bg-gray-100 hover:bg-gray-200 border-gray-300' },
+  { value: 'week-b',  label: 'Week B',  templateId: 'week-b',  color: 'bg-[var(--color-success-bg)] hover:bg-emerald-200 border-emerald-300' },
+  { value: 'holiday', label: 'Holiday', templateId: 'holiday', color: 'bg-[var(--color-warning-bg)] hover:bg-amber-200 border-amber-300' },
+  { value: null,      label: 'Clear',   templateId: null,      color: 'bg-[var(--color-surface)] hover:bg-gray-200 border-gray-300' },
 ];
 
 const TYPE_CELL_COLORS = {
@@ -63,7 +63,7 @@ export default function TermSchedulePage() {
       { weekStartsOn: 1 }
     );
     return (
-      <div key={format(monthDate, 'yyyy-MM')} className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+      <div key={format(monthDate, 'yyyy-MM')} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 text-center">{format(monthDate, 'MMMM yyyy')}</h3>
         <div className="space-y-1">
           {weeks.map((weekMon) => {
@@ -134,7 +134,7 @@ export default function TermSchedulePage() {
         ))}
       </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
       {loading ? (
         <p className="text-[var(--color-text-muted)] text-sm">Loading…</p>
@@ -144,7 +144,7 @@ export default function TermSchedulePage() {
         </div>
       )}
 
-      <div className="mt-4 bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 flex flex-wrap gap-5">
+      <div className="mt-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 flex flex-wrap gap-5">
         {['week-a', 'week-b', 'holiday'].map((type) => {
           const count = Object.values(calendar).filter((e) => e.weekType === type).length;
           return (

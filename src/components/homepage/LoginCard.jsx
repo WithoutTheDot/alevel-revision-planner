@@ -94,7 +94,7 @@ export default function LoginCard({ tab, setTab, email, setEmail, password, setP
           {/* Error */}
           {error && (
             <div
-              className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 dark:bg-red-950/60 dark:border-red-800/50 dark:text-red-300 text-sm"
+              className="mb-5 p-3 rounded-xl bg-[var(--color-danger-bg)] border border-red-200 text-[var(--color-danger-text)] dark:bg-red-950/60 dark:border-red-800/50 dark:text-red-300 text-sm"
               role="alert"
             >
               {error}
@@ -165,7 +165,8 @@ export default function LoginCard({ tab, setTab, email, setEmail, password, setP
             </a>
             {setDark && (
               <button
-                onClick={() => setDark((d) => !d)}
+                type="button"
+                onClick={() => setDark(!dark)}
                 aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
                 className="p-1.5 rounded-lg hover:bg-brand-border/40 transition-colors"
               >

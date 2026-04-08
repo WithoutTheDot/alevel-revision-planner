@@ -195,7 +195,7 @@ export default function HistoryPage() {
         <div className="flex items-center gap-2 flex-shrink-0 ml-4">
           {view === 'table' && papers.length > 0 && (
             <button onClick={exportCsv}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+              className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
               Export CSV
             </button>
           )}
@@ -205,7 +205,7 @@ export default function HistoryPage() {
                 className={'px-4 py-2 text-sm font-medium capitalize transition-colors ' +
                   (view === v
                     ? 'bg-[var(--color-accent)] text-white'
-                    : 'bg-white text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]')}>
+                    : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]')}>
                 {v}
               </button>
             ))}
@@ -213,10 +213,10 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {loadError && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{loadError}</div>}
+      {loadError && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{loadError}</div>}
 
       {loading ? (
-        <p className="text-gray-400 text-sm">Loading...</p>
+        <p className="text-[var(--color-text-muted)] text-sm">Loading...</p>
       ) : view === 'charts' ? (
         <HistoryCharts
           gradeChartData={gradeChartData}
@@ -239,7 +239,7 @@ export default function HistoryPage() {
           />
 
           {filtered.length === 0 ? (
-            <p className="text-gray-400 text-sm">No papers match your filters.</p>
+            <p className="text-[var(--color-text-muted)] text-sm">No papers match your filters.</p>
           ) : (
             <HistoryTable
               filtered={filtered}
@@ -265,7 +265,7 @@ export default function HistoryPage() {
       )}
 
       {editError && (
-        <div className="fixed bottom-4 right-4 z-50 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm border border-red-200">
+        <div className="fixed bottom-4 right-4 z-50 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm border border-red-200">
           {editError}
         </div>
       )}

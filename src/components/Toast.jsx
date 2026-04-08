@@ -13,14 +13,14 @@ export default function Toast({ message, onDismiss }) {
   }, [onDismiss]);
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 shadow-lg rounded-2xl min-w-64 max-w-sm">
+    <div className="flex items-center gap-3 px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg rounded-2xl min-w-64 max-w-sm">
       <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
         <BellIcon />
       </div>
-      <p className="flex-1 text-sm font-medium text-gray-800">{message}</p>
+      <p className="flex-1 text-sm font-medium text-[var(--color-text-primary)]">{message}</p>
       <button
         onClick={onDismiss}
-        className="text-gray-300 hover:text-gray-500 text-lg leading-none ml-1"
+        className="text-gray-300 hover:text-[var(--color-text-muted)] text-lg leading-none ml-1"
         aria-label="Dismiss"
       >
         ×

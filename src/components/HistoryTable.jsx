@@ -17,13 +17,13 @@ export default function HistoryTable({
   return (
     <div>
       {/* Mobile card list */}
-      <ul className="sm:hidden divide-y bg-white rounded-xl border overflow-hidden">
+      <ul className="sm:hidden divide-y bg-[var(--color-surface)] rounded-xl border overflow-hidden">
         {filtered.map((p) => {
           const pct = calcPct(p.marks);
           return (
             <li key={p.id} className="px-4 py-3 space-y-1">
               <div className="flex items-start justify-between">
-                <p className="font-medium text-gray-800 text-sm">{p.displayName}</p>
+                <p className="font-medium text-[var(--color-text-primary)] text-sm">{p.displayName}</p>
                 <div className="flex items-center gap-2 ml-2">
                   <button onClick={() => onEdit?.(p)} className="text-gray-300 hover:text-indigo-500" title="Edit">
                     <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M17.414 2.586a2 2 0 0 0-2.828 0L3 14.172V17h2.828L17.414 5.414a2 2 0 0 0 0-2.828z" /></svg>
@@ -36,12 +36,12 @@ export default function HistoryTable({
               <div className="flex flex-wrap items-center gap-2">
                 <SubjectBadge subject={p.subject} />
                 {p.grade && <span className="font-semibold text-indigo-600 text-sm">{p.grade}</span>}
-                {p.marks && <span className="text-xs text-gray-500">{p.marks}{pct !== null ? ` (${pct}%)` : ''}</span>}
+                {p.marks && <span className="text-xs text-[var(--color-text-muted)]">{p.marks}{pct !== null ? ` (${pct}%)` : ''}</span>}
                 {p.actualDurationSeconds != null && (
-                  <span className="text-xs font-mono text-gray-500">{formatTime(p.actualDurationSeconds)}</span>
+                  <span className="text-xs font-mono text-[var(--color-text-muted)]">{formatTime(p.actualDurationSeconds)}</span>
                 )}
                 {pbSet?.has(p.id) && <PbBadge seconds={p.actualDurationSeconds} />}
-                <span className="text-xs text-gray-400">{p.completedAt ? new Date(p.completedAt).toLocaleDateString() : '—'}</span>
+                <span className="text-xs text-[var(--color-text-muted)]">{p.completedAt ? new Date(p.completedAt).toLocaleDateString() : '—'}</span>
               </div>
             </li>
           );
@@ -49,10 +49,10 @@ export default function HistoryTable({
       </ul>
 
       {/* Desktop table */}
-      <div className="hidden sm:block bg-white rounded-xl border overflow-hidden">
+      <div className="hidden sm:block bg-[var(--color-surface)] rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b text-left text-xs text-gray-500 uppercase tracking-wide">
+            <tr className="bg-[var(--color-surface)] border-b text-left text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
               <th className="px-4 py-3">Paper</th>
               <th className="px-4 py-3">Subject</th>
               <th className="px-4 py-3">Week</th>
@@ -67,25 +67,25 @@ export default function HistoryTable({
             {filtered.map((p) => {
               const pct = calcPct(p.marks);
               return (
-                <tr key={p.id} className="hover:bg-gray-50">
+                <tr key={p.id} className="hover:bg-[var(--color-surface)]">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-gray-800">{p.displayName}</p>
+                    <p className="font-medium text-[var(--color-text-primary)]">{p.displayName}</p>
                     {p.comment && (
-                      <p className="text-xs text-gray-400 mt-0.5 max-w-xs truncate" title={p.comment}>{p.comment}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-0.5 max-w-xs truncate" title={p.comment}>{p.comment}</p>
                     )}
                   </td>
                   <td className="px-4 py-3"><SubjectBadge subject={p.subject} /></td>
-                  <td className="px-4 py-3 text-gray-500">{p.weekId}</td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-[var(--color-text-muted)]">{p.weekId}</td>
+                  <td className="px-4 py-3 text-[var(--color-text-secondary)]">
                     {p.marks ?? '—'}
-                    {pct !== null && <span className="text-xs text-gray-400 ml-1">({pct}%)</span>}
+                    {pct !== null && <span className="text-xs text-[var(--color-text-muted)] ml-1">({pct}%)</span>}
                   </td>
                   <td className="px-4 py-3">
                     {p.grade ? (
                       <span className="font-semibold text-indigo-600">{p.grade}</span>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3 text-[var(--color-text-muted)]">
                     {p.actualDurationSeconds != null ? (
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono text-xs">{formatTime(p.actualDurationSeconds)}</span>
@@ -93,7 +93,7 @@ export default function HistoryTable({
                       </div>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-400">
+                  <td className="px-4 py-3 text-[var(--color-text-muted)]">
                     {p.completedAt ? new Date(p.completedAt).toLocaleDateString() : '—'}
                   </td>
                   <td className="px-4 py-3">

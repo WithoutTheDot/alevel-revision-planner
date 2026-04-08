@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useDarkMode } from '../hooks/useDarkMode';
+import { useTheme } from '../contexts/ThemeContext';
 import LoginCard from '../components/homepage/LoginCard';
 import { friendlyAuthError } from '../lib/authErrors';
 
@@ -13,7 +13,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
-  const [dark, setDark] = useDarkMode();
+  const { theme, setTheme } = useTheme();
+  const dark = theme === 'dark';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -45,7 +46,7 @@ export default function LoginPage() {
       loading={loading}
       onSubmit={handleSubmit}
       dark={dark}
-      setDark={setDark}
+      setDark={(d) => setTheme(d ? 'dark' : 'light')}
     />
   );
 }

@@ -316,7 +316,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2 flex-shrink-0 ml-4">
           <button
             onClick={() => setShowLogModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] transition-colors"
           >
             Log Paper
           </button>
@@ -329,7 +329,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
       {loading ? (
         <DashboardSkeleton />
@@ -337,28 +337,28 @@ export default function DashboardPage() {
         <div className="space-y-5">
           {/* Stat cards */}
           <div className={`grid gap-3 ${reviewModeEnabled ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+            <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
               <p className="text-xs text-[var(--color-text-muted)] mb-1">Streak</p>
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{streak || '—'}</p>
               {longestStreak > 0 && (
                 <p className="text-xs text-[var(--color-text-muted)] mt-1">Best: {longestStreak}</p>
               )}
             </div>
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+            <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
               <p className="text-xs text-[var(--color-text-muted)] mb-1">Papers done</p>
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{completed}/{total}</p>
             </div>
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+            <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
               <p className="text-xs text-[var(--color-text-muted)] mb-1">Study hours</p>
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{studyHrs}h</p>
             </div>
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+            <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
               <p className="text-xs text-[var(--color-text-muted)] mb-1">Level</p>
               <p className="text-2xl font-semibold text-[var(--color-text-primary)] leading-none">{level}</p>
               <p className="text-xs text-[var(--color-text-muted)] mt-1">{xp} XP</p>
             </div>
             {reviewModeEnabled && (
-              <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
+              <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
                 <p className="text-xs text-[var(--color-text-muted)] mb-1">Top review topic</p>
                 {topReviewTopic ? (
                   <>
@@ -390,8 +390,8 @@ export default function DashboardPage() {
 
           {/* b. Overdue warning card */}
           {overdueCount > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-[var(--radius-lg)] p-4 flex items-center justify-between">
-              <p className="text-sm text-red-700 font-medium">
+            <div className="bg-[var(--color-danger-bg)] border border-red-200 rounded-[var(--radius-lg)] p-4 flex items-center justify-between">
+              <p className="text-sm text-[var(--color-danger-text)] font-medium">
                 {overdueCount} incomplete paper{overdueCount > 1 ? 's' : ''} from last week
               </p>
               <div className="flex items-center gap-3">
@@ -406,7 +406,7 @@ export default function DashboardPage() {
           )}
 
           {!schedule ? (
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
+            <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
               <p className="text-sm font-medium text-[var(--color-text-primary)]">No schedule for this week yet — here&apos;s how to get started:</p>
               <ol className="text-sm text-[var(--color-text-secondary)] space-y-2 list-decimal list-inside">
                 <li>Go to <Link to="/term-schedule" className="text-[var(--color-accent)] underline font-medium">Term Schedule</Link> and paint your weeks as Week A, Week B, or Holiday.</li>
@@ -423,7 +423,7 @@ export default function DashboardPage() {
           ) : (
             <>
               {/* Progress bar */}
-              <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5">
+              <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-sm font-medium text-[var(--color-text-secondary)]">This Week</h2>
                   <span className="text-lg font-semibold text-[var(--color-accent)]">{pct}%</span>
@@ -448,7 +448,7 @@ export default function DashboardPage() {
                 />
 
                 {/* Subject breakdown */}
-                <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5">
+                <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5">
                   <h2 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">By Subject</h2>
                   <div className="space-y-3">
                     {Object.entries(bySubject).map(([subject, counts]) => (
@@ -476,7 +476,7 @@ export default function DashboardPage() {
                   <Link to="/classes" className="text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]">Join or create →</Link>
                 </div>
               ) : classWidget ? (
-                <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+                <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                   <div className="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
                     <h2 className="text-sm font-medium text-[var(--color-text-primary)]">{classWidget.class.name}</h2>
                     <Link to={`/classes/${classWidget.class.id}`} className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] font-medium">View full →</Link>
@@ -515,7 +515,7 @@ export default function DashboardPage() {
               ) : null}
 
               {/* All papers list */}
-              <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+              <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                 <div className="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
                   <h2 className="text-sm font-medium text-[var(--color-text-primary)]">All Papers</h2>
                   <Link to="/calendar" className="text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] font-medium">View calendar →</Link>

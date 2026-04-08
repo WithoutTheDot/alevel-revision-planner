@@ -76,7 +76,7 @@ export default function ReviewPage() {
   function QueueItem({ item, showSchedule }) {
     const sm = subjectMeta[item.subject];
     return (
-      <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-md)] px-4 py-3 flex flex-wrap items-center gap-3">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] px-4 py-3 flex flex-wrap items-center gap-3">
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${sm?.color ?? 'bg-gray-400'}`}>
           {item.topic}
         </span>
@@ -92,7 +92,7 @@ export default function ReviewPage() {
             weekPickerOpen === item.id ? (
               <div className="flex items-center gap-2">
                 <input type="date" value={weekPickerValue} onChange={(e) => setWeekPickerValue(e.target.value)}
-                  className="text-xs border border-[var(--color-border)] rounded px-2 py-1 bg-white" />
+                  className="text-xs border border-[var(--color-border)] rounded px-2 py-1 bg-[var(--color-surface)]" />
                 <button onClick={() => handleQueueForWeek(item)}
                   className="text-xs font-medium text-[var(--color-accent)] hover:underline">Confirm</button>
                 <button onClick={() => setWeekPickerOpen(null)}
@@ -104,7 +104,7 @@ export default function ReviewPage() {
             )
           )}
           <button onClick={() => handleMarkDone(item)}
-            className="text-xs font-medium text-emerald-600 hover:underline">Mark done</button>
+            className="text-xs font-medium text-[var(--color-success-text)] hover:underline">Mark done</button>
           <button onClick={() => handleDelete(item)}
             className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-danger)]">Delete</button>
         </div>
@@ -120,18 +120,18 @@ export default function ReviewPage() {
       </div>
 
       {!loading && !reviewModeEnabled && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-[var(--radius-md)] text-sm text-amber-800">
+        <div className="mb-6 p-4 bg-[var(--color-warning-bg)] border border-amber-200 rounded-[var(--radius-md)] text-sm text-amber-800">
           Review mode is off. Enable it in{' '}
           <Link to="/settings" className="font-medium underline">Settings</Link> to tag topics after each paper.
         </div>
       )}
 
       {(error || actionError) && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error || actionError}</div>
+        <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error || actionError}</div>
       )}
 
       {loading ? (
-        <p className="text-gray-400 text-sm">Loading...</p>
+        <p className="text-[var(--color-text-muted)] text-sm">Loading...</p>
       ) : (
         <div className="space-y-8">
           {/* Queue sections */}

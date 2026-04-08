@@ -5,9 +5,9 @@ const SIZE = {
 
 const VARIANT = {
   primary: 'bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white',
-  secondary: 'bg-white border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]',
+  secondary: 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]',
   ghost: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]',
-  danger: 'text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-red-50',
+  danger: 'text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-[var(--color-danger-bg)]',
 };
 
 export default function Button({ variant = 'secondary', size = 'md', className = '', children, ...rest }) {

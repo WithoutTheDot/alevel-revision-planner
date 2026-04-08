@@ -15,6 +15,16 @@
   --brand-muted:      148 163 184; /* slate-400 */
 }
 
+.dark {
+  --brand-bg:          15  23  42; /* slate-900 */
+  --brand-surface:     30  41  59; /* slate-800 */
+  --brand-border:      51  65  85; /* slate-700 */
+  --brand-accent:     139  92 246; /* violet-500 */
+  --brand-accent-dim: 167 139 250; /* violet-400 */
+  --brand-text:       248 250 252; /* slate-50 */
+  --brand-muted:      100 116 139; /* slate-500 */
+}
+
 body {
   font-family: 'DM Sans', system-ui, sans-serif;
   background-color: var(--color-bg, #ffffff);

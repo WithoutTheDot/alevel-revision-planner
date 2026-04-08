@@ -10,14 +10,20 @@
   --color-text-secondary: #475569;
   --color-text-muted:     #94a3b8;
 
-  /* Accent — violet-600, interactive elements only */
+  /* Accent — violet-600 */
   --color-accent:        #7c3aed;
   --color-accent-hover:  #6d28d9;
-  --color-accent-subtle: #ede9fe;
-  --color-accent-text:   #5b21b6;
+  --color-accent-subtle: #f5f3ff; /* violet-50 */
+  --color-accent-text:   #5b21b6; /* violet-800 */
 
-  /* Danger */
-  --color-danger:        #dc2626;
+  /* Status Colors */
+  --color-danger:        #ef4444; /* red-500 */
+  --color-danger-bg:     #fef2f2; /* red-50 */
+  --color-danger-text:   #b91c1c; /* red-700 */
+  --color-warning-bg:    #fffbeb; /* amber-50 */
+  --color-warning-text:  #b45309; /* amber-700 */
+  --color-success-bg:    #ecfdf5; /* emerald-50 */
+  --color-success-text:  #047857; /* emerald-700 */
 
   /* Elevation — modals only */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
@@ -27,4 +33,36 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
+}
+
+.dark {
+  /* Surfaces */
+  --color-bg:            #0f172a; /* slate-900 */
+  --color-surface:       #1e293b; /* slate-800 */
+  --color-border:        #334155; /* slate-700 */
+  --color-border-strong: #475569; /* slate-600 */
+
+  /* Text */
+  --color-text-primary:   #f8fafc; /* slate-50 */
+  --color-text-secondary: #cbd5e1; /* slate-300 */
+  --color-text-muted:     #64748b; /* slate-500 */
+
+  /* Accent — violet-500, slightly brighter for dark mode */
+  --color-accent:        #8b5cf6;
+  --color-accent-hover:  #a78bfa;
+  --color-accent-subtle: #1e1b4b; /* indigo-950 */
+  --color-accent-text:   #c4b5fd; /* violet-300 */
+
+  /* Status Colors */
+  --color-danger:        #ef4444; /* red-500 */
+  --color-danger-bg:     #450a0a; /* red-950 */
+  --color-danger-text:   #fca5a5; /* red-300 */
+  --color-warning-bg:    #451a03; /* amber-950 */
+  --color-warning-text:  #fcd34d; /* amber-300 */
+  --color-success-bg:    #064e3b; /* emerald-950 */
+  --color-success-text:  #6ee7b7; /* emerald-300 */
+
+  /* Elevation — modals only */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2);
 }

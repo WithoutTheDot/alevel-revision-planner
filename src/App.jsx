@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TimerProvider } from './contexts/TimerContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { SubjectsProvider } from './contexts/SubjectsContext';
 import { NudgeProvider } from './contexts/NudgeContext';
 import { TutorialProvider } from './contexts/TutorialContext';
@@ -29,7 +30,7 @@ const BadgesPage       = lazy(() => import('./pages/BadgesPage'));
 const AdminPage        = lazy(() => import('./pages/AdminPage'));
 
 function PageLoader() {
-  return <div className="flex items-center justify-center h-full text-gray-400 text-sm">Loading…</div>;
+  return <div className="flex items-center justify-center h-full text-[var(--color-text-muted)] text-sm">Loading…</div>;
 }
 
 function AnalyticsTracker() {
@@ -61,7 +62,8 @@ function OnboardingGuard({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
       <Routes>
         {/* Admin — completely isolated from all app providers */}
         <Route
@@ -135,5 +137,6 @@ export default function App() {
         />
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }

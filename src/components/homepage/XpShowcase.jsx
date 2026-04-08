@@ -59,7 +59,7 @@ export default function XpShowcase() {
             viewport={{ once: true }}
             transition={{ delay: 0.1, type: 'spring', stiffness: 260, damping: 28 }}
           >
-            <div className="rounded-[var(--radius-lg)] bg-white border border-brand-border p-6 shadow-[var(--shadow-sm)]">
+            <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface)] border border-brand-border p-6 shadow-[var(--shadow-sm)]">
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <div>

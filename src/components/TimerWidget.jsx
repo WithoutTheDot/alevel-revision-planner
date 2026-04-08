@@ -75,9 +75,9 @@ export default function TimerWidget({ nextPaper, weekId, getTimerData, onComplet
       {/* Progress bar (only when running) */}
       {isRunning && (
         <div className="mb-4">
-          <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[var(--color-surface)]/20 rounded-full overflow-hidden">
             <div
-              className="h-1.5 bg-white rounded-full transition-all duration-1000"
+              className="h-1.5 bg-[var(--color-surface)] rounded-full transition-all duration-1000"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -89,7 +89,7 @@ export default function TimerWidget({ nextPaper, weekId, getTimerData, onComplet
         {!isRunning ? (
           <button
             onClick={() => onStartModal(nextPaper)}
-            className="flex-1 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="flex-1 bg-[var(--color-surface)]/15 hover:bg-[var(--color-surface)]/25 backdrop-blur-sm border border-white/20 text-white font-bold py-3 rounded-xl text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.84Z" />
@@ -100,7 +100,7 @@ export default function TimerWidget({ nextPaper, weekId, getTimerData, onComplet
           <>
             <button
               onClick={() => onComplete(nextPaper, nextPaper._idx)}
-              className="flex-1 bg-white text-emerald-700 font-bold py-3 rounded-xl text-sm transition-all hover:bg-white/90 active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 bg-[var(--color-surface)] text-[var(--color-success-text)] font-bold py-3 rounded-xl text-sm transition-all hover:bg-[var(--color-surface)]/90 active:scale-95 flex items-center justify-center gap-2"
             >
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                 <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />

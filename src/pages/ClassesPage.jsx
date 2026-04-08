@@ -15,7 +15,7 @@ function CopyButton({ text }) {
     <button
       onClick={handleCopy}
       className={`ml-2 text-xs px-2 py-0.5 rounded-lg border transition-colors ${
-        copied ? 'border-emerald-300 text-emerald-600 bg-emerald-50' : 'border-gray-300 text-gray-500 hover:bg-gray-50'
+        copied ? 'border-emerald-300 text-[var(--color-success-text)] bg-[var(--color-success-bg)]' : 'border-gray-300 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}
@@ -102,11 +102,11 @@ export default function ClassesPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-extrabold text-gray-900">Classes</h1>
+        <h1 className="text-2xl font-extrabold text-[var(--color-text-primary)]">Classes</h1>
         <div className="flex gap-2">
           <button
             onClick={() => { setShowJoin(true); setError(''); }}
-            className="px-4 py-2 rounded-xl border text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 rounded-xl border text-sm font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
           >
             Join Class
           </button>
@@ -119,31 +119,31 @@ export default function ClassesPage() {
         </div>
       </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded text-sm">{error}</div>}
 
       {loading ? (
-        <p className="text-gray-400 text-sm">Loading…</p>
+        <p className="text-[var(--color-text-muted)] text-sm">Loading…</p>
       ) : classes.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-[var(--color-text-muted)]">
           <p className="text-lg font-medium mb-1">No classes yet</p>
           <p className="text-sm">Create a class or join one with a 6-character code.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {classes.map((cls) => (
-            <div key={cls.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex">
+            <div key={cls.id} className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden flex">
               <div className="w-1.5 bg-gradient-to-b from-indigo-400 to-violet-500 flex-shrink-0" />
               <div className="flex items-start justify-between gap-3 p-5 flex-1">
                 <div>
-                  <h2 className="text-base font-bold text-gray-900">{cls.name}</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <h2 className="text-base font-bold text-[var(--color-text-primary)]">{cls.name}</h2>
+                  <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
                     {cls.members?.length ?? 0} member{cls.members?.length !== 1 ? 's' : ''}
                     {cls.subject && (
                       <> · <span className="text-indigo-600 font-medium">{ALL_SUBJECTS.find((s) => s.id === cls.subject)?.label ?? cls.subject}</span></>
                     )}
                   </p>
                   <div className="flex items-center mt-2">
-                    <span className="text-xs text-gray-400 mr-1">Code:</span>
+                    <span className="text-xs text-[var(--color-text-muted)] mr-1">Code:</span>
                     <span className="font-mono text-sm font-bold tracking-widest text-indigo-700">{cls.code}</span>
                     <CopyButton text={cls.code} />
                   </div>
@@ -171,11 +171,11 @@ export default function ClassesPage() {
       {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Create a Class</h2>
+          <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-4">Create a Class</h2>
             {createdCode ? (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Class created! Share this code with classmates:</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-3">Class created! Share this code with classmates:</p>
                 <div className="flex items-center justify-center gap-2 py-4">
                   <span className="font-mono text-3xl font-bold tracking-widest text-indigo-700">{createdCode}</span>
                   <CopyButton text={createdCode} />
@@ -189,7 +189,7 @@ export default function ClassesPage() {
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Class Name</label>
                 <input
                   className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-3"
                   placeholder="e.g. 6th Form Study Group"
@@ -198,7 +198,7 @@ export default function ClassesPage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   autoFocus
                 />
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Subject</label>
                 <select
                   className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-4"
                   value={newClassSubject}
@@ -209,7 +209,7 @@ export default function ClassesPage() {
                   ))}
                 </select>
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Cancel</button>
+                  <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg border text-sm hover:bg-[var(--color-surface)]">Cancel</button>
                   <button
                     onClick={handleCreate}
                     disabled={creating || !newClassName.trim()}
@@ -227,10 +227,10 @@ export default function ClassesPage() {
       {/* Join modal */}
       {showJoin && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Join a Class</h2>
-            {error && <div className="mb-3 p-2 bg-red-50 text-red-700 rounded text-sm">{error}</div>}
-            <label className="block text-sm font-medium text-gray-700 mb-1">6-Character Code</label>
+          <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-4">Join a Class</h2>
+            {error && <div className="mb-3 p-2 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded text-sm">{error}</div>}
+            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">6-Character Code</label>
             <input
               className="w-full border rounded-md px-3 py-2 text-sm font-mono tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-4"
               placeholder="XXXXXX"
@@ -240,7 +240,7 @@ export default function ClassesPage() {
               autoFocus
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => { setShowJoin(false); setJoinCode(''); setError(''); }} className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { setShowJoin(false); setJoinCode(''); setError(''); }} className="px-4 py-2 rounded-lg border text-sm hover:bg-[var(--color-surface)]">Cancel</button>
               <button
                 onClick={handleJoin}
                 disabled={joining || joinCode.length !== 6}

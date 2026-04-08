@@ -31,9 +31,9 @@ export default function AdminRoute({ children }) {
 
   if (!authed) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 w-full max-w-sm">
-          <h1 className="text-xl font-bold text-gray-900 mb-6">Admin Login</h1>
+      <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center">
+        <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-sm p-8 w-full max-w-sm">
+          <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-6">Admin Login</h1>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input

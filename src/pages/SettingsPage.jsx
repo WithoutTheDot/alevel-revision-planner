@@ -17,13 +17,14 @@ import Modal from '../components/Modal';
 import { inputCls as baseInputCls } from '../lib/styles';
 import { DEFAULT_PAPER_DURATION_MINS } from '../lib/constants';
 import { useAsyncData } from '../hooks/useAsyncData';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TABS = ['General', 'Papers', 'Subjects', 'Exams', 'Account'];
 
 function Field({ label, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">{label}</label>
       {children}
     </div>
   );
@@ -80,6 +81,8 @@ function buildDisplayFamilies(firestoreMap) {
 export default function SettingsPage() {
   const { currentUser, profile, logout, refreshProfile } = useAuth();
   const { subjects, subjectMeta, addSubject, removeSubject } = useSubjects();
+  const { theme, setTheme } = useTheme();
+  const dark = theme === 'dark';
   const [tab, setTab] = useState('General');
   const [displayNameInput, setDisplayNameInput] = useState('');
   const [displayNameSaving, setDisplayNameSaving] = useState(false);
@@ -357,7 +360,7 @@ export default function SettingsPage() {
   }
 
   const inputCls = baseInputCls;
-  const miniInput = 'border border-[var(--color-border)] rounded-[var(--radius-sm)] px-2 py-1.5 text-sm w-20 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-center bg-white text-[var(--color-text-primary)]';
+  const miniInput = 'border border-[var(--color-border)] rounded-[var(--radius-sm)] px-2 py-1.5 text-sm w-20 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-center bg-[var(--color-surface)] text-[var(--color-text-primary)]';
 
   function FamilyRow({ displayFam, subject }) {
     const dur = familyDuration(displayFam.paperPaths);
@@ -408,15 +411,15 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {(error || loadError) && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error || loadError}</div>}
+      {(error || loadError) && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error || loadError}</div>}
 
-      {loading ? <p className="text-gray-400 text-sm">Loading...</p> : (
+      {loading ? <p className="text-[var(--color-text-muted)] text-sm">Loading...</p> : (
         <>
           {/* ── General ── */}
           {tab === 'General' && (
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
               {durations._default < 75 && (
-                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-[var(--radius-md)] text-sm flex items-start justify-between gap-3">
+                <div className="p-3 bg-[var(--color-warning-bg)] border border-amber-200 text-[var(--color-warning-text)] rounded-[var(--radius-md)] text-sm flex items-start justify-between gap-3">
                   <span>Default duration is <strong>{durations._default} min</strong>. Most A-level papers are 120–150 min.</span>
                   <button
                     onClick={async () => { await setPaperDuration(currentUser.uid, '_default', 120); setDurations((d) => ({ ...d, _default: 120 })); }}
@@ -448,9 +451,22 @@ export default function SettingsPage() {
                     onChange={(e) => setSettings((s) => ({ ...s, calendarEndHour: Number(e.target.value) }))} />
                 </Field>
               </div>
+
+              <div className="pt-2 border-t border-[var(--color-border)]">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${dark ? 'bg-[var(--color-accent)]' : 'bg-gray-200'}`}>
+                    <input type="checkbox" className="sr-only" checked={dark} onChange={() => setTheme(dark ? 'light' : 'dark')} />
+                    <div className={`absolute top-1 left-1 w-4 h-4 bg-[var(--color-surface)] rounded-full transition-transform ${dark ? 'translate-x-4' : 'translate-x-0'}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">Dark mode</p>
+                    <p className="text-xs text-[var(--color-text-muted)]">Switch to the dark theme for late-night study sessions.</p>
+                  </div>
+                </label>
+              </div>
               <div className="flex items-start justify-between gap-4 py-1">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Review mode</p>
+                  <p className="text-sm font-medium text-[var(--color-text-secondary)]">Review mode</p>
                   <p className="text-xs text-[var(--color-text-muted)] mt-0.5">After each paper, tag topics that need work. They&apos;ll appear in your review queue.</p>
                 </div>
                 <button
@@ -459,7 +475,7 @@ export default function SettingsPage() {
                   onClick={() => setSettings((s) => ({ ...s, reviewModeEnabled: !s.reviewModeEnabled }))}
                   className={'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
                     (settings.reviewModeEnabled ? 'bg-[var(--color-accent)]' : 'bg-gray-200')}>
-                  <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform ' +
+                  <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-[var(--color-surface)] shadow transform transition-transform ' +
                     (settings.reviewModeEnabled ? 'translate-x-5' : 'translate-x-0')} />
                 </button>
               </div>
@@ -468,7 +484,7 @@ export default function SettingsPage() {
                   className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
                   {saving ? 'Saving…' : 'Save'}
                 </button>
-                {saved && <span className="text-emerald-600 text-sm">Saved</span>}
+                {saved && <span className="text-[var(--color-success-text)] text-sm">Saved</span>}
               </div>
             </div>
           )}
@@ -490,7 +506,7 @@ export default function SettingsPage() {
               {familiesBySubject.map(({ subject, families }) => {
                 if (families.length === 0) return null;
                 return (
-                  <div key={subject} className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+                  <div key={subject} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                     <div className="px-4 py-2 border-b border-[var(--color-border)] flex items-center justify-between bg-[var(--color-surface)]">
                       <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
                         {subjectMeta[subject]?.label || subject}
@@ -509,7 +525,7 @@ export default function SettingsPage() {
           {/* ── Subjects ── */}
           {tab === 'Subjects' && (
             <div className="space-y-4">
-              <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                 {subjects.map((s) => (
                   <div key={s.id} className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)] last:border-0">
                     <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${s.color}`} />
@@ -545,7 +561,7 @@ export default function SettingsPage() {
               {examEntries.length === 0 ? (
                 <p className="text-sm text-[var(--color-text-muted)]">No exam entries yet.</p>
               ) : (
-                <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                   {examEntries.map((e) => (
                     <div key={e.id} className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)] last:border-0">
                       <div className="flex-1 min-w-0">
@@ -563,7 +579,7 @@ export default function SettingsPage() {
 
           {/* ── Account ── */}
           {tab === 'Account' && (
-            <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
               <p className="text-sm text-[var(--color-text-secondary)]">Signed in as <strong className="text-[var(--color-text-primary)]">{currentUser.email}</strong></p>
               <div className="space-y-2">
                 <Field label="Display name">
@@ -575,7 +591,7 @@ export default function SettingsPage() {
                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
                     {displayNameSaving ? 'Saving…' : 'Save name'}
                   </button>
-                  {displayNameSaved && <span className="text-emerald-600 text-sm">Saved</span>}
+                  {displayNameSaved && <span className="text-[var(--color-success-text)] text-sm">Saved</span>}
                 </div>
               </div>
               <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
@@ -583,7 +599,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Export data</p>
                   <p className="text-xs text-[var(--color-text-muted)] mb-2">Download all your data as a JSON file.</p>
                   <button onClick={handleExport}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                     Download backup
                   </button>
                 </div>
@@ -592,11 +608,11 @@ export default function SettingsPage() {
                   <p className="text-xs text-[var(--color-text-muted)] mb-2">If your study minutes or paper counts seem wrong, this will recompute them from your history.</p>
                   <div className="flex items-center gap-3">
                     <button onClick={handleReconcile} disabled={reconciling}
-                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                       {reconciling ? 'Repairing…' : 'Repair stats'}
                     </button>
                     {reconcileResult && (
-                      <span className="text-emerald-600 text-sm">
+                      <span className="text-[var(--color-success-text)] text-sm">
                         Fixed! {reconcileResult.papersCompleted} papers, {reconcileResult.studyMinutes}m total.
                       </span>
                     )}
@@ -604,14 +620,14 @@ export default function SettingsPage() {
                 </div>
                 <div className="border-t border-[var(--color-border)] pt-3 space-y-3">
                   <button onClick={handleLogout}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                     Log out
                   </button>
                   <div className="border-t border-[var(--color-border)] pt-3">
                     <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Danger zone</p>
                     <p className="text-xs text-[var(--color-text-muted)] mb-2">Permanently delete your account and all data. This cannot be undone.</p>
                     <button onClick={() => { setDeleteConfirmText(''); setShowDeleteModal(true); }}
-                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-red-50 transition-colors">
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-[var(--color-danger-bg)] transition-colors">
                       Delete account
                     </button>
                   </div>
@@ -709,7 +725,7 @@ export default function SettingsPage() {
                 onChange={(e) => setFamilyModal((m) => ({ ...m, data: { ...m.data, duration: Number(e.target.value) } }))} />
             </Field>
             {familyModal.isBuiltIn && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 Changing years only affects which papers get this duration override — paper generation always uses the full built-in year range.
               </p>
             )}
@@ -727,12 +743,12 @@ export default function SettingsPage() {
 
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-lg font-bold text-red-600">Delete your account</h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               This will permanently delete <strong>all your data</strong> — schedules, completed papers, XP, badges, and settings. This cannot be undone.
             </p>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               Type <strong>DELETE</strong> to confirm:
             </p>
             <input
@@ -746,7 +762,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={deleteLoading}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                 Cancel
               </button>
               <button

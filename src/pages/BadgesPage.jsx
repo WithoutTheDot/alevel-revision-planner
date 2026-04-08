@@ -42,10 +42,10 @@ export default function BadgesPage() {
     <div className="max-w-2xl">
       <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">Badges &amp; XP</h1>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-[var(--radius-md)] text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
       {/* Level card */}
-      <div className="bg-white border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5 mb-6">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5 mb-6">
         <div className="flex justify-between items-center text-sm mb-2">
           <span className="font-semibold text-[var(--color-text-primary)]">Level {level}</span>
           <span className="text-[var(--color-text-muted)]">{xpInLevel} / {xpPerLevel} XP</span>
@@ -67,8 +67,8 @@ export default function BadgesPage() {
               <div key={badge.id}
                 className={`rounded-[var(--radius-lg)] p-4 border transition-all ${
                   earned
-                    ? 'bg-white border-[var(--color-accent)] bg-[var(--color-accent-subtle)]/20'
-                    : 'bg-white border-[var(--color-border)] opacity-50'
+                    ? 'bg-[var(--color-surface)] border-[var(--color-accent)] bg-[var(--color-accent-subtle)]/20'
+                    : 'bg-[var(--color-surface)] border-[var(--color-border)] opacity-50'
                 }`}>
                 <div className={`w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center mb-3 ${
                   earned ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent)]' : 'bg-[var(--color-surface)] text-[var(--color-text-muted)]'
@@ -79,7 +79,7 @@ export default function BadgesPage() {
                 <p className="text-xs text-[var(--color-text-muted)] mt-0.5 leading-snug">{badge.description}</p>
                 <p className="text-xs font-medium text-[var(--color-accent)] mt-1.5">+{badge.xpReward} XP</p>
                 {earned ? (
-                  <p className="text-xs text-emerald-600 mt-0.5">{format(parseISO(earned.earnedAt), 'd MMM yyyy')}</p>
+                  <p className="text-xs text-[var(--color-success-text)] mt-0.5">{format(parseISO(earned.earnedAt), 'd MMM yyyy')}</p>
                 ) : (
                   <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Locked</p>
                 )}

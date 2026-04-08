@@ -54,7 +54,7 @@ function FeatureCard({ Icon, title, desc, delay, prefersReduced }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ delay, type: 'spring', stiffness: 260, damping: 28 }}
-      className="bg-white border border-brand-border rounded-[var(--radius-lg)] p-6 hover:border-brand-amber/40 transition-colors cursor-default"
+      className="bg-[var(--color-surface)] border border-brand-border rounded-[var(--radius-lg)] p-6 hover:border-brand-amber/40 transition-colors cursor-default"
     >
       <div className="w-9 h-9 rounded-[var(--radius-md)] bg-brand-surface border border-brand-border flex items-center justify-center mb-4 text-brand-amber">
         <Icon />

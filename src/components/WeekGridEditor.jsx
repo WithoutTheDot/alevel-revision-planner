@@ -115,7 +115,7 @@ export default function WeekGridEditor({ value, onChange }) {
         <div className="flex">
           <div className="w-12 flex-shrink-0" />
           {DAYS.map((d) => (
-            <div key={d} className="flex-1 text-center text-xs font-medium text-gray-500 py-1 border-b">
+            <div key={d} className="flex-1 text-center text-xs font-medium text-[var(--color-text-muted)] py-1 border-b">
               {d.slice(0, 3)}
             </div>
           ))}
@@ -130,7 +130,7 @@ export default function WeekGridEditor({ value, onChange }) {
               {/* Time label */}
               <div className="w-12 flex-shrink-0 flex items-start justify-end pr-1">
                 {isHourStart && (
-                  <span className="text-[10px] text-gray-400 leading-none -mt-0.5">
+                  <span className="text-[10px] text-[var(--color-text-muted)] leading-none -mt-0.5">
                     {String(hour).padStart(2, '0')}:00
                   </span>
                 )}
@@ -144,8 +144,8 @@ export default function WeekGridEditor({ value, onChange }) {
                     key={day}
                     className={
                       'flex-1 border-r last:border-r-0 cursor-pointer transition-colors ' +
-                      (isHourStart ? 'border-t border-gray-200 ' : 'border-t border-gray-100 ') +
-                      (on ? 'bg-indigo-400 hover:bg-indigo-500 ' : 'bg-white hover:bg-indigo-50 ')
+                      (isHourStart ? 'border-t border-[var(--color-border)] ' : 'border-t border-[var(--color-border)] ') +
+                      (on ? 'bg-indigo-400 hover:bg-indigo-500 ' : 'bg-[var(--color-surface)] hover:bg-indigo-50 ')
                     }
                     onMouseDown={(e) => handleMouseDown(cellId, e)}
                     onMouseEnter={() => handleMouseEnter(cellId)}
@@ -160,12 +160,12 @@ export default function WeekGridEditor({ value, onChange }) {
         <div className="flex">
           <div className="w-12 flex-shrink-0" />
           {DAYS.map((d) => (
-            <div key={d} className="flex-1 border-t border-gray-200" />
+            <div key={d} className="flex-1 border-t border-[var(--color-border)]" />
           ))}
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 mt-2">Click or drag to toggle study time. Blue = study slot.</p>
+      <p className="text-xs text-[var(--color-text-muted)] mt-2">Click or drag to toggle study time. Blue = study slot.</p>
     </div>
   );
 }

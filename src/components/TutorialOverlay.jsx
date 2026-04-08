@@ -138,17 +138,17 @@ export default function TutorialOverlay() {
       {/* Tooltip card */}
       <div
         style={{ ...tipStyle, width: TOOLTIP_WIDTH, zIndex: 9999, pointerEvents: 'auto' }}
-        className="bg-white rounded-xl shadow-2xl border border-gray-200 p-5"
+        className="bg-[var(--color-surface)] rounded-xl shadow-2xl border border-[var(--color-border)] p-5"
       >
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 text-base leading-tight pr-2">{step.title}</h3>
-          <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{currentStep + 1} / {totalSteps}</span>
+          <h3 className="font-semibold text-[var(--color-text-primary)] text-base leading-tight pr-2">{step.title}</h3>
+          <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap flex-shrink-0">{currentStep + 1} / {totalSteps}</span>
         </div>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4">{step.body}</p>
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">{step.body}</p>
         <div className="flex items-center justify-between gap-2">
           <button
             onClick={skip}
-            className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+            className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] underline underline-offset-2"
           >
             Skip tutorial
           </button>

@@ -57,7 +57,7 @@ function TagInput({ enabled, initialTags, onChange }) {
       <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
         Topics to review <span className="font-normal text-[var(--color-text-muted)]">(press Enter or comma to add)</span>
       </label>
-      <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 border border-[var(--color-border)] rounded-[var(--radius-sm)] bg-white focus-within:ring-1 focus-within:ring-[var(--color-accent)]">
+      <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 border border-[var(--color-border)] rounded-[var(--radius-sm)] bg-[var(--color-surface)] focus-within:ring-1 focus-within:ring-[var(--color-accent)]">
         {tags.map((tag) => (
           <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text-primary)]">
             {tag}
@@ -210,7 +210,7 @@ export default function CompletionDetailsModal({
             placeholder="e.g. 85:00"
             value={durationInput}
             onChange={(e) => setDurationInput(e.target.value)}
-            className="border border-[var(--color-border)] rounded-[var(--radius-sm)] px-2 py-1 text-xs w-28 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-white text-[var(--color-text-primary)]"
+            className="border border-[var(--color-border)] rounded-[var(--radius-sm)] px-2 py-1 text-xs w-28 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-surface)] text-[var(--color-text-primary)]"
           />
         </div>
       </div>

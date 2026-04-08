@@ -7,26 +7,36 @@ export default function ExamCountdown({ exams }) {
   if (exams.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <h2 className="font-semibold text-gray-700 mb-3">Upcoming Exams</h2>
+    <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-5 shadow-sm">
+      <h2 className="font-semibold text-[var(--color-text-secondary)] mb-3">Upcoming Exams</h2>
       <div className="space-y-3">
         {exams.map((e) => {
           const days = differenceInCalendarDays(parseISO(e.date), new Date());
-          const urgency = days <= 7 ? 'bg-red-50 border-red-200' : days <= 30 ? 'bg-amber-50 border-amber-200' : 'bg-indigo-50 border-indigo-100';
-          const textColor = days <= 7 ? 'text-red-600' : days <= 30 ? 'text-amber-600' : 'text-indigo-600';
+          const urgency = days <= 7 
+            ? 'bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger-text)]' 
+            : days <= 30 
+              ? 'bg-[var(--color-warning-bg)] border-[var(--color-warning-text)]/20 text-[var(--color-warning-text)]' 
+              : 'bg-[var(--color-accent-subtle)] border-[var(--color-accent)]/20 text-[var(--color-accent-text)]';
+          
+          const highlightColor = days <= 7 
+            ? 'text-[var(--color-danger)]' 
+            : days <= 30 
+              ? 'text-[var(--color-warning-text)]' 
+              : 'text-[var(--color-accent)]';
+
           return (
             <div key={e.id} className={`flex items-center justify-between rounded-xl border px-4 py-3 ${urgency}`}>
               <div>
-                <p className="text-sm font-semibold text-gray-800">{e.paperLabel}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">{e.paperLabel}</p>
+                <p className="text-xs opacity-80">
                   {subjectMeta[e.subject]?.label || e.subject} · {e.date} at {e.time}
                 </p>
               </div>
               <div className="text-right flex-shrink-0 ml-4">
-                <p className={`text-xl font-extrabold ${textColor}`}>
+                <p className={`text-xl font-extrabold ${highlightColor}`}>
                   {days === 0 ? 'Today!' : `${days}d`}
                 </p>
-                <p className="text-xs text-gray-400">to go</p>
+                <p className="text-xs opacity-70">to go</p>
               </div>
             </div>
           );
