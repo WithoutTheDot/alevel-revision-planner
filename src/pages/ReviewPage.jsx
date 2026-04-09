@@ -3,11 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
 import {
   getReviewQueue, updateReviewQueueItem, deleteReviewQueueItem,
-  getAllCompletedPapers, computeTopicFrequency, getUserSettings,
+  getAllCompletedPapers, computeTopicFrequency, addReviewTopics,
 } from '../firebase/db';
-import { Link } from 'react-router-dom';
 import HistoryCharts from '../components/HistoryCharts';
 import { useAsyncData } from '../hooks/useAsyncData';
+import Button from '../components/Button';
 
 export default function ReviewPage() {
   const { currentUser } = useAuth();
@@ -15,19 +15,20 @@ export default function ReviewPage() {
 
   const [reviewQueue, setReviewQueue] = useState([]);
   const [topicChartData, setTopicChartData] = useState([]);
-  const [reviewModeEnabled, setReviewModeEnabled] = useState(false);
   const [weekPickerOpen, setWeekPickerOpen] = useState(null);
   const [weekPickerValue, setWeekPickerValue] = useState('');
   const [actionError, setActionError] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addTopic, setAddTopic] = useState('');
+  const [addSubject, setAddSubject] = useState('');
+  const [addSubmitting, setAddSubmitting] = useState(false);
 
   const { loading, error } = useAsyncData(useCallback(async () => {
-    const [queue, settings, { papers }] = await Promise.all([
+    const [queue, { papers }] = await Promise.all([
       getReviewQueue(currentUser.uid),
-      getUserSettings(currentUser.uid),
       getAllCompletedPapers(currentUser.uid, { limit: 100 }),
     ]);
     setReviewQueue(queue);
-    setReviewModeEnabled(settings?.reviewModeEnabled ?? true);
     setTopicChartData(computeTopicFrequency(papers).slice(0, 10).map((t) => ({
       topic: t.topic, count: t.count, subject: t.subject,
     })));
@@ -73,6 +74,33 @@ export default function ReviewPage() {
     }
   }
 
+  async function handleAddTopic(e) {
+    e.preventDefault();
+    const trimmed = addTopic.trim();
+    if (!trimmed || !addSubject) return;
+    setAddSubmitting(true);
+    setActionError('');
+    try {
+      await addReviewTopics(currentUser.uid, [trimmed], addSubject);
+      const newItem = {
+        id: Date.now().toString(),
+        topic: trimmed,
+        subject: addSubject,
+        addedAt: new Date().toISOString(),
+        status: 'pending',
+        scheduledWeekId: null,
+        completedAt: null,
+      };
+      setReviewQueue((prev) => [newItem, ...prev]);
+      setAddTopic('');
+      setShowAddForm(false);
+    } catch (e) {
+      setActionError('Failed to add topic: ' + e.message);
+    } finally {
+      setAddSubmitting(false);
+    }
+  }
+
   function QueueItem({ item, showSchedule }) {
     const sm = subjectMeta[item.subject];
     return (
@@ -114,17 +142,62 @@ export default function ReviewPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Review</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">Topics to revisit from your completed papers</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Review</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">Topics to revisit from your completed papers</p>
+        </div>
+        <Button onClick={() => { setShowAddForm((v) => !v); setActionError(''); }}>
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+            <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+          </svg>
+          Log topic
+        </Button>
       </div>
 
-      {!loading && !reviewModeEnabled && (
-        <div className="mb-6 p-4 bg-[var(--color-warning-bg)] border border-amber-200 rounded-[var(--radius-md)] text-sm text-amber-800">
-          Review mode is off. Enable it in{' '}
-          <Link to="/settings" className="font-medium underline">Settings</Link> to tag topics after each paper.
-        </div>
+      {showAddForm && (
+        <form onSubmit={handleAddTopic} className="mb-6 p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] space-y-3">
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Add a review topic</p>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={addSubject}
+              onChange={(e) => setAddSubject(e.target.value)}
+              required
+              className="text-sm border border-[var(--color-border)] rounded-[var(--radius-sm)] px-3 py-2 bg-[var(--color-surface)] text-[var(--color-text-primary)] min-w-[160px]"
+            >
+              <option value="">Select subject…</option>
+              {Object.entries(subjectMeta).map(([key, meta]) => (
+                <option key={key} value={key}>{meta.label}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={addTopic}
+              onChange={(e) => setAddTopic(e.target.value)}
+              placeholder="Topic name"
+              required
+              className="flex-1 min-w-[160px] text-sm border border-[var(--color-border)] rounded-[var(--radius-sm)] px-3 py-2 bg-[var(--color-surface)] text-[var(--color-text-primary)]"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={addSubmitting}
+              className="text-sm font-medium px-4 py-2 bg-[var(--color-accent)] text-white rounded-[var(--radius-sm)] hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {addSubmitting ? 'Adding…' : 'Add'}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowAddForm(false); setAddTopic(''); setAddSubject(''); }}
+              className="text-sm text-[var(--color-text-muted)] hover:underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       )}
+
 
       {(error || actionError) && (
         <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error || actionError}</div>

@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { initDefaultTemplates, initDefaultDurations, initDefaultProfile, getUserProfile, initPublicStats } from '../firebase/db';
@@ -38,8 +39,18 @@ export function AuthProvider({ children }) {
       initDefaultProfile(credential.user.uid),
       initPublicStats(credential.user.uid, defaultDisplayName),
     ]);
+    await sendEmailVerification(credential.user);
     await refreshProfile(credential.user.uid);
     return credential;
+  }
+
+  function resendVerification() {
+    return sendEmailVerification(auth.currentUser);
+  }
+
+  async function reloadUser() {
+    await auth.currentUser?.reload();
+    setCurrentUser({ ...auth.currentUser });
   }
 
   function login(email, password) {
@@ -71,6 +82,8 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    resendVerification,
+    reloadUser,
   };
 
   return (

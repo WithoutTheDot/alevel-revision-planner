@@ -12,6 +12,7 @@ import AdminRoute from './components/AdminRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import { analytics } from './firebase/config';
 
 const LandingPage      = lazy(() => import('./pages/LandingPage'));
@@ -93,6 +94,7 @@ export default function App() {
                   <Route path="/" element={<Navigate to="/home" replace />} />
                   <Route path="/home" element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>} />
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/verify-email" element={<VerifyEmailPage />} />
 
                   <Route
                     path="/onboarding"

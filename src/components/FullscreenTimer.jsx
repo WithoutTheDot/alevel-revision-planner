@@ -60,7 +60,17 @@ export default function FullscreenTimer() {
       .catch(() => setPb(null));
   }, [currentUser?.uid, session?.subject, session?.paperPath]);
 
-  if (!session) return null;
+  if (!session) {
+    if (celebration) {
+      return (
+        <XpCelebration
+          {...celebration}
+          onDismiss={() => setCelebration(null)}
+        />
+      );
+    }
+    return null;
+  }
 
   const elapsedSecs = Math.round(session.elapsedSeconds ?? 0);
   const expectedSecs = (session.expectedMins ?? 0) * 60;

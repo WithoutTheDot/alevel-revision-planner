@@ -3,5 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function PrivateRoute({ children }) {
   const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/home" replace />;
+  if (!currentUser) return <Navigate to="/home" replace />;
+  if (!currentUser.emailVerified) return <Navigate to="/verify-email" replace />;
+  return children;
 }

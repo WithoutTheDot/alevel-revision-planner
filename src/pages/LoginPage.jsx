@@ -22,11 +22,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (tab === 'login') {
-        await login(email, password);
+        const cred = await login(email, password);
+        navigate(cred.user.emailVerified ? '/dashboard' : '/verify-email');
       } else {
         await register(email, password);
+        navigate('/verify-email');
       }
-      navigate('/dashboard');
     } catch (err) {
       setError(friendlyAuthError(err));
     } finally {

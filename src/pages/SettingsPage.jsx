@@ -454,30 +454,20 @@ export default function SettingsPage() {
 
               <div className="pt-2 border-t border-[var(--color-border)]">
                 <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className={`w-10 h-6 rounded-full transition-colors relative ${dark ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]'}`}>
-                    <input type="checkbox" className="sr-only" checked={dark} onChange={() => setTheme(dark ? 'light' : 'dark')} />
-                    <div className={`absolute top-1 left-1 w-4 h-4 bg-[var(--color-surface)] rounded-full transition-transform ${dark ? 'translate-x-4' : 'translate-x-0'}`} />
-                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[var(--color-text-primary)]">Dark mode</p>
                     <p className="text-xs text-[var(--color-text-muted)]">Switch to the dark theme for late-night study sessions.</p>
                   </div>
+                  <button
+                    role="switch"
+                    aria-checked={dark}
+                    onClick={() => setTheme(dark ? 'light' : 'dark')}
+                    className={'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
+                      (dark ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]')}>
+                    <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-[var(--color-surface)] shadow transform transition-transform ' +
+                      (dark ? 'translate-x-5' : 'translate-x-0')} />
+                  </button>
                 </label>
-              </div>
-              <div className="flex items-start justify-between gap-4 py-1">
-                <div>
-                  <p className="text-sm font-medium text-[var(--color-text-secondary)]">Review mode</p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">After each paper, tag topics that need work. They&apos;ll appear in your review queue.</p>
-                </div>
-                <button
-                  role="switch"
-                  aria-checked={settings.reviewModeEnabled}
-                  onClick={() => setSettings((s) => ({ ...s, reviewModeEnabled: !s.reviewModeEnabled }))}
-                  className={'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
-                    (settings.reviewModeEnabled ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]')}>
-                  <span className={'pointer-events-none inline-block h-5 w-5 rounded-full bg-[var(--color-surface)] shadow transform transition-transform ' +
-                    (settings.reviewModeEnabled ? 'translate-x-5' : 'translate-x-0')} />
-                </button>
               </div>
               <div className="flex items-center gap-3 pt-2">
                 <button onClick={saveSettings} disabled={saving}
