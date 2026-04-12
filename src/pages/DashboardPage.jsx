@@ -23,6 +23,7 @@ import { useTimerContext } from '../contexts/TimerContext';
 import StartTimerModal from '../components/StartTimerModal';
 import TimerWidget from '../components/TimerWidget';
 import XpCelebration from '../components/XpCelebration';
+import { BADGE_DEFS, BADGE_ICONS } from '../lib/badges';
 
 function progressLabel(pct) {
   if (pct === 0) return "Just getting started";
@@ -66,6 +67,7 @@ export default function DashboardPage() {
   const [totalStudyMins, setTotalStudyMins] = useState(0);
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
+  const [latestBadgeId, setLatestBadgeId] = useState(null);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -116,6 +118,8 @@ export default function DashboardPage() {
         setLongestStreak(sd.longestStreak ?? 0);
         setXp(sd.xp ?? 0);
         setLevel(sd.level ?? 1);
+        const ids = sd.badgeIds ?? [];
+        setLatestBadgeId(ids.length > 0 ? ids[ids.length - 1] : null);
       }
       setTotalStudyMins(Math.round((totalStudySeconds ?? 0) / 60));
       // Overdue: incomplete papers from previous week
@@ -208,6 +212,8 @@ export default function DashboardPage() {
           setLongestStreak(sd.longestStreak ?? 0);
           setXp(sd.xp ?? 0);
           setLevel(sd.level ?? 1);
+          const ids = sd.badgeIds ?? [];
+          setLatestBadgeId(ids.length > 0 ? ids[ids.length - 1] : null);
           const newLevel = sd.level ?? 1;
           if (xpEarned > 0 || newBadges.length > 0 || isPB) {
             setCelebration({ xpEarned, newBadges, prevLevel, newLevel, isPB, breakdown });
@@ -306,6 +312,9 @@ export default function DashboardPage() {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const upcomingExams = examEntries.filter((e) => e.date >= todayStr).slice(0, 3);
 
+  const latestBadge = latestBadgeId ? BADGE_DEFS.find((b) => b.id === latestBadgeId) ?? null : null;
+  const LatestBadgeIcon = latestBadge ? BADGE_ICONS[latestBadge.id] : null;
+
   return (
     <div>
       <div className="flex items-start justify-between mb-6">
@@ -377,6 +386,25 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {latestBadge && LatestBadgeIcon && (
+            <Link
+              to="/badges"
+              className="flex items-center gap-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:bg-[var(--color-surface)] transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center flex-shrink-0 text-[var(--color-accent)]">
+                <LatestBadgeIcon />
+              </div>
+              <div>
+                <p className="text-xs text-[var(--color-text-muted)]">Latest badge</p>
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">{latestBadge.label}</p>
+                <p className="text-xs text-[var(--color-text-muted)]">{latestBadge.description}</p>
+              </div>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-4 h-4 text-[var(--color-text-muted)] ml-auto flex-shrink-0">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </Link>
+          )}
 
           {/* Timer widget */}
           {schedule && (
