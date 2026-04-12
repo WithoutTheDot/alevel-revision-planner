@@ -445,6 +445,7 @@ export default function DashboardPage() {
                 <UpcomingPapers
                   upcoming={upcoming}
                   onComplete={(p) => setCompleting({ paper: p, index: p._idx })}
+                  onStart={(p) => setStartingTimer({ paper: p, index: p._idx })}
                 />
 
                 {/* Subject breakdown */}
