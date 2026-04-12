@@ -145,7 +145,7 @@ function NavLinks({ onNav, showAdmin }) {
     <>
       {NAV_GROUPS.map(({ label, items }) => (
         <div key={label} className="mb-1">
-          <p className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
+          <p aria-hidden="true" className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
             {label}
           </p>
           {items.map(({ to, icon, label: itemLabel }) => (
@@ -158,7 +158,7 @@ function NavLinks({ onNav, showAdmin }) {
       ))}
       {showAdmin && (
         <div className="mb-1">
-          <p className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
+          <p aria-hidden="true" className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
             ADMIN
           </p>
           <NavLink to="/admin" onClick={onNav} className={navItemCls}>
@@ -184,6 +184,7 @@ const AppLogo = () => (
 
 export default function Layout() {
   const { logout, profile, currentUser } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const { nudges, dismiss } = useNudges();
   const { theme, setTheme } = useTheme();
   const dark = theme === 'dark';
@@ -225,7 +226,7 @@ export default function Layout() {
         <AppLogo />
       </div>
       <nav className="flex-1 py-3 overflow-y-auto">
-        <NavLinks onNav={onClose} showAdmin={false} />
+        <NavLinks onNav={onClose} showAdmin={isAdmin} />
       </nav>
       <div className="px-4 py-2 border-t border-[var(--color-border)]">
         <a
@@ -278,7 +279,7 @@ export default function Layout() {
               </button>
             </div>
             <nav className="flex-1 py-3 overflow-y-auto">
-              <NavLinks onNav={() => setDrawerOpen(false)} showAdmin={false} />
+              <NavLinks onNav={() => setDrawerOpen(false)} showAdmin={isAdmin} />
             </nav>
             {userFooter(() => setDrawerOpen(false))}
           </DialogPanel>
