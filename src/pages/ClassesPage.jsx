@@ -117,7 +117,7 @@ export default function ClassesPage() {
     if (activeTab !== 'leaderboard') return;
     const targetId = lbClassId ?? classes[0]?.id;
     if (!targetId) return;
-    if (!lbClassId) setLbClassId(targetId);
+    if (!lbClassId) { setLbClassId(targetId); return; }
     loadLeaderboard(targetId);
   }, [activeTab, lbClassId, classes, loadLeaderboard]);
 
