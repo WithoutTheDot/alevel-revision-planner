@@ -57,6 +57,8 @@ During A-Level revision I found myself manually deciding which past paper to do 
 - Full history table with search, subject/grade filters, and date range filtering
 - Progress charts — marks over time (line), grade distribution (bar) per subject
 - **Review mode** — tag weak topics after each paper (e.g. "integration", "chain rule"); topics go into a review queue, can be scheduled to a specific week, and appear as distinct review blocks in the calendar; a topic frequency chart surfaces your most-struggled areas
+- **PMT links** — each scheduled paper shows direct links to the question paper and mark scheme on Physics & Maths Tutor (pmt.physicsandmathstutor.com), opening in a new tab
+- **Personal best badge** — tracks fastest completion time per paper; displayed alongside each paper block once a timer session is recorded
 
 ### Gamification
 - **XP & levels** — earn XP for every paper completed, level up over time
@@ -75,6 +77,12 @@ During A-Level revision I found myself manually deciding which past paper to do 
 - PDF export of schedule via jsPDF
 - Dark mode
 - Onboarding wizard — choose subjects, set exam dates, pick exam board per subject
+- **Interactive tutorial** — step-by-step spotlight walkthrough on first login, highlighting each section of the UI in sequence; can be replayed from settings
+- **Email verification gate** — new accounts must verify their email before accessing the app; resend and check-status flow built in
+- **XP celebration** — confetti animation fires on level-up
+- **Toast notifications** — app-wide dismissible toasts for success/error feedback
+- **Skeleton loading states** — placeholder shimmer UI while data loads, preventing layout shift
+- **Error boundary** — catches unexpected runtime errors and renders a fallback UI instead of a blank screen
 - 30 A-Level subjects supported, each with correct paper structures for AQA, OCR, Edexcel, and other boards
 - Settings: manage subjects, exam dates, paper durations, and account details
 - Admin panel for managing users and classes
@@ -254,7 +262,7 @@ This catches weighting bugs that would be invisible to a one-shot test.
 
 ## Testing & CI
 
-**91 tests** across 5 suites, run with Vitest and Testing Library.
+**105 tests** across 8 suites, run with Vitest and Testing Library.
 
 | Suite | Tests | What it covers |
 |---|---|---|
@@ -263,6 +271,9 @@ This catches weighting bugs that would be invisible to a one-shot test.
 | `builtInFamilies.test.js` | 26 | Paper family structure and metadata validation |
 | `useAsyncData.test.js` | 5 | Custom hook loading/error/success states |
 | `Modal.test.jsx` | 7 | Component render, open/close, keyboard accessibility |
+| `timeUtils.test.js` | — | Time formatting and offset utility functions |
+| `completion.test.js` | — | Paper completion recording logic |
+| `reviewQueueSync.test.js` | — | Review queue Firestore sync operations |
 
 A GitHub Actions CI pipeline runs lint → test → build on every push and pull request.
 
