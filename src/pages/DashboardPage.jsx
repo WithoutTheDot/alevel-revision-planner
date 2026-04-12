@@ -285,7 +285,10 @@ export default function DashboardPage() {
 
   const upcoming = (schedule?.papers || [])
     .map((p, idx) => ({ ...p, _idx: idx }))
-    .filter((p) => !p.completed && p.scheduledStart)
+    .filter((p) => {
+      const key = `timer_${weekId}_${p._idx}`;
+      return !p.completed && p.scheduledStart && getTimerData(key) === null;
+    })
     .sort((a, b) => {
       const dayOrder = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
       const d = dayOrder.indexOf(a.scheduledDay) - dayOrder.indexOf(b.scheduledDay);

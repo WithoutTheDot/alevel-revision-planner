@@ -21,7 +21,7 @@ export default function UpcomingPapers({ upcoming, onComplete, onStart }) {
                 {onStart && (
                   <button
                     onClick={() => onStart(p)}
-                    className="text-xs bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] font-semibold px-2.5 py-1 rounded-lg transition-colors"
+                    className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] font-semibold px-2.5 py-1 rounded-lg transition-colors"
                   >
                     Start
                   </button>
