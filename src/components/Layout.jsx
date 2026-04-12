@@ -100,17 +100,37 @@ const Icons = {
   ),
 };
 
-const NAV_ITEMS = [
-  { to: '/dashboard',     label: 'Dashboard',     icon: Icons.Dashboard },
-  { to: '/calendar',      label: 'Calendar',      icon: Icons.Calendar },
-  { to: '/term-schedule', label: 'Term Schedule',  icon: Icons.TermSchedule },
-  { to: '/templates',     label: 'Templates',     icon: Icons.Templates },
-  { to: '/generate',      label: 'Generate',      icon: Icons.Generate },
-  { to: '/history',       label: 'History',       icon: Icons.History },
-  { to: '/review',        label: 'Review',        icon: Icons.Review },
-  { to: '/classes',       label: 'Classes',       icon: Icons.Classes },
-  { to: '/badges',        label: 'Badges',        icon: Icons.Badges },
-  { to: '/settings',      label: 'Settings',      icon: Icons.Settings },
+const NAV_GROUPS = [
+  {
+    label: 'STUDY',
+    items: [
+      { to: '/dashboard',  label: 'Dashboard', icon: Icons.Dashboard },
+      { to: '/calendar',   label: 'Calendar',  icon: Icons.Calendar  },
+    ],
+  },
+  {
+    label: 'PLAN',
+    items: [
+      { to: '/term-schedule', label: 'Term Schedule', icon: Icons.TermSchedule },
+      { to: '/templates',     label: 'Templates',     icon: Icons.Templates    },
+      { to: '/generate',      label: 'Generate',      icon: Icons.Generate     },
+    ],
+  },
+  {
+    label: 'PROGRESS',
+    items: [
+      { to: '/history', label: 'History', icon: Icons.History },
+      { to: '/review',  label: 'Review',  icon: Icons.Review  },
+    ],
+  },
+  {
+    label: 'PROFILE',
+    items: [
+      { to: '/classes',  label: 'Classes',  icon: Icons.Classes  },
+      { to: '/badges',   label: 'Badges',   icon: Icons.Badges   },
+      { to: '/settings', label: 'Settings', icon: Icons.Settings },
+    ],
+  },
 ];
 
 const navItemCls = ({ isActive }) =>
@@ -123,17 +143,29 @@ const navItemCls = ({ isActive }) =>
 function NavLinks({ onNav, showAdmin }) {
   return (
     <>
-      {NAV_ITEMS.map(({ to, label, icon }) => (
-        <NavLink key={to} to={to} onClick={onNav} className={navItemCls}>
-          {icon}
-          {label}
-        </NavLink>
+      {NAV_GROUPS.map(({ label, items }) => (
+        <div key={label} className="mb-1">
+          <p className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
+            {label}
+          </p>
+          {items.map(({ to, icon, label: itemLabel }) => (
+            <NavLink key={to} to={to} onClick={onNav} className={navItemCls}>
+              {icon}
+              {itemLabel}
+            </NavLink>
+          ))}
+        </div>
       ))}
       {showAdmin && (
-        <NavLink to="/admin" onClick={onNav} className={navItemCls}>
-          {Icons.Admin}
-          Admin
-        </NavLink>
+        <div className="mb-1">
+          <p className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase select-none">
+            ADMIN
+          </p>
+          <NavLink to="/admin" onClick={onNav} className={navItemCls}>
+            {Icons.Admin}
+            Admin
+          </NavLink>
+        </div>
       )}
     </>
   );
