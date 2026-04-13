@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserBadges } from '../firebase/db';
+import { getUserBadges, reconcileBadgesForUser } from '../firebase/db';
 import { BADGE_DEFS, BADGE_ICONS, xpToLevel, xpProgressInLevel } from '../lib/badges';
 import { format, parseISO } from 'date-fns';
 
@@ -18,6 +18,8 @@ export default function BadgesPage() {
       setLoading(true);
       setError('');
       try {
+        // Reconcile first so newly earned badges are present before we render
+        await reconcileBadgesForUser(currentUser.uid);
         const [statsSnap, badges] = await Promise.all([
           getDoc(doc(db, 'userPublicStats', currentUser.uid)),
           getUserBadges(currentUser.uid),

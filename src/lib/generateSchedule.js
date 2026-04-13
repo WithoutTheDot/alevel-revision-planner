@@ -1,6 +1,7 @@
 import { SUBJECT_TREES } from './paperTrees';
 import { weightedRandom, weightedRandomChoice } from './random';
 import { getDisplayName, getPaperPath } from './paperPaths';
+import { FM_ALL_OPTIONAL_VALUES } from './allSubjects';
 
 // ─── getAllPaperPaths ─────────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ function collectLeafPaths(node, pathSoFar = [], weightSoFar = 1) {
  * @param {object}   [customPapers] - map from familyId to family data
  * @param {string[]} [allTimePaths] - all ever-completed paper paths (weight × 0.05 if seen, 1.0 if unseen)
  */
-export function selectPaper(subject, weekExcluded, recentPaths, durations, customPapers, allTimePaths = []) {
+export function selectPaper(subject, weekExcluded, recentPaths, durations, customPapers, allTimePaths = [], subjectConfig = {}) {
   const tree = SUBJECT_TREES[subject];
   const recentSet = new Set(recentPaths);
   const allTimeSet = new Set(allTimePaths);
@@ -124,7 +125,18 @@ export function selectPaper(subject, weekExcluded, recentPaths, durations, custo
   }
 
   // Enumerate all leaf paths with effective weights
-  const leaves = collectLeafPaths(tree).map(({ path, weight }) => {
+  let rawLeaves = collectLeafPaths(tree);
+
+  // For furtherMaths: filter optional modules to only those the user selected
+  if (subject === 'furtherMaths' && subjectConfig.furtherMathsModules?.length > 0) {
+    const selectedModules = new Set(subjectConfig.furtherMathsModules);
+    rawLeaves = rawLeaves.filter(({ path }) => {
+      const module = path[path.length - 1];
+      return !FM_ALL_OPTIONAL_VALUES.has(module) || selectedModules.has(module);
+    });
+  }
+
+  const leaves = rawLeaves.map(({ path, weight }) => {
     const paperPath = getPaperPath(path);
     return {
       path,
@@ -252,7 +264,7 @@ function schedulePapers(papers, timeBlocks, breakMinutes) {
  *   timeBlocks: [{ day, startTime, endTime }]
  * }
  */
-export function generateWeeklySchedule(userId, weekStart, weekType, template, recentPaths, durations, customPapers, allTimePaths = []) {
+export function generateWeeklySchedule(userId, weekStart, weekType, template, recentPaths, durations, customPapers, allTimePaths = [], subjectConfig = {}) {
   const {
     subjects = [],
     maxPapersPerSubject = 6,
@@ -301,7 +313,7 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
 
     while (picked < target && attempts < 100) {
       attempts++;
-      const paper = selectPaper(subject, weekExcluded, [...recentSet], durations, customPapers, allTimePaths);
+      const paper = selectPaper(subject, weekExcluded, [...recentSet], durations, customPapers, allTimePaths, subjectConfig);
       if (!paper) break; // no papers available for this subject (no tree, no custom)
       const isTextbook = paper.paperPath === 'textbook';
 

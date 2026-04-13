@@ -8,11 +8,13 @@ import {
   getCustomPapers, saveCustomPaper, deleteCustomPaper,
   getExamTimetable, addExamEntry, updateExamEntry, deleteExamEntry,
   updateDisplayName, deleteAllUserData, exportAllUserData,
-  rebuildUserPublicStatsFromCompletedPapers, computeWeeklyRollups
+  rebuildUserPublicStatsFromCompletedPapers, computeWeeklyRollups,
+  reconcileBadgesForUser,
+  saveUserProfile,
 } from '../firebase/db';
 import { BUILT_IN_FAMILIES, BUILT_IN_FAMILIES_MAP, recomputePaths } from '../lib/builtInFamilies';
 import { getDefaultDurationForPath } from '../lib/generateSchedule';
-import { ALL_SUBJECTS } from '../lib/allSubjects';
+import { ALL_SUBJECTS, FM_OPTIONAL_MODULES } from '../lib/allSubjects';
 import Modal from '../components/Modal';
 import { inputCls as baseInputCls } from '../lib/styles';
 import { DEFAULT_PAPER_DURATION_MINS } from '../lib/constants';
@@ -104,6 +106,17 @@ export default function SettingsPage() {
 
   const [reconciling, setReconciling] = useState(false);
   const [reconcileResult, setReconcileResult] = useState(null);
+  const [badgeReconciling, setBadgeReconciling] = useState(false);
+  const [badgeReconcileResult, setBadgeReconcileResult] = useState(null);
+
+  const [showFmModules, setShowFmModules] = useState(false);
+  const [fmModules, setFmModules] = useState(() => profile?.furtherMathsModules ?? []);
+  const [fmModulesSaving, setFmModulesSaving] = useState(false);
+  const [fmModulesSaved, setFmModulesSaved] = useState(false);
+
+  useEffect(() => {
+    setFmModules(profile?.furtherMathsModules ?? []);
+  }, [profile]);
 
   // Modal: null | { id, data, isBuiltIn }
   const [familyModal, setFamilyModal] = useState(null);
@@ -193,6 +206,34 @@ export default function SettingsPage() {
       setError('Failed to repair stats: ' + e.message);
     } finally {
       setReconciling(false);
+    }
+  }
+
+  async function handleBadgeReconcile() {
+    setBadgeReconciling(true);
+    setError('');
+    try {
+      const res = await reconcileBadgesForUser(currentUser.uid);
+      setBadgeReconcileResult(res);
+      setTimeout(() => setBadgeReconcileResult(null), 5000);
+    } catch (e) {
+      setError('Failed to recalculate badges: ' + e.message);
+    } finally {
+      setBadgeReconciling(false);
+    }
+  }
+
+  async function saveFmModules() {
+    setFmModulesSaving(true);
+    try {
+      await saveUserProfile(currentUser.uid, { furtherMathsModules: fmModules });
+      await refreshProfile();
+      setFmModulesSaved(true);
+      setTimeout(() => setFmModulesSaved(false), 2000);
+    } catch (e) {
+      setError('Failed to save FM modules: ' + e.message);
+    } finally {
+      setFmModulesSaving(false);
     }
   }
 
@@ -495,14 +536,51 @@ export default function SettingsPage() {
 
               {familiesBySubject.map(({ subject, families }) => {
                 if (families.length === 0) return null;
+                const isFm = subject === 'furtherMaths';
                 return (
                   <div key={subject} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
                     <div className="px-4 py-2 border-b border-[var(--color-border)] flex items-center justify-between bg-[var(--color-surface)]">
                       <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
                         {subjectMeta[subject]?.label || subject}
                       </h3>
-                      <span className="text-xs text-[var(--color-text-muted)]">Duration</span>
+                      <div className="flex items-center gap-3">
+                        {isFm && (
+                          <button onClick={() => setShowFmModules((v) => !v)}
+                            className="text-xs text-[var(--color-text-muted)] border border-[var(--color-border)] rounded px-2 py-0.5 hover:text-[var(--color-text-secondary)] transition-colors">
+                            Edit modules
+                          </button>
+                        )}
+                        <span className="text-xs text-[var(--color-text-muted)]">Duration</span>
+                      </div>
                     </div>
+                    {isFm && showFmModules && (
+                      <div className="px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+                        <p className="text-xs text-[var(--color-text-muted)] mb-2">Select optional modules you study — only their papers appear in schedules.</p>
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          {FM_OPTIONAL_MODULES.map((m) => (
+                            <label key={m.value} className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={fmModules.includes(m.value)}
+                                onChange={(e) => setFmModules((prev) =>
+                                  e.target.checked ? [...prev, m.value] : prev.filter((v) => v !== m.value)
+                                )}
+                                className="rounded border-[var(--color-border)] text-[var(--color-accent)]"
+                              />
+                              <span className="text-sm text-[var(--color-text-primary)]">{m.label}</span>
+                              <span className="text-xs text-[var(--color-text-muted)]">({m.boards.join('/')})</span>
+                            </label>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button onClick={saveFmModules} disabled={fmModulesSaving}
+                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
+                            {fmModulesSaving ? 'Saving…' : 'Save modules'}
+                          </button>
+                          {fmModulesSaved && <span className="text-[var(--color-success-text)] text-sm">Saved</span>}
+                        </div>
+                      </div>
+                    )}
                     <div className="px-4 py-1">
                       {families.map((f) => <FamilyRow key={f.id} displayFam={f} subject={subject} />)}
                     </div>
@@ -604,6 +682,23 @@ export default function SettingsPage() {
                     {reconcileResult && (
                       <span className="text-[var(--color-success-text)] text-sm">
                         Fixed! {reconcileResult.papersCompleted} papers, {reconcileResult.studyMinutes}m total.
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="border-t border-[var(--color-border)] pt-4">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Recalculate Badges</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mb-2">Awards any badges you've earned that haven't been credited yet.</p>
+                  <div className="flex items-center gap-3">
+                    <button onClick={handleBadgeReconcile} disabled={badgeReconciling}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                      {badgeReconciling ? 'Checking…' : 'Recalculate badges'}
+                    </button>
+                    {badgeReconcileResult && (
+                      <span className="text-[var(--color-success-text)] text-sm">
+                        {badgeReconcileResult.newBadges.length > 0
+                          ? `Awarded ${badgeReconcileResult.newBadges.length} badge(s) (+${badgeReconcileResult.xpAwarded} XP)`
+                          : 'All badges up to date'}
                       </span>
                     )}
                   </div>

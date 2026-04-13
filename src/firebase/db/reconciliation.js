@@ -1,5 +1,6 @@
-import { doc, getDocs, collection, setDoc, serverTimestamp, query, orderBy, limit, startAfter } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection, setDoc, serverTimestamp, query, orderBy, limit, startAfter, arrayUnion, increment, updateDoc } from 'firebase/firestore';
 import { db } from '../config';
+import { BADGE_DEFS, xpToLevel } from '../../lib/badges';
 
 /**
  * Rebuilds the userPublicStats document by scanning the canonical completedPapers log.
@@ -49,6 +50,75 @@ export async function rebuildUserPublicStatsFromCompletedPapers(uid) {
   }, { merge: true });
 
   return { papersCompleted, studyMinutes: Math.round(totalSeconds / 60) };
+}
+
+/**
+ * Checks all badge definitions against the user's current stats and awards any
+ * missing badges they've already earned. Safe to call repeatedly.
+ *
+ * @param {string} uid User ID
+ * @returns {{ newBadges: string[], xpAwarded: number }}
+ */
+export async function reconcileBadgesForUser(uid) {
+  // Build context from completedPapers (authoritative)
+  const colRef = collection(db, 'users', uid, 'completedPapers');
+  let papersCompleted = 0;
+  const subjectCounts = {};
+
+  let lastDoc = null;
+  while (true) {
+    const q = lastDoc
+      ? query(colRef, orderBy('__name__'), startAfter(lastDoc), limit(1000))
+      : query(colRef, orderBy('__name__'), limit(1000));
+    const snap = await getDocs(q);
+    if (snap.empty) break;
+    for (const d of snap.docs) {
+      papersCompleted++;
+      if (d.data().subject) subjectCounts[d.data().subject] = (subjectCounts[d.data().subject] || 0) + 1;
+    }
+    if (snap.docs.length < 1000) break;
+    lastDoc = snap.docs[snap.docs.length - 1];
+  }
+
+  // Get current public stats (for longestStreak + existing badgeIds)
+  const statsRef = doc(db, 'userPublicStats', uid);
+  const statsSnap = await getDoc(statsRef);
+  const stats = statsSnap.exists() ? statsSnap.data() : {};
+  const longestStreak = stats.longestStreak ?? 0;
+  const existingBadgeIds = stats.badgeIds ?? [];
+
+  const ctx = { papersCompleted, longestStreak, subjectCounts };
+
+  // Find badges earned but not yet awarded
+  const missing = BADGE_DEFS.filter(
+    (b) => !existingBadgeIds.includes(b.id) && b.check(ctx)
+  );
+
+  if (missing.length === 0) return { newBadges: [], xpAwarded: 0 };
+
+  const xpAwarded = missing.reduce((sum, b) => sum + b.xpReward, 0);
+  const newBadgeIds = missing.map((b) => b.id);
+
+  // Award XP + update badgeIds
+  const currentXp = stats.xp ?? 0;
+  const newXp = currentXp + xpAwarded;
+  await updateDoc(statsRef, {
+    xp: increment(xpAwarded),
+    level: xpToLevel(newXp),
+    badgeIds: arrayUnion(...newBadgeIds),
+    lastUpdated: serverTimestamp(),
+  });
+
+  // Write badge docs
+  for (const b of missing) {
+    await setDoc(doc(db, 'users', uid, 'badges', b.id), {
+      badgeId: b.id,
+      earnedAt: new Date().toISOString(),
+      xpAwarded: b.xpReward,
+    }, { merge: true });
+  }
+
+  return { newBadges: newBadgeIds, xpAwarded };
 }
 
 /**

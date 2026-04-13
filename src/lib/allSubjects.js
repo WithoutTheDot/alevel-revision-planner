@@ -38,6 +38,27 @@ export const ALL_SUBJECTS = [
 export const BUILT_IN_SUBJECT_IDS = new Set(['maths', 'furtherMaths', 'physics', 'computerScience']);
 
 /**
+ * Further Maths optional modules. Each entry applies to one or more exam boards.
+ * 'value' matches the terminal node value in paperTrees.js.
+ */
+export const FM_OPTIONAL_MODULES = [
+  { value: 'mechanics',           label: 'Mechanics',             boards: ['ocr', 'aqa'] },
+  { value: 'statistics',          label: 'Statistics',            boards: ['ocr', 'aqa'] },
+  { value: 'discrete',            label: 'Discrete Mathematics',  boards: ['ocr', 'aqa'] },
+  { value: 'additional-pure',     label: 'Additional Pure',       boards: ['ocr'] },
+  { value: 'further-pure-1',      label: 'Further Pure 1',        boards: ['edexcel'] },
+  { value: 'further-pure-2',      label: 'Further Pure 2',        boards: ['edexcel'] },
+  { value: 'further-mechanics-1', label: 'Further Mechanics 1',   boards: ['edexcel'] },
+  { value: 'further-mechanics-2', label: 'Further Mechanics 2',   boards: ['edexcel'] },
+  { value: 'statistics-1',        label: 'Further Statistics 1',  boards: ['edexcel'] },
+  { value: 'statistics-2',        label: 'Further Statistics 2',  boards: ['edexcel'] },
+  { value: 'decision-1',          label: 'Decision 1',            boards: ['edexcel'] },
+  { value: 'decision-2',          label: 'Decision 2',            boards: ['edexcel'] },
+];
+
+export const FM_ALL_OPTIONAL_VALUES = new Set(FM_OPTIONAL_MODULES.map((m) => m.value));
+
+/**
  * 12-colour palette. Built-in subjects use indices 0–3.
  * Each entry: { color: Tailwind bg class, text: Tailwind text class, light: Tailwind bg light class }
  */

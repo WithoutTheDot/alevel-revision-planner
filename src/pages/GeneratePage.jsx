@@ -60,7 +60,7 @@ function mondaysBetween(startStr, endStr) {
 }
 
 export default function GeneratePage() {
-  const { currentUser } = useAuth();
+  const { currentUser, profile } = useAuth();
   const { active, step: tutStep, notifyActionDone } = useTutorial();
 
   // Step state: 'select' | 'preview' | 'saved'
@@ -154,8 +154,9 @@ export default function GeneratePage() {
       }
       const weekType = calendarEntry?.weekType || templateId;
       const scheduleTemplate = { ...template, timeBlocks: localBlocks };
+      const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
       const { schedule, warnings: w } = generateWeeklySchedule(
-        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths
+        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths, subjectConfig
       );
       setPreview(schedule);
       setPreviewTemplate(scheduleTemplate);
@@ -185,8 +186,9 @@ export default function GeneratePage() {
       if (!template) throw new Error(`Template "${templateId}" not found.`);
       const weekType = calendarEntry?.weekType || templateId;
       const scheduleTemplate = { ...template, timeBlocks: localBlocks };
+      const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
       const { schedule, warnings: w } = generateWeeklySchedule(
-        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths
+        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths, subjectConfig
       );
       setPreview(schedule);
       setPreviewTemplate(scheduleTemplate);
@@ -252,8 +254,9 @@ export default function GeneratePage() {
           getAllCompletedPaperPaths(currentUser.uid),
         ]);
         const weekType = termCalendar[mon]?.weekType || templateId;
+        const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
         const { schedule } = generateWeeklySchedule(
-          currentUser.uid, mon, weekType, template, recent, durations, customPapers, allTimePaths
+          currentUser.uid, mon, weekType, template, recent, durations, customPapers, allTimePaths, subjectConfig
         );
         await saveWeeklySchedule(currentUser.uid, mon, schedule);
         saved++;
