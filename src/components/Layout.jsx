@@ -6,6 +6,7 @@ import { useNudges } from '../contexts/NudgeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import Toast from './Toast';
 import FullscreenTimer from './FullscreenTimer';
+import QuickLogFab from './QuickLogFab';
 
 // ─── SVG Icon set (Heroicons outline 20x20) ──────────────────────────────────
 const Icons = {
@@ -291,18 +292,17 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Nudge toasts */}
-      {nudges.length > 0 && (
-        <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-          {nudges.map((n) => (
-            <Toast
-              key={n.id}
-              message={`${n.fromDisplayName} nudged you — time to study!`}
-              onDismiss={() => dismiss(n.id)}
-            />
-          ))}
-        </div>
-      )}
+      {/* Nudge toasts + FAB */}
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+        {nudges.length > 0 && nudges.map((n) => (
+          <Toast
+            key={n.id}
+            message={`${n.fromDisplayName} nudged you — time to study!`}
+            onDismiss={() => dismiss(n.id)}
+          />
+        ))}
+        <QuickLogFab />
+      </div>
 
       {/* Fullscreen timer overlay + minimised pill */}
       <FullscreenTimer />
