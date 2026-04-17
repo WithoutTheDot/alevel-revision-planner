@@ -32,10 +32,10 @@ During A-Level revision I found myself manually deciding which past paper to do 
 ![Calendar — hour-based weekly grid with paper blocks](docs/screenshots/screenshot-calendar.png)
 
 ### Schedule generation
-![Generate — time block preview before generating a week](docs/screenshots/screenshot-generate.png)
+![Generate — time block preview and batch generation](docs/screenshots/screenshot-generate.png)
 
 ### History & analytics
-![History — filterable paper log with marks and grades](docs/screenshots/screenshot-history.png)
+![History — filterable paper log with marks, grades, and personal bests](docs/screenshots/screenshot-history.png)
 
 ![History charts — grade distribution and papers per week](docs/screenshots/screenshot-charts.png)
 
@@ -50,41 +50,55 @@ During A-Level revision I found myself manually deciding which past paper to do 
 - **Term calendar** — mark weeks as Term A, Term B, or Holiday across your academic year
 - **Time block templates** — define your weekly availability (e.g. "Mon 4–6pm, Sat 9am–1pm")
 - **Auto-generate schedules** — one click produces a week's worth of papers, weighted by exam structure (correct paper-type ratios per board/subject)
-- **Interactive weekly calendar** — drag-and-drop hour-based grid, export to clipboard
+- **Batch generation** — generate multiple weeks at once with a single action
+- **Interactive weekly calendar** — hour-based grid, drag-and-drop paper blocks, export to clipboard
 
 ### Paper tracking
-- Mark any paper complete, enter your raw marks and grade
+- Log any paper as complete with raw marks, grade, time taken, and notes
+- **Log from family** — when logging an ad-hoc paper, pick directly from a paper family (e.g. "OCR Pure") and year; the app auto-fills the display name and duration, and records the paper path so it won't be suggested again
+- **Start timer from log modal** — begin a timed session for the selected paper; the fullscreen timer takes over and pre-fills elapsed time when you complete the paper
 - Full history table with search, subject/grade filters, and date range filtering
+- Export history to CSV
 - Progress charts — marks over time (line), grade distribution (bar) per subject
-- **Review mode** — tag weak topics after each paper (e.g. "integration", "chain rule"); topics go into a review queue, can be scheduled to a specific week, and appear as distinct review blocks in the calendar; a topic frequency chart surfaces your most-struggled areas
-- **PMT links** — each scheduled paper shows direct links to the question paper and mark scheme on Physics & Maths Tutor (pmt.physicsandmathstutor.com), opening in a new tab
-- **Personal best badge** — tracks fastest completion time per paper; displayed alongside each paper block once a timer session is recorded
+- **Personal best badge** — tracks fastest completion time per paper; displayed in the history table once a timer session is recorded
+- **PMT links** — each scheduled paper shows direct links to the question paper and mark scheme on Physics & Maths Tutor, opening in a new tab
+
+### Review mode
+- Tag weak topics after each paper (e.g. "integration", "chain rule") or add them manually
+- Topics flow into a review queue with three states: **Pending → Scheduled → Done**
+- Schedule a topic to a specific week; it appears as a review block in the calendar
+- **Review page** — dedicated page showing your full queue grouped by status, with inline week scheduling and mark-done actions
+- Topic frequency chart surfaces your most-struggled areas (top 10 across all completed papers)
 
 ### Gamification
-- **XP & levels** — earn XP for every paper completed, level up over time
-- **Badges** — 15+ unlockable achievements (streaks, milestones, subject mastery)
-- **Leaderboard** — compare progress with classmates in a shared class
-- **Classes** — create or join a class, invite others via code
+- **XP & levels** — earn XP for every paper completed, bonus for higher grades; level up over time
+- **8 badges** — unlockable achievements (First Steps, Getting Serious, On a Roll, Dedicated, Century, Week Warrior, Month of Mastery, Subject Master)
+- **Streak tracking** — daily study streaks with longest-streak personal best shown on the dashboard
+- **Latest badge on dashboard** — most recently earned badge displayed in the stats area
+- **Leaderboard** — compare XP, papers completed, and streaks with classmates
+- **Classes** — create or join a class via invite code; nudge classmates who haven't studied recently
 
 ### Dashboard
-- Live exam countdown per subject
-- Upcoming papers this week
-- Subject breakdown with completion percentages
-- XP progress bar and badge showcase
+- Live exam countdown per subject (days remaining)
+- "Up Next" card with Start button to begin a timed session immediately
+- This-week progress bar with paper completion percentage
+- Streak, papers done, study hours, and level stats at a glance
+- Overdue papers banner with quick dismiss
 
 ### Supporting features
-- Fullscreen focus timer (Pomodoro-style) per paper session
-- PDF export of schedule via jsPDF
-- Dark mode
+- **Fullscreen focus timer** — per-paper session timer with pause/resume, progress bar, personal best display, and overtime indicator
+- **Further Maths module selection** — choose your optional FM modules (Statistics, Mechanics, Additional Pure, etc.) in Settings; the scheduler weights papers accordingly
+- Dark mode (toggle in nav and landing page)
 - Onboarding wizard — choose subjects, set exam dates, pick exam board per subject
-- **Interactive tutorial** — step-by-step spotlight walkthrough on first login, highlighting each section of the UI in sequence; can be replayed from settings
-- **Email verification gate** — new accounts must verify their email before accessing the app; resend and check-status flow built in
-- **XP celebration** — confetti animation fires on level-up
+- **Grouped sidebar navigation** — Study (Dashboard, Calendar, History, Review), Plan (Term Schedule, Templates, Generate), Progress (Classes, Badges), Profile (Settings)
+- **Interactive tutorial** — step-by-step spotlight walkthrough on first login; can be replayed from Settings
+- **Email verification gate** — new accounts must verify before accessing the app; resend and check-status flow built in
+- **XP celebration** — confetti animation on level-up
 - **Toast notifications** — app-wide dismissible toasts for success/error feedback
-- **Skeleton loading states** — placeholder shimmer UI while data loads, preventing layout shift
-- **Error boundary** — catches unexpected runtime errors and renders a fallback UI instead of a blank screen
-- 30 A-Level subjects supported, each with correct paper structures for AQA, OCR, Edexcel, and other boards
-- Settings: manage subjects, exam dates, paper durations, and account details
+- **Skeleton loading states** — shimmer placeholder UI while data loads
+- **Error boundary** — catches unexpected runtime errors and renders a fallback UI
+- 105 built-in paper families across Maths, Further Maths, Physics, Chemistry, Computer Science (AQA, OCR, Edexcel); custom families also supported
+- PDF export of schedule via jsPDF
 - Admin panel for managing users and classes
 
 ---
@@ -94,7 +108,7 @@ During A-Level revision I found myself manually deciding which past paper to do 
 | Layer | Technology |
 |---|---|
 | Frontend | React 19, Vite 7, React Router DOM 7 |
-| Styling | Tailwind CSS 3, Headless UI, Framer Motion |
+| Styling | Tailwind CSS 3, Framer Motion |
 | Backend / DB | Firebase 12 — Firestore (NoSQL), Firebase Auth |
 | Charts | Recharts |
 | PDF | jsPDF + jsPDF-AutoTable |
@@ -108,9 +122,11 @@ During A-Level revision I found myself manually deciding which past paper to do 
 ## Architecture highlights
 
 - **Context-driven data layer** — `AuthContext` seeds user defaults on registration; `SubjectsContext` provides subject/colour state globally, keeping pages decoupled from Firestore calls
+- **Paper family system** — `builtInFamilies.js` defines 105 families as `{ id, name, subject, yearStart, yearEnd, pathFn }`. Each family's `pathFn(year)` generates the canonical `paperPath` string used throughout scheduling, history, and personal bests. User overrides and custom families are merged at runtime without mutating built-ins
 - **Paper tree algorithm** — `paperTrees.js` encodes the decision trees for every supported exam board, producing correct paper-type weightings (e.g. AQA Physics Paper 3B = 7.7% of selections). `generateSchedule.js` walks these trees with weighted-random selection to build a balanced week
-- **Subcollection architecture** — term calendar entries live under `users/{uid}/termCalendar/{mondayDateStr}` to avoid document size limits and enable efficient per-week queries
-- **Code splitting** — React lazy + Suspense on all routes; Vite manual chunks for vendor, Firebase, and charts bundles, keeping initial load fast
+- **Coverage-first weighted selection** — the scheduler applies graduated weights: 0 (done this week), 0.01× (done recently), 0.05× (done ever), 1.0× (never attempted). Papers selected from a family when logging are stored with their `paperPath`, so they feed directly into this system
+- **Subcollection architecture** — term calendar, completed papers, review queue, and schedules live in per-user subcollections (`users/{uid}/termCalendar/{weekId}` etc.) to avoid document size limits and enable efficient per-week queries
+- **Code splitting** — React lazy + Suspense on all routes; Vite manual chunks for vendor, Firebase, and charts bundles
 - **Firestore security rules** — all reads/writes scoped to authenticated `uid`; server-side validation on field types
 - **Custom hooks** — `useAsyncData`, `useTimer`, `useDarkMode`, `useDebounce` extracted for reuse and testability
 
@@ -119,7 +135,7 @@ During A-Level revision I found myself manually deciding which past paper to do 
 ## Getting started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20+
 - A Firebase project (Firestore + Authentication enabled)
 
 ### Setup
@@ -176,13 +192,17 @@ firebase deploy
 
 ```
 src/
-├── components/       # Shared UI components (Modal, Layout, badges, timer…)
-├── contexts/         # AuthContext, SubjectsContext
-├── firebase/         # Firebase init, all Firestore CRUD helpers (db.js)
-├── hooks/            # useAsyncData, useTimer, useDarkMode, useDebounce
-├── lib/              # Business logic — paper trees, schedule generation,
-│                     # badge definitions, grade utils, export helpers
-└── pages/            # One file per route (Dashboard, Calendar, History…)
+├── components/       # Shared UI (Modal, Layout, TimerWidget, FullscreenTimer…)
+│   └── homepage/     # Landing page sections (Hero, Features, HowItWorks…)
+├── contexts/         # AuthContext, SubjectsContext, TimerContext, ThemeContext
+├── firebase/
+│   └── db/           # Firestore helpers split by domain (papers, schedule,
+│                     #   completion, review, social, profile…)
+├── hooks/            # useAsyncData, useTimer, useDebounce
+├── lib/              # Business logic — builtInFamilies, paperTrees,
+│                     #   generateSchedule, badges, gradeUtils, export helpers
+└── pages/            # One file per route (Dashboard, Calendar, History,
+                      #   Review, Classes, Badges, Settings…)
 ```
 
 ---
@@ -196,17 +216,28 @@ See `.env.example`. All variables are prefixed `VITE_` and consumed at build tim
 ## Firestore data model
 
 ```
+userPublicStats/{uid}
+  └── xp, level, streak, papersCompleted, studyMinutes,
+      subjectPapersCompleted, personalBests, badges
+
 users/{uid}
-  ├── profile          — subjects, exam dates, XP, level
-  ├── settings/
-  │   └── durations    — per-subject paper duration overrides
-  ├── termCalendar/{mondayDateStr}   — week type (A/B/Holiday)
-  ├── templates/{id}   — time block templates
-  ├── schedule/{id}    — generated paper slots
-  ├── completedPapers/{id}          — marks, grade, timestamp, reviewTopics[]
-  └── reviewQueue/{id}              — topic review tasks (pending/scheduled/done)
+  ├── profile/main      — displayName, subjects, onboardingComplete,
+  │                       furtherMathsModules
+  ├── settings/main     — defaultPaperDuration, breakDuration,
+  │                       calendarHours, reviewModeEnabled
+  ├── settings/durations — per-paperPath duration overrides
+  ├── termCalendar/{weekId}       — week type (Term A / Term B / Holiday)
+  ├── weeklySchedules/{weekId}    — array of scheduled paper slots
+  ├── weekTemplates/{id}          — saved time block templates
+  ├── completedPapers/{id}        — paperPath, marks, grade, comment,
+  │                                 actualDurationSeconds, reviewTopics[],
+  │                                 source (scheduled|adhoc), completedAt
+  ├── customPapers/{familyId}     — user-created paper families
+  ├── examTimetable/{id}          — exam name, subject, date/time
+  └── reviewQueue/{id}            — topic, subject, status, scheduledWeekId
+
 classes/{classId}
-  └── members, leaderboard entries
+  └── name, joinCode, members[], leaderboard entries
 ```
 
 ---
@@ -222,7 +253,7 @@ The naive approach to picking a revision paper is random — but that means stud
 - **0.05** — completed at any point in history (mildly deprioritised)
 - **1.0** — never attempted (full weight)
 
-This means the schedule naturally steers toward unseen papers without ever being rigid. If a student has genuinely done every paper, it falls back gracefully to equal weight rather than erroring.
+When a student logs a paper ad-hoc by selecting it from a family, the resulting `paperPath` is stored in `completedPapers`, so the scheduler naturally steers away from it in future weeks without any special-casing.
 
 ### 2. Encoding exam board paper structures as recursive decision trees
 
@@ -244,7 +275,7 @@ This gets close-to-optimal packing without the exponential cost of a full search
 
 An obvious data model puts the entire term calendar — 30+ weeks of A/B/Holiday entries — in the user's profile document. Firestore has a 1 MB document size limit, and a document that also holds subjects, exam dates, XP history, and settings would approach it quickly.
 
-Instead, `termCalendar` is a subcollection: `users/{uid}/termCalendar/{mondayDateStr}`. Each week is its own document. This keeps the profile document small and enables efficient per-week queries without reading the whole calendar.
+Instead, `termCalendar` is a subcollection: `users/{uid}/termCalendar/{mondayDateStr}`. Each week is its own document. The same pattern applies to `completedPapers` and `reviewQueue`, each of which can grow unboundedly.
 
 ### 5. Probabilistic testing for the schedule generator
 
@@ -262,27 +293,24 @@ This catches weighting bugs that would be invisible to a one-shot test.
 
 ## Testing & CI
 
-**105 tests** across 8 suites, run with Vitest and Testing Library.
+Tests across 4 suites, run with Vitest and Testing Library.
 
-| Suite | Tests | What it covers |
-|---|---|---|
-| `generateSchedule.test.js` | 8 | Schedule constraints, statistical paper weighting (100–200 iterations each) |
-| `pmtLinks.test.js` | 45 | Past paper URL generation for every subject/board/year combination |
-| `builtInFamilies.test.js` | 26 | Paper family structure and metadata validation |
-| `useAsyncData.test.js` | 5 | Custom hook loading/error/success states |
-| `Modal.test.jsx` | 7 | Component render, open/close, keyboard accessibility |
-| `timeUtils.test.js` | — | Time formatting and offset utility functions |
-| `completion.test.js` | — | Paper completion recording logic |
-| `reviewQueueSync.test.js` | — | Review queue Firestore sync operations |
+| Suite | What it covers |
+|---|---|
+| `generateSchedule.test.js` | Schedule constraints, statistical paper weighting (100–200 iterations each) |
+| `pmtLinks.test.js` | Past paper URL generation for every subject/board/year combination |
+| `builtInFamilies.test.js` | Paper family structure and metadata validation (105 families) |
+| `Modal.test.jsx` | Component render, open/close, keyboard accessibility |
 
-A GitHub Actions CI pipeline runs lint → test → build on every push and pull request.
+A GitHub Actions CI pipeline runs lint → test → build on every push and pull request, and auto-deploys to Firebase Hosting on merge to `main`.
 
 ---
 
 ## What I'd build next
 
 - **Spaced repetition scoring** — weight paper selection not just by recency but by past grade, so papers where the student scored below a threshold come back more often
-- **Mark scheme integration** — link directly to official mark schemes alongside each paper
-- **Mobile app** — the scheduling and completion flow maps well to React Native; calendar notifications for scheduled papers would be the key addition
-- ~~**Topic-level tracking**~~ — shipped as review mode (tag topics after papers, queue for review, charts in History)
+- **Push notifications** — remind students about scheduled papers at the right time, especially on mobile
+- **Mobile app** — the scheduling and completion flow maps well to React Native; the timer and calendar would be the key surfaces to rebuild
 - **Shared class schedules** — teachers generating a schedule template that pushes recommended papers to all students in a class
+- ~~**Topic-level tracking**~~ — shipped as review mode
+- ~~**Log papers from a named family**~~ — shipped; selects paperPath and auto-fills duration
