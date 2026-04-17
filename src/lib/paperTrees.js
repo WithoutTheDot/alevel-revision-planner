@@ -186,9 +186,288 @@ export const computerScience = {
   ],
 };
 
+// ─── Chemistry ───────────────────────────────────────────────────────────────
+
+const chemAqaPaperNode = {
+  options: [
+    { label: 'Paper 1 (Physical)',           value: 'paper1', terminal: true },
+    { label: 'Paper 2 (Inorganic/Physical)', value: 'paper2', terminal: true },
+    { label: 'Paper 3 (Organic/Physical)',   value: 'paper3', terminal: true },
+  ],
+};
+const chemOcrAPaperNode = {
+  options: [
+    { label: 'Component 01', value: '01', terminal: true },
+    { label: 'Component 02', value: '02', terminal: true },
+    { label: 'Component 03', value: '03', terminal: true },
+  ],
+};
+const chemEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const chemAqaYearNode     = { options: yearOptions(2017, 2024, chemAqaPaperNode) };
+const chemOcrAYearNode    = { options: yearOptions(2017, 2024, chemOcrAPaperNode) };
+const chemEdexcelYearNode = { options: yearOptions(2017, 2024, chemEdexcelPaperNode) };
+
+export const chemistry = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: chemAqaYearNode },
+    { label: 'OCR A',   value: 'ocra',    next: chemOcrAYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: chemEdexcelYearNode },
+  ],
+};
+
+// ─── Biology ─────────────────────────────────────────────────────────────────
+
+const bioAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const bioOcrAPaperNode = {
+  options: [
+    { label: 'Biological Processes', value: 'biological-processes', terminal: true },
+    { label: 'Biological Diversity', value: 'biological-diversity', terminal: true },
+    { label: 'Unified Biology',       value: 'unified-biology',       terminal: true },
+  ],
+};
+const bioEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const bioAqaYearNode     = { options: yearOptions(2017, 2024, bioAqaPaperNode) };
+const bioOcrAYearNode    = { options: yearOptions(2017, 2024, bioOcrAPaperNode) };
+const bioEdexcelYearNode = { options: yearOptions(2017, 2024, bioEdexcelPaperNode) };
+
+export const biology = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: bioAqaYearNode },
+    { label: 'OCR A',   value: 'ocra',    next: bioOcrAYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: bioEdexcelYearNode },
+  ],
+};
+
+// ─── Psychology ───────────────────────────────────────────────────────────────
+
+const psychAqaPaperNode = {
+  options: [
+    { label: 'Paper 1 (Introductory Topics)',   value: 'paper1', terminal: true },
+    { label: 'Paper 2 (Psychology in Context)', value: 'paper2', terminal: true },
+    { label: 'Paper 3 (Issues & Options)',      value: 'paper3', terminal: true },
+  ],
+};
+const psychEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const psychAqaYearNode     = { options: yearOptions(2017, 2024, psychAqaPaperNode) };
+const psychEdexcelYearNode = { options: yearOptions(2017, 2024, psychEdexcelPaperNode) };
+
+export const psychology = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: psychAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: psychEdexcelYearNode },
+  ],
+};
+
+// ─── Sociology ────────────────────────────────────────────────────────────────
+
+const socioAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const socioAqaYearNode = { options: yearOptions(2017, 2024, socioAqaPaperNode) };
+
+export const sociology = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: socioAqaYearNode },
+  ],
+};
+
+// ─── Economics ────────────────────────────────────────────────────────────────
+
+const econAqaPaperNode = {
+  options: [
+    { label: 'Paper 1 (Markets)',  value: 'paper1', terminal: true },
+    { label: 'Paper 2 (National)', value: 'paper2', terminal: true },
+    { label: 'Paper 3 (Themes)',   value: 'paper3', terminal: true },
+  ],
+};
+const econEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const econAqaYearNode     = { options: yearOptions(2017, 2024, econAqaPaperNode) };
+const econEdexcelYearNode = { options: yearOptions(2017, 2024, econEdexcelPaperNode) };
+
+export const economics = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: econAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: econEdexcelYearNode },
+  ],
+};
+
+// ─── History ──────────────────────────────────────────────────────────────────
+
+const histAqaPaperNode = {
+  options: [
+    { label: 'Component 1', value: 'component1', terminal: true },
+    { label: 'Component 2', value: 'component2', terminal: true },
+    { label: 'Component 3', value: 'component3', terminal: true },
+  ],
+};
+const histEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const histAqaYearNode     = { options: yearOptions(2017, 2024, histAqaPaperNode) };
+const histEdexcelYearNode = { options: yearOptions(2017, 2024, histEdexcelPaperNode) };
+
+export const history = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: histAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: histEdexcelYearNode },
+  ],
+};
+
+// ─── Geography ────────────────────────────────────────────────────────────────
+
+const geogAqaPaperNode = {
+  options: [
+    { label: 'Paper 1 (Physical)',   value: 'paper1', terminal: true },
+    { label: 'Paper 2 (Human)',      value: 'paper2', terminal: true },
+    { label: 'Paper 3 (Issue Eval)', value: 'paper3', terminal: true },
+  ],
+};
+const geogEdexcelPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const geogAqaYearNode     = { options: yearOptions(2017, 2024, geogAqaPaperNode) };
+const geogEdexcelYearNode = { options: yearOptions(2017, 2024, geogEdexcelPaperNode) };
+
+export const geography = {
+  options: [
+    { label: 'AQA',     value: 'aqa',     next: geogAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: geogEdexcelYearNode },
+  ],
+};
+
+// ─── English Literature ───────────────────────────────────────────────────────
+
+const engAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const engAqaYearNode = { options: yearOptions(2017, 2024, engAqaPaperNode) };
+
+export const english = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: engAqaYearNode },
+  ],
+};
+
+// ─── Business ─────────────────────────────────────────────────────────────────
+
+const bizAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const bizAqaYearNode = { options: yearOptions(2017, 2024, bizAqaPaperNode) };
+
+export const business = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: bizAqaYearNode },
+  ],
+};
+
+// ─── Law ──────────────────────────────────────────────────────────────────────
+
+const lawAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+    { label: 'Paper 3', value: 'paper3', terminal: true },
+  ],
+};
+const lawAqaYearNode = { options: yearOptions(2017, 2024, lawAqaPaperNode) };
+
+export const law = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: lawAqaYearNode },
+  ],
+};
+
+// ─── Physical Education ───────────────────────────────────────────────────────
+
+const peAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+  ],
+};
+const peAqaYearNode = { options: yearOptions(2017, 2024, peAqaPaperNode) };
+
+export const pe = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: peAqaYearNode },
+  ],
+};
+
+// ─── Statistics ───────────────────────────────────────────────────────────────
+
+const statsAqaPaperNode = {
+  options: [
+    { label: 'Paper 1', value: 'paper1', terminal: true },
+    { label: 'Paper 2', value: 'paper2', terminal: true },
+  ],
+};
+const statsAqaYearNode = { options: yearOptions(2017, 2024, statsAqaPaperNode) };
+
+export const statistics = {
+  options: [
+    { label: 'AQA', value: 'aqa', next: statsAqaYearNode },
+  ],
+};
+
 // ─── Export all ─────────────────────────────────────────────────────────────
 
-export const SUBJECT_TREES = { maths, furtherMaths, physics, computerScience };
+export const SUBJECT_TREES = {
+  maths, furtherMaths, physics, computerScience,
+  chemistry, biology, psychology, sociology,
+  economics, history, geography, english,
+  business, law, pe, statistics,
+};
 
 // ─── Subject metadata (colours etc.) ────────────────────────────────────────
 
