@@ -4,9 +4,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
     setupFiles: ['./src/test/setup.js'],
+    include: ['src/lib/__tests__/**/*.test.js', 'src/lib/**/*.test.js', 'src/firebase/db/**/*.test.js'],
   },
   build: {
     rollupOptions: {
