@@ -43,6 +43,7 @@ describe('getTodaysPapers', () => {
       ],
     };
     const result = getTodaysPapers(schedule, 'Monday');
+    expect(result).toHaveLength(2);
     expect(result[0].index).toBe(1);
     expect(result[1].index).toBe(2);
   });
