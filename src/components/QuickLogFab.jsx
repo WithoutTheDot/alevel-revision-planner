@@ -13,7 +13,11 @@ export default function QuickLogFab() {
   const [toast, setToast] = useState('');
 
   const handleSubmit = useCallback(async (paperData) => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.uid) {
+      setToast('You must be signed in to log a paper.');
+      setTimeout(() => setToast(''), TOAST_DURATION_MS);
+      return;
+    }
     try {
       await completePaper(currentUser.uid, {
         ...paperData,
