@@ -47,7 +47,7 @@ export async function updateStreak(uid) {
  * Returns { xpEarned, newBadges }.
  */
 export async function awardXpAndBadges(uid, paperData, updatedStats) {
-  const { total: xpEarned, base, gradeBonus, timeBonus } = calculateXp(
+  const { total: xpEarned, base, gradeBonus, timeBonus, streakBonus } = calculateXp(
     { grade: paperData.grade, timeTaken: paperData.timeTaken, expectedTime: paperData.expectedTime },
     { currentStreak: updatedStats.currentStreak ?? 0 }
   );
@@ -104,7 +104,7 @@ export async function awardXpAndBadges(uid, paperData, updatedStats) {
     });
   }
 
-  return { xpEarned: totalXp, newBadges: newBadgeDefs, breakdown: { base, grade: gradeBonus, time: timeBonus, badge: badgeXp } };
+  return { xpEarned: totalXp, newBadges: newBadgeDefs, breakdown: { base, grade: gradeBonus, time: timeBonus, streak: streakBonus, badge: badgeXp } };
 }
 
 export async function getUserBadges(uid) {
