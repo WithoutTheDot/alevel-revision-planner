@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config';
 import { BADGE_DEFS, xpToLevel } from '../../lib/badges';
+import { calculateXp, computeNextStreak } from '../../lib/xpUtils';
 
 // ─── Streaks ─────────────────────────────────────────────────────────────────
 
@@ -29,11 +30,8 @@ export async function updateStreak(uid) {
   const current = data.currentStreak ?? 0;
   const longest = data.longestStreak ?? 0;
 
-  if (last === today) return; // already counted today
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().slice(0, 10);
-  const newStreak = last === yStr ? current + 1 : 1;
+  const { newStreak, alreadyCounted } = computeNextStreak(today, last, current);
+  if (alreadyCounted) return;
 
   await setDoc(ref, {
     currentStreak: newStreak,
@@ -49,24 +47,10 @@ export async function updateStreak(uid) {
  * Returns { xpEarned, newBadges }.
  */
 export async function awardXpAndBadges(uid, paperData, updatedStats) {
-  // Base XP
-  const base = 25;
-  let xpEarned = base;
-  // Grade bonus
-  const gradeBonus = (paperData.grade === 'A' || paperData.grade === 'A*') ? 25 : 0;
-  xpEarned += gradeBonus;
-  // Timer bonus: proportional to how much faster than expected, capped at +50
-  let timeBonus = 0;
-  if (paperData.timeTaken != null && paperData.expectedTime != null
-      && paperData.timeTaken < paperData.expectedTime && paperData.expectedTime > 0) {
-    const pctFaster = (paperData.expectedTime - paperData.timeTaken) / paperData.expectedTime;
-    timeBonus = Math.min(50, Math.round(pctFaster * 100));
-  }
-  xpEarned += timeBonus;
-  // Streak bonuses (only on exact milestone hits)
-  const streak = updatedStats.currentStreak ?? 0;
-  if (streak === 7) xpEarned += 50;
-  if (streak === 30) xpEarned += 150;
+  const { total: xpEarned, base, gradeBonus, timeBonus } = calculateXp(
+    { grade: paperData.grade, timeTaken: paperData.timeTaken, expectedTime: paperData.expectedTime },
+    { currentStreak: updatedStats.currentStreak ?? 0 }
+  );
 
   // Build context for badge checks
   const papersCompleted = (updatedStats.papersCompleted ?? 0);
