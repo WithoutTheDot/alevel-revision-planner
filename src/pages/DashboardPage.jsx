@@ -14,7 +14,8 @@ import LevelCard from '../components/LevelCard';
 import StatCard from '../components/StatCard';
 import UpcomingPapers from '../components/UpcomingPapers';
 import ExamCountdown from '../components/ExamCountdown';
-import { getMondayStr } from '../lib/dateUtils';
+import { getMondayStr, getTodaysPapers, getTodayDayName } from '../lib/dateUtils';
+import TodaySection from '../components/TodaySection';
 import PmtLinkButton from '../components/PmtLinkButton';
 import { getPmtLinks } from '../lib/pmtLinks';
 import { TOAST_DURATION_MS } from '../lib/constants';
@@ -57,6 +58,8 @@ export default function DashboardPage() {
   const { subjectMeta } = useSubjects();
   const navigate = useNavigate();
   const weekId = getMondayStr(new Date());
+  const todayDayName = getTodayDayName();
+  const todaysPapers = getTodaysPapers(schedule, todayDayName);
   const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
 
   const [schedule, setSchedule] = useState(null);
@@ -347,6 +350,15 @@ export default function DashboardPage() {
         <DashboardSkeleton />
       ) : (
         <div className="space-y-5">
+          <TodaySection
+            todaysPapers={todaysPapers}
+            onComplete={(idx) => {
+              const paper = schedule?.papers?.[idx];
+              setCompleting({ paper, index: idx });
+            }}
+            onStartTimer={(paper, index) => setStartingTimer({ paper, index })}
+            dayName={todayDayName}
+          />
           {/* Stat cards */}
           <div className={`grid gap-3 ${reviewModeEnabled ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
             <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
