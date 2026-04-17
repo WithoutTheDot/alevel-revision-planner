@@ -49,7 +49,10 @@ export function getDefaultDurationForPath(path, subject) {
     if (path.includes('modelling-physics') || path.includes('exploring-physics')) return 135;
     if (path.includes('unified-physics')) return 90;
   }
-  return 120; // maths, furtherMaths, AQA physics papers
+  if (subject === 'psychology' || subject === 'sociology') return 90;
+  if (subject === 'pe') return 90;
+  if (subject === 'statistics') return 90;
+  return 120;
 }
 const DEFAULT_BREAK    = 10; // minutes — plan default
 

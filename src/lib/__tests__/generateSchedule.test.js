@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateWeeklySchedule } from '../generateSchedule';
+import { generateWeeklySchedule, selectPaper } from '../generateSchedule';
 import { weightedRandom } from '../random';
 
 // Template aligned with corrected db.js schema
@@ -131,4 +131,22 @@ describe('generateWeeklySchedule', () => {
     expect(ratio).toBeGreaterThan(0.40);
     expect(ratio).toBeLessThan(0.60);
   });
+});
+
+describe('new subject coverage — selectPaper returns a paper', () => {
+  const NEW_SUBJECTS = [
+    'chemistry', 'biology', 'psychology', 'sociology',
+    'economics', 'history', 'geography', 'english',
+    'business', 'law', 'pe', 'statistics',
+  ];
+
+  for (const subject of NEW_SUBJECTS) {
+    it(`${subject}`, () => {
+      const result = selectPaper(subject, new Set(), [], { _default: 90 }, undefined, []);
+      expect(result).not.toBeNull();
+      expect(result.subject).toBe(subject);
+      expect(typeof result.paperPath).toBe('string');
+      expect(result.paperPath.length).toBeGreaterThan(0);
+    });
+  }
 });

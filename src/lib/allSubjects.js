@@ -7,17 +7,17 @@ export const ALL_SUBJECTS = [
   { id: 'furtherMaths',    label: 'Further Mathematics',  builtIn: true },
   { id: 'physics',         label: 'Physics',              builtIn: true },
   { id: 'computerScience', label: 'Computer Science',     builtIn: true },
-  { id: 'chemistry',       label: 'Chemistry' },
-  { id: 'biology',         label: 'Biology' },
-  { id: 'economics',       label: 'Economics' },
-  { id: 'history',         label: 'History' },
-  { id: 'geography',       label: 'Geography' },
-  { id: 'english',         label: 'English Literature' },
+  { id: 'chemistry',       label: 'Chemistry',              builtIn: true },
+  { id: 'biology',         label: 'Biology',                builtIn: true },
+  { id: 'economics',       label: 'Economics',              builtIn: true },
+  { id: 'history',         label: 'History',                builtIn: true },
+  { id: 'geography',       label: 'Geography',              builtIn: true },
+  { id: 'english',         label: 'English Literature',     builtIn: true },
   { id: 'englishLang',     label: 'English Language' },
-  { id: 'psychology',      label: 'Psychology' },
-  { id: 'sociology',       label: 'Sociology' },
-  { id: 'business',        label: 'Business Studies' },
-  { id: 'law',             label: 'Law' },
+  { id: 'psychology',      label: 'Psychology',             builtIn: true },
+  { id: 'sociology',       label: 'Sociology',              builtIn: true },
+  { id: 'business',        label: 'Business Studies',       builtIn: true },
+  { id: 'law',             label: 'Law',                    builtIn: true },
   { id: 'politics',        label: 'Politics' },
   { id: 'philosophy',      label: 'Philosophy' },
   { id: 'french',          label: 'French' },
@@ -28,14 +28,20 @@ export const ALL_SUBJECTS = [
   { id: 'music',           label: 'Music' },
   { id: 'drama',           label: 'Drama & Theatre' },
   { id: 'dandt',           label: 'Design & Technology' },
-  { id: 'pe',              label: 'Physical Education' },
+  { id: 'pe',              label: 'Physical Education',     builtIn: true },
   { id: 'religious',       label: 'Religious Studies' },
   { id: 'media',           label: 'Media Studies' },
   { id: 'film',            label: 'Film Studies' },
+  { id: 'statistics',      label: 'Statistics',             builtIn: true },
   { id: 'accounting',      label: 'Accounting' },
 ];
 
-export const BUILT_IN_SUBJECT_IDS = new Set(['maths', 'furtherMaths', 'physics', 'computerScience']);
+export const BUILT_IN_SUBJECT_IDS = new Set([
+  'maths', 'furtherMaths', 'physics', 'computerScience',
+  'chemistry', 'biology', 'psychology', 'sociology',
+  'economics', 'history', 'geography', 'english',
+  'business', 'law', 'pe', 'statistics',
+]);
 
 /**
  * Further Maths optional modules. Each entry applies to one or more exam boards.
