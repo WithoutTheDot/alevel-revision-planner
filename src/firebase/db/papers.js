@@ -115,7 +115,7 @@ export async function recordCompletion(userId, paperData) {
       if (existingSnap.exists() && existingSnap.data().xpAwarded === true) {
         existingXpAwarded = true;
       }
-    } catch (_) { /* best-effort */ }
+    } catch (e) { console.error('[papers] best-effort op failed:', e); }
   }
 
   // Atomically write completed paper record + public stats in a single batch
