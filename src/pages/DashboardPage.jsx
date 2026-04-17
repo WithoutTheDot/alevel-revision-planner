@@ -58,8 +58,6 @@ export default function DashboardPage() {
   const { subjectMeta } = useSubjects();
   const navigate = useNavigate();
   const weekId = getMondayStr(new Date());
-  const todayDayName = getTodayDayName();
-  const todaysPapers = getTodaysPapers(schedule, todayDayName);
   const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
 
   const [schedule, setSchedule] = useState(null);
@@ -87,6 +85,9 @@ export default function DashboardPage() {
   const [prevWeekId, setPrevWeekId] = useState('');
   const [reviewModeEnabled, setReviewModeEnabled] = useState(true);
   const [topReviewTopic, setTopReviewTopic] = useState(null); // { topic, count, subject }
+
+  const todayDayName = getTodayDayName();
+  const todaysPapers = getTodaysPapers(schedule, todayDayName);
 
   const load = useCallback(async () => {
     setLoading(true);
