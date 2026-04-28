@@ -184,6 +184,7 @@ export default function HistoryPage() {
     try {
       await deleteCompletedPaper(currentUser.uid, p.id);
       setPapers((prev) => prev.filter((pp) => pp.id !== p.id));
+      setCoverageData(null);
     } catch (e) {
       setLoadError('Failed to delete: ' + e.message);
     }
@@ -195,6 +196,7 @@ export default function HistoryPage() {
     try {
       await updateCompletion(currentUser.uid, editingPaper.id, updates);
       setPapers((prev) => prev.map((pp) => pp.id === editingPaper.id ? { ...pp, ...updates } : pp));
+      setCoverageData(null);
       await syncReviewQueueForCompletionEdit(currentUser.uid, {
         subject: editingPaper.subject,
         prevTopics: editingPaper.reviewTopics ?? [],
