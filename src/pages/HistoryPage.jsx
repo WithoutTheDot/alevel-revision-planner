@@ -33,6 +33,7 @@ export default function HistoryPage() {
   const [personalBests, setPersonalBests] = useState({});
   const [coverageData, setCoverageData] = useState(null);
   const [coverageLoading, setCoverageLoading] = useState(false);
+  const [coverageError, setCoverageError] = useState('');
 
   const [editingPaper, setEditingPaper] = useState(null);
   const [editError, setEditError] = useState('');
@@ -61,16 +62,19 @@ export default function HistoryPage() {
 
   const handleViewChange = useCallback(async (v) => {
     setView(v);
-    if (v === 'grid' && coverageData === null) {
+    if (v === 'grid' && coverageData === null && !coverageLoading) {
       setCoverageLoading(true);
+      setCoverageError('');
       try {
         const data = await getCoverageData(currentUser.uid);
         setCoverageData(data);
+      } catch {
+        setCoverageError('Failed to load coverage data. Please try again.');
       } finally {
         setCoverageLoading(false);
       }
     }
-  }, [coverageData, currentUser]);
+  }, [coverageData, coverageLoading, currentUser.uid]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -237,6 +241,8 @@ export default function HistoryPage() {
       ) : view === 'grid' ? (
         coverageLoading ? (
           <p className="text-[var(--color-text-muted)] text-sm">Loading coverage...</p>
+        ) : coverageError ? (
+          <p className="text-[var(--color-danger-text)] text-sm">{coverageError}</p>
         ) : (
           <CoverageGrid coverageData={coverageData} subjects={subjects} />
         )
