@@ -32,7 +32,7 @@ export default function QuickLogFab() {
       setToast('Failed to log paper. Please try again.');
       setTimeout(() => setToast(''), TOAST_DURATION_MS);
     }
-  }, [currentUser?.uid]);
+  }, [currentUser]);
 
   return (
     <>

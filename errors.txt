@@ -1,0 +1,49 @@
+
+Run npm run lint
+
+> alevel-study-planner@1.0.0 lint
+> eslint .
+
+
+/home/runner/work/alevel-revision-planner/alevel-revision-planner/src/components/CoverageGrid.jsx
+  56:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  54 |   useEffect(() => {
+  55 |     if (filterSubject !== 'all' && !visibleFamilies.some((f) => f.subject === filterSubject)) {
+> 56 |       setFilterSubject('all');
+     |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  57 |     }
+  58 |   }, [visibleFamilies, filterSubject]);
+  59 |  react-hooks/set-state-in-effect
+
+/home/runner/work/alevel-revision-planner/alevel-revision-planner/src/components/QuickLogFab.jsx
+  15:36  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `currentUser`, but the source dependencies were [currentUser?.uid]. Inferred less specific property than source.
+
+  13 |   const [toast, setToast] = useState('');
+  14 |
+> 15 |   const handleSubmit = useCallback(async (paperData) => {
+     |                                    ^^^^^^^^^^^^^^^^^^^^^^
+> 16 |     if (!currentUser?.uid) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 17 |       setToast('You must be signed in to log a paper.');
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |   }, [currentUser?.uid]);
+     | ^^^^ Could not preserve existing manual memoization
+  36 |
+  37 |   return (
+  38 |     <>  react-hooks/preserve-manual-memoization
+
+✖ 2 problems (2 errors, 0 warnings)
+
+Error: Process completed with exit code 1.

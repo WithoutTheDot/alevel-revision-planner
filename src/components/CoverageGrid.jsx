@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { BUILT_IN_FAMILIES } from '../lib/builtInFamilies';
 import { parseBoard, gradeColor } from '../lib/coverageUtils';
 import { format, parseISO } from 'date-fns';
@@ -51,11 +51,10 @@ export default function CoverageGrid({ coverageData, subjects = [] }) {
     return map;
   }, [filtered]);
 
-  useEffect(() => {
-    if (filterSubject !== 'all' && !visibleFamilies.some((f) => f.subject === filterSubject)) {
-      setFilterSubject('all');
-    }
-  }, [visibleFamilies, filterSubject]);
+  // Reset filter if subject is no longer visible
+  if (filterSubject !== 'all' && !visibleFamilies.some((f) => f.subject === filterSubject)) {
+    setFilterSubject('all');
+  }
 
   const subjectLabel = (id) => subjects.find((s) => s.id === id)?.label ?? id;
 
