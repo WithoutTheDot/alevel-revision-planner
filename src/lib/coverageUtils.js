@@ -1,7 +1,9 @@
 const BOARDS = ['ocr', 'aqa', 'edexcel'];
 
 export function parseBoard(familyId) {
+  if (!familyId) return null;
   const parts = familyId.split('-');
+  // Family IDs are expected to contain at most one board segment, so the first match is always the only match.
   return BOARDS.find((b) => parts.includes(b)) ?? null;
 }
 

@@ -14,6 +14,12 @@ describe('parseBoard', () => {
   it('returns null for family with no known board', () => {
     expect(parseBoard('maths-madas-mp2')).toBeNull();
   });
+  it('returns null for null input', () => {
+    expect(parseBoard(null)).toBeNull();
+  });
+  it('returns null for undefined input', () => {
+    expect(parseBoard(undefined)).toBeNull();
+  });
 });
 
 describe('gradeColor', () => {
@@ -34,6 +40,9 @@ describe('gradeColor', () => {
   });
   it('returns red classes for U', () => {
     expect(gradeColor('U')).toBe('bg-red-500 text-white');
+  });
+  it('returns red classes for unrecognised grade like E', () => {
+    expect(gradeColor('E')).toBe('bg-red-500 text-white');
   });
   it('returns null for falsy grade', () => {
     expect(gradeColor(null)).toBeNull();
