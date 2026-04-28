@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { BUILT_IN_FAMILIES } from '../lib/builtInFamilies';
 import { parseBoard, gradeColor } from '../lib/coverageUtils';
 import { format, parseISO } from 'date-fns';
@@ -13,7 +13,7 @@ function yearRange(start, end) {
   return years;
 }
 
-export default function CoverageGrid({ coverageData, subjects }) {
+export default function CoverageGrid({ coverageData, subjects = [] }) {
   const enrolledIds = useMemo(() => new Set(subjects.map((s) => s.id)), [subjects]);
 
   const visibleFamilies = useMemo(
@@ -51,6 +51,12 @@ export default function CoverageGrid({ coverageData, subjects }) {
     return map;
   }, [filtered]);
 
+  useEffect(() => {
+    if (filterSubject !== 'all' && !visibleFamilies.some((f) => f.subject === filterSubject)) {
+      setFilterSubject('all');
+    }
+  }, [visibleFamilies, filterSubject]);
+
   const subjectLabel = (id) => subjects.find((s) => s.id === id)?.label ?? id;
 
   if (visibleFamilies.length === 0) {
@@ -66,8 +72,9 @@ export default function CoverageGrid({ coverageData, subjects }) {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-2">
-          <label className="text-sm text-[var(--color-text-secondary)]">Subject</label>
+          <label htmlFor="coverage-filter-subject" className="text-sm text-[var(--color-text-secondary)]">Subject</label>
           <select
+            id="coverage-filter-subject"
             value={filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
             className="text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-[var(--color-text-primary)]"
@@ -81,8 +88,9 @@ export default function CoverageGrid({ coverageData, subjects }) {
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-[var(--color-text-secondary)]">Board</label>
+          <label htmlFor="coverage-filter-board" className="text-sm text-[var(--color-text-secondary)]">Board</label>
           <select
+            id="coverage-filter-board"
             value={filterBoard}
             onChange={(e) => setFilterBoard(e.target.value)}
             className="text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-[var(--color-text-primary)]"
@@ -118,11 +126,11 @@ export default function CoverageGrid({ coverageData, subjects }) {
               <table className="text-xs border-collapse">
                 <thead>
                   <tr>
-                    <th className="text-left pr-4 pb-1 text-[var(--color-text-muted)] font-medium min-w-[160px]">
+                    <th scope="col" className="text-left pr-4 pb-1 text-[var(--color-text-muted)] font-medium min-w-[160px]">
                       Family
                     </th>
                     {years.map((y) => (
-                      <th key={y} className="px-1 pb-1 text-[var(--color-text-muted)] font-medium w-10 text-center">
+                      <th key={y} scope="col" className="px-1 pb-1 text-[var(--color-text-muted)] font-medium w-10 text-center">
                         {y}
                       </th>
                     ))}
@@ -131,9 +139,9 @@ export default function CoverageGrid({ coverageData, subjects }) {
                 <tbody>
                   {families.map((fam) => (
                     <tr key={fam.id}>
-                      <td className="pr-4 py-0.5 text-[var(--color-text-secondary)] whitespace-nowrap">
+                      <th scope="row" className="pr-4 py-0.5 text-[var(--color-text-secondary)] whitespace-nowrap">
                         {fam.name}
-                      </td>
+                      </th>
                       {years.map((y) => {
                         const inRange = y >= fam.yearStart && y <= fam.yearEnd;
                         if (!inRange) {
