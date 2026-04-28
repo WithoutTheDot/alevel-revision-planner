@@ -39,9 +39,11 @@ export default function QuickLogFab() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Quick log a paper"
-        className="w-12 h-12 rounded-full bg-[var(--color-primary)] text-white shadow-lg hover:opacity-90 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
+        className="w-14 h-14 rounded-full bg-[var(--color-accent)] text-white shadow-lg hover:bg-[var(--color-accent-hover)] active:scale-95 transition-all flex items-center justify-center"
       >
-        +
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="w-7 h-7">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
       </button>
       {open && (
         <CompletionDetailsModal
