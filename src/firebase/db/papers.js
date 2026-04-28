@@ -90,6 +90,24 @@ export async function getAllCompletedPaperPaths(userId) {
   return snap.docs.map((d) => d.data().paperPath).filter(Boolean);
 }
 
+/**
+ * Fetches all completed papers for a user and returns a Map<paperPath, { grade, completedAt }>.
+ * If a paperPath was completed multiple times, keeps the most recent entry.
+ */
+export async function getCoverageData(userId) {
+  const snap = await getDocs(collection(db, 'users', userId, 'completedPapers'));
+  const map = new Map();
+  for (const d of snap.docs) {
+    const { paperPath, grade, completedAt } = d.data();
+    if (!paperPath) continue;
+    const existing = map.get(paperPath);
+    if (!existing || completedAt > existing.completedAt) {
+      map.set(paperPath, { grade: grade ?? null, completedAt: completedAt ?? null });
+    }
+  }
+  return map;
+}
+
 export async function getRecentCompletedPapers(userId, beforeDate, weeksBack = 3) {
   const end = new Date(beforeDate);
   const start = new Date(beforeDate);
