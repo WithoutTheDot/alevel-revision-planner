@@ -9,6 +9,8 @@ import HistoryCharts from '../components/HistoryCharts';
 import HistoryFilters from '../components/HistoryFilters';
 import HistoryTable from '../components/HistoryTable';
 import CompletionDetailsModal from '../components/CompletionDetailsModal';
+import CoverageGrid from '../components/CoverageGrid';
+import { getCoverageData } from '../firebase/db';
 
 const ALL_GRADES = ['A*', 'A', 'B', 'C', 'D', 'E', 'U'];
 
@@ -27,8 +29,10 @@ export default function HistoryPage() {
   const [filterGrade, setFilterGrade] = useState('all');
   const [search, setSearch] = useState('');
   const [loadError, setLoadError] = useState('');
-  const [view, setView] = useState('table'); // 'table' | 'charts'
+  const [view, setView] = useState('table'); // 'table' | 'charts' | 'grid'
   const [personalBests, setPersonalBests] = useState({});
+  const [coverageData, setCoverageData] = useState(null);
+  const [coverageLoading, setCoverageLoading] = useState(false);
 
   const [editingPaper, setEditingPaper] = useState(null);
   const [editError, setEditError] = useState('');
@@ -54,6 +58,19 @@ export default function HistoryPage() {
       setLoading(false);
     }
   }, [currentUser.uid]);
+
+  const handleViewChange = useCallback(async (v) => {
+    setView(v);
+    if (v === 'grid' && coverageData === null) {
+      setCoverageLoading(true);
+      try {
+        const data = await getCoverageData(currentUser.uid);
+        setCoverageData(data);
+      } finally {
+        setCoverageLoading(false);
+      }
+    }
+  }, [coverageData, currentUser]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -200,8 +217,8 @@ export default function HistoryPage() {
             </button>
           )}
           <div className="flex border border-[var(--color-border)] rounded-[var(--radius-md)] overflow-hidden">
-            {['table', 'charts'].map((v) => (
-              <button key={v} onClick={() => setView(v)}
+            {['table', 'charts', 'grid'].map((v) => (
+              <button key={v} onClick={() => handleViewChange(v)}
                 className={'px-4 py-2 text-sm font-medium capitalize transition-colors ' +
                   (view === v
                     ? 'bg-[var(--color-accent)] text-white'
@@ -217,6 +234,12 @@ export default function HistoryPage() {
 
       {loading ? (
         <p className="text-[var(--color-text-muted)] text-sm">Loading...</p>
+      ) : view === 'grid' ? (
+        coverageLoading ? (
+          <p className="text-[var(--color-text-muted)] text-sm">Loading coverage...</p>
+        ) : (
+          <CoverageGrid coverageData={coverageData} subjects={subjects} />
+        )
       ) : view === 'charts' ? (
         <HistoryCharts
           gradeChartData={gradeChartData}
