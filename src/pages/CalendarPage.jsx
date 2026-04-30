@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isBefore, startOfDay } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, getExamTimetable, getUserSettings, getReviewQueue, deletePaper, updatePaper, getAllCompletedPapers, updateReviewQueueItem, completePaper } from '../firebase/db';
+import { getWeeklySchedule, getExamTimetable, getUserSettings, getReviewQueue, deletePaper, updatePaper, getAllCompletedPaperPaths, getRecentCompletedPapers, updateReviewQueueItem, completePaper } from '../firebase/db';
+import { formatTime } from '../lib/timeUtils';
 import { selectPaper } from '../lib/generateSchedule';
 import { downloadIcs, downloadPdf } from '../lib/exportCalendar';
 import SubjectBadge from '../components/SubjectBadge';
@@ -196,17 +197,17 @@ export default function CalendarPage() {
     setGhostPos(null);
   }
 
-  function handleGlobalMouseUp() {
+  const handleGlobalMouseUp = useCallback(() => {
     if (dragState) {
       setDragState(null);
       setGhostPos(null);
     }
-  }
+  }, [dragState]);
 
   useEffect(() => {
     window.addEventListener('mouseup', handleGlobalMouseUp);
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-  });
+  }, [handleGlobalMouseUp]);
 
   async function handleDeletePaper(paperIdx) {
     if (!confirm('Remove this paper from the schedule?')) return;
@@ -228,13 +229,10 @@ export default function CalendarPage() {
           .filter((p) => p !== paper)
           .map((p) => p.paperPath)
       );
-      const { papers: allCompleted } = await getAllCompletedPapers(currentUser.uid, { limit: 500 });
-      const allTimePaths = allCompleted.map((p) => p.paperPath);
-      const threeWeeksAgo = new Date();
-      threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
-      const recentPaths = allCompleted
-        .filter((p) => p.completedAt && new Date(p.completedAt) > threeWeeksAgo)
-        .map((p) => p.paperPath);
+      const [allTimePaths, recentPaths] = await Promise.all([
+        getAllCompletedPaperPaths(currentUser.uid),
+        getRecentCompletedPapers(currentUser.uid, new Date().toISOString(), 3),
+      ]);
 
       const newPaper = selectPaper(paper.subject, weekExcluded, recentPaths, {}, [], allTimePaths);
       if (!newPaper) return setLocalError('No alternative paper found for this subject.');
@@ -467,9 +465,7 @@ export default function CalendarPage() {
                           const timerKey = `timer_${weekId}_${p._idx}`;
                           const timerData = getTimerData(timerKey);
                           const elapsedMins = timerData ? getElapsed(timerKey) : null;
-                          const elapsedDisplay = elapsedMins != null
-                            ? `${Math.floor(elapsedMins)}:${String(Math.floor((elapsedMins % 1) * 60)).padStart(2, '0')}`
-                            : null;
+                          const elapsedDisplay = elapsedMins != null ? formatTime(Math.round(elapsedMins * 60)) : null;
                           return (
                             <div
                               key={p._idx}
@@ -542,9 +538,7 @@ export default function CalendarPage() {
                   const timerKey = `timer_${weekId}_${p._idx}`;
                   const timerData = getTimerData(timerKey);
                   const elapsedMins = timerData ? getElapsed(timerKey) : null;
-                  const elapsedDisplay = elapsedMins != null
-                    ? `${Math.floor(elapsedMins)}:${String(Math.floor((elapsedMins % 1) * 60)).padStart(2, '0')}`
-                    : null;
+                  const elapsedDisplay = elapsedMins != null ? formatTime(Math.round(elapsedMins * 60)) : null;
                   return (
                     <button
                       key={p._idx}
@@ -638,9 +632,7 @@ export default function CalendarPage() {
         const timerKey = `timer_${weekId}_${p._idx}`;
         const timerData = getTimerData(timerKey);
         const elapsedMins = timerData ? getElapsed(timerKey) : null;
-        const elapsedDisplay = elapsedMins != null
-          ? `${Math.floor(elapsedMins)}:${String(Math.floor((elapsedMins % 1) * 60)).padStart(2, '0')}`
-          : null;
+        const elapsedDisplay = elapsedMins != null ? formatTime(Math.round(elapsedMins * 60)) : null;
         const _sm = subjectMeta[p.subject];
         const isOverdue = isPast && !p.completed;
 

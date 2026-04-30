@@ -9,7 +9,6 @@ import {
   addDoc,
   query,
   where,
-  limit,
   arrayUnion,
   arrayRemove,
   increment,
@@ -57,13 +56,8 @@ export async function awardXpAndBadges(uid, paperData, updatedStats) {
   const longestStreak = (updatedStats.longestStreak ?? 0);
   const existingBadgeIds = updatedStats.badgeIds ?? [];
 
-  // Subject count for subject-mastery badge
-  let subjectCounts = {};
-  try {
-    const colRef = collection(db, 'users', uid, 'completedPapers');
-    const subSnap = await getDocs(query(colRef, where('subject', '==', paperData.subject), limit(21)));
-    subjectCounts[paperData.subject] = subSnap.size;
-  } catch (_) { /* best-effort */ }
+  // Subject counts are already in updatedStats — no extra query needed.
+  const subjectCounts = { ...updatedStats.subjectPapersCompleted };
 
   const ctx = { papersCompleted, longestStreak, subjectCounts };
 

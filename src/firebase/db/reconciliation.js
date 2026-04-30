@@ -1,4 +1,5 @@
 import { doc, getDoc, getDocs, collection, setDoc, serverTimestamp, query, orderBy, limit, startAfter, arrayUnion, increment, updateDoc } from 'firebase/firestore';
+import { format, startOfWeek, parseISO } from 'date-fns';
 import { db } from '../config';
 import { BADGE_DEFS, xpToLevel } from '../../lib/badges';
 
@@ -138,12 +139,9 @@ export async function computeWeeklyRollups(uid) {
     const data = d.data();
     if (!data.completedAt) return;
     
-    // completedAt is ISO string. We need to find the Monday of that week.
-    const date = new Date(data.completedAt);
-    const day = date.getUTCDay();
-    const diff = date.getUTCDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-    const monday = new Date(date.setUTCDate(diff));
-    const weekId = monday.toISOString().slice(0, 10);
+    // completedAt is ISO string. Use date-fns for consistency with the rest of the app.
+    const monday = startOfWeek(parseISO(data.completedAt), { weekStartsOn: 1 });
+    const weekId = format(monday, 'yyyy-MM-dd');
 
     if (!weeklyStats[weekId]) {
       weeklyStats[weekId] = { count: 0, seconds: 0 };

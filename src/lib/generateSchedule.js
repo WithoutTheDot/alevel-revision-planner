@@ -324,14 +324,14 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
         if (textbookCount >= 2) continue; // cap reached
         textbookCount++;
         // Don't add textbook to weekExcluded so the second one can be selected
-        papers.push({ ...paper, completed: false, marks: null, grade: null });
+        papers.push({ ...paper, paperId: crypto.randomUUID(), completed: false, marks: null, grade: null });
         picked++;
         continue;
       }
 
       if (weekExcluded.has(paper.paperPath)) continue;
       weekExcluded.add(paper.paperPath);
-      papers.push({ ...paper, completed: false, marks: null, grade: null });
+      papers.push({ ...paper, paperId: crypto.randomUUID(), completed: false, marks: null, grade: null });
       picked++;
     }
   }

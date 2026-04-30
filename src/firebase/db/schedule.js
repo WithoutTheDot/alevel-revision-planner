@@ -6,6 +6,7 @@ import {
   deleteDoc,
   collection,
   getDocs,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from '../config';
 
@@ -136,21 +137,42 @@ export async function saveWeeklySchedule(userId, weekId, data) {
   await setDoc(doc(db, 'users', userId, 'weeklySchedules', weekId), data);
 }
 
-export async function updatePaper(userId, weekId, paperIndex, updates) {
+/**
+ * Atomically update a single paper in a weekly schedule.
+ * Accepts either a paperId string (preferred, stable across deletions) or a
+ * numeric index (legacy fallback for schedules generated before paperId existed).
+ */
+export async function updatePaper(userId, weekId, paperIdOrIndex, updates) {
   const ref = doc(db, 'users', userId, 'weeklySchedules', weekId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-  const papers = [...(snap.data().papers || [])];
-  papers[paperIndex] = { ...papers[paperIndex], ...updates };
-  await updateDoc(ref, { papers });
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const papers = [...(snap.data().papers || [])];
+    const idx = typeof paperIdOrIndex === 'string'
+      ? papers.findIndex((p) => p.paperId === paperIdOrIndex)
+      : paperIdOrIndex;
+    if (idx === -1 || idx == null) return;
+    papers[idx] = { ...papers[idx], ...updates };
+    tx.update(ref, { papers });
+  });
 }
 
-export async function deletePaper(userId, weekId, paperIndex) {
+/**
+ * Atomically delete a single paper from a weekly schedule.
+ * Accepts paperId string or numeric index.
+ */
+export async function deletePaper(userId, weekId, paperIdOrIndex) {
   const ref = doc(db, 'users', userId, 'weeklySchedules', weekId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-  const data = snap.data();
-  const papers = [...(data.papers || [])];
-  papers.splice(paperIndex, 1);
-  await setDoc(ref, { ...data, papers });
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    let papers = [...(data.papers || [])];
+    if (typeof paperIdOrIndex === 'string') {
+      papers = papers.filter((p) => p.paperId !== paperIdOrIndex);
+    } else {
+      papers.splice(paperIdOrIndex, 1);
+    }
+    tx.set(ref, { ...data, papers });
+  });
 }

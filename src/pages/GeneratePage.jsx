@@ -135,33 +135,35 @@ export default function GeneratePage() {
   }
 
 
+  async function runGenerate(navigateToPreview) {
+    const [template, durations, recent, allTimePaths, customPapers, exams] = await Promise.all([
+      getWeekTemplate(currentUser.uid, templateId),
+      getPaperDurations(currentUser.uid),
+      getRecentCompletedPapers(currentUser.uid, weekStart, 3),
+      getAllCompletedPaperPaths(currentUser.uid),
+      getCustomPapers(currentUser.uid),
+      getExamTimetable(currentUser.uid),
+    ]);
+    setExamEntries(exams);
+    if (!template) throw new Error(`Template "${templateId}" not found. Check your Templates page.`);
+    const weekType = calendarEntry?.weekType || templateId;
+    const scheduleTemplate = { ...template, timeBlocks: localBlocks };
+    const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
+    const { schedule, warnings: w } = generateWeeklySchedule(
+      currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths, subjectConfig
+    );
+    setPreview(schedule);
+    setPreviewTemplate(scheduleTemplate);
+    setWarnings(w);
+    if (navigateToPreview) setStep('preview');
+  }
+
   async function handleGenerate() {
     setGenerating(true);
     setError('');
     setWarnings([]);
     try {
-      const [template, durations, recent, allTimePaths, customPapers, exams] = await Promise.all([
-        getWeekTemplate(currentUser.uid, templateId),
-        getPaperDurations(currentUser.uid),
-        getRecentCompletedPapers(currentUser.uid, weekStart, 3),
-        getAllCompletedPaperPaths(currentUser.uid),
-        getCustomPapers(currentUser.uid),
-        getExamTimetable(currentUser.uid),
-      ]);
-      setExamEntries(exams);
-      if (!template) {
-        throw new Error(`Template "${templateId}" not found. Check your Templates page.`);
-      }
-      const weekType = calendarEntry?.weekType || templateId;
-      const scheduleTemplate = { ...template, timeBlocks: localBlocks };
-      const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
-      const { schedule, warnings: w } = generateWeeklySchedule(
-        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths, subjectConfig
-      );
-      setPreview(schedule);
-      setPreviewTemplate(scheduleTemplate);
-      setWarnings(w);
-      setStep('preview');
+      await runGenerate(true);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -174,25 +176,7 @@ export default function GeneratePage() {
     setError('');
     setWarnings([]);
     try {
-      const [template, durations, recent, allTimePaths, customPapers, exams] = await Promise.all([
-        getWeekTemplate(currentUser.uid, templateId),
-        getPaperDurations(currentUser.uid),
-        getRecentCompletedPapers(currentUser.uid, weekStart, 3),
-        getAllCompletedPaperPaths(currentUser.uid),
-        getCustomPapers(currentUser.uid),
-        getExamTimetable(currentUser.uid),
-      ]);
-      setExamEntries(exams);
-      if (!template) throw new Error(`Template "${templateId}" not found.`);
-      const weekType = calendarEntry?.weekType || templateId;
-      const scheduleTemplate = { ...template, timeBlocks: localBlocks };
-      const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
-      const { schedule, warnings: w } = generateWeeklySchedule(
-        currentUser.uid, weekStart, weekType, scheduleTemplate, recent, durations, customPapers, allTimePaths, subjectConfig
-      );
-      setPreview(schedule);
-      setPreviewTemplate(scheduleTemplate);
-      setWarnings(w);
+      await runGenerate(false);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -240,6 +224,7 @@ export default function GeneratePage() {
       ]);
       if (!template) throw new Error(`Template "${templateId}" not found.`);
 
+      const allTimePaths = await getAllCompletedPaperPaths(currentUser.uid);
       const mondays = mondaysBetween(weekStart, batchEnd);
       let saved = 0;
       let skipped = 0;
@@ -249,10 +234,7 @@ export default function GeneratePage() {
         // Skip weeks already having a saved schedule
         const existing = await getWeeklySchedule(currentUser.uid, mon);
         if (existing) { skipped++; continue; }
-        const [recent, allTimePaths] = await Promise.all([
-          getRecentCompletedPapers(currentUser.uid, mon, 3),
-          getAllCompletedPaperPaths(currentUser.uid),
-        ]);
+        const recent = await getRecentCompletedPapers(currentUser.uid, mon, 3);
         const weekType = termCalendar[mon]?.weekType || templateId;
         const subjectConfig = { furtherMathsModules: profile?.furtherMathsModules ?? [] };
         const { schedule } = generateWeeklySchedule(

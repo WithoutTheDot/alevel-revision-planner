@@ -5,7 +5,8 @@ import { getDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, getTermCalendar, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, getAllCompletedPapers, computeTopicFrequency, getTotalStudySecondsFromCompletedPapers, completePaper } from '../firebase/db';
+import { getWeeklySchedule, getTermCalendar, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, getAllCompletedPapers, computeTopicFrequency, completePaper } from '../firebase/db';
+import { formatTime } from '../lib/timeUtils';
 import SubjectBadge from '../components/SubjectBadge';
 import WeekTypeBadge from '../components/WeekTypeBadge';
 import CompletionDetailsModal from '../components/CompletionDetailsModal';
@@ -95,14 +96,13 @@ export default function DashboardPage() {
     try {
       const prevMonday = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 1);
       const prevWId = format(prevMonday, 'yyyy-MM-dd');
-      const [s, cal, exams, statsSnap, prevSchedule, userSettings, totalStudySeconds] = await Promise.all([
+      const [s, cal, exams, statsSnap, prevSchedule, userSettings] = await Promise.all([
         getWeeklySchedule(currentUser.uid, weekId),
         getTermCalendar(currentUser.uid),
         getExamTimetable(currentUser.uid),
         getDoc(doc(db, 'userPublicStats', currentUser.uid)),
         getWeeklySchedule(currentUser.uid, prevWId),
         getUserSettings(currentUser.uid),
-        getTotalStudySecondsFromCompletedPapers(currentUser.uid),
       ]);
       const reviewEnabled = userSettings?.reviewModeEnabled ?? true;
       setReviewModeEnabled(reviewEnabled);
@@ -125,7 +125,7 @@ export default function DashboardPage() {
         const ids = sd.badgeIds ?? [];
         setLatestBadgeId(ids.length > 0 ? ids[ids.length - 1] : null);
       }
-      setTotalStudyMins(Math.round((totalStudySeconds ?? 0) / 60));
+      setTotalStudyMins(statsSnap.exists() ? Math.round(statsSnap.data().studyMinutes ?? 0) : 0);
       // Overdue: incomplete papers from previous week
       setPrevWeekId(prevWId);
       if (prevSchedule && !prevSchedule.dismissedOverdue) {
@@ -570,9 +570,7 @@ export default function DashboardPage() {
                     const timerKey = `timer_${weekId}_${idx}`;
                     const timerData = getTimerData(timerKey);
                     const elapsedMins = timerData ? getElapsed(timerKey) : null;
-                    const elapsedDisplay = elapsedMins != null
-                      ? `${Math.floor(elapsedMins)}:${String(Math.floor((elapsedMins % 1) * 60)).padStart(2, '0')}`
-                      : null;
+                    const elapsedDisplay = elapsedMins != null ? formatTime(Math.round(elapsedMins * 60)) : null;
                     return (
                       <div key={`${p.subject}-${p.paperPath}-${idx}`} className="flex items-center justify-between px-5 py-3 border-b border-[var(--color-border)] last:border-0">
                         <div className="flex items-center gap-3 min-w-0">
