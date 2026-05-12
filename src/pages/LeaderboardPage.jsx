@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getClass, getClassLeaderboard, leaveClass, sendNudge, rebuildSubjectStats } from '../firebase/db';
+import { getClass, getClassLeaderboard, leaveClass, sendNudge, rebuildUserPublicStatsFromCompletedPapers } from '../firebase/db';
 import { BADGE_DEFS, BADGE_ICONS, xpToLevel } from '../lib/badges';
 import { ALL_SUBJECTS } from '../lib/allSubjects';
 
@@ -69,8 +69,7 @@ export default function LeaderboardPage() {
     setLoading(true);
     setError('');
     try {
-      // Repair current user's subject counts from history (background, best-effort)
-      rebuildSubjectStats(currentUser.uid).catch(() => {});
+      await rebuildUserPublicStatsFromCompletedPapers(currentUser.uid).catch(() => {});
       const [cls, boardResult] = await Promise.all([
         getClass(classId),
         getClassLeaderboard(classId),

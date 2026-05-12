@@ -29,6 +29,7 @@ const ClassesPage      = lazy(() => import('./pages/ClassesPage'));
 const LeaderboardPage  = lazy(() => import('./pages/LeaderboardPage'));
 const BadgesPage       = lazy(() => import('./pages/BadgesPage'));
 const AdminPage        = lazy(() => import('./pages/AdminPage'));
+const PaperViewerPage  = lazy(() => import('./pages/PaperViewerPage'));
 
 function PageLoader() {
   return <div className="flex items-center justify-center h-full text-[var(--color-text-muted)] text-sm">Loading…</div>;
@@ -128,6 +129,17 @@ export default function App() {
                     <Route path="/classes/:classId" element={<Suspense fallback={<PageLoader />}><LeaderboardPage /></Suspense>} />
                     <Route path="/badges"           element={<Suspense fallback={<PageLoader />}><BadgesPage /></Suspense>} />
                   </Route>
+
+                  <Route
+                    path="/view-paper"
+                    element={
+                      <PrivateRoute>
+                        <Suspense fallback={<PageLoader />}>
+                          <PaperViewerPage />
+                        </Suspense>
+                      </PrivateRoute>
+                    }
+                  />
                 </Routes>
                 </ErrorBoundary>
               </TutorialProvider>

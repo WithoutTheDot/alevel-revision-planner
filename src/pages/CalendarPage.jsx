@@ -675,8 +675,8 @@ export default function CalendarPage() {
               if (!links) return null;
               return (
                 <div className="flex gap-2 mb-4">
-                  {links.qp && <PmtLinkButton href={links.qp} label="QP" />}
-                  {links.ms && <PmtLinkButton href={links.ms} label="MS" />}
+                  {links.qp && <PmtLinkButton href={links.qp} label="QP" paper={p} msHref={links.ms} />}
+                  {links.ms && <PmtLinkButton href={links.ms} label="MS" paper={p} />}
                 </div>
               );
             })()}

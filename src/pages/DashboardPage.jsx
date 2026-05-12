@@ -591,8 +591,8 @@ export default function DashboardPage() {
                             if (!links) return null;
                             return (
                               <>
-                                {links.qp && <PmtLinkButton href={links.qp} label="QP" />}
-                                {links.ms && <PmtLinkButton href={links.ms} label="MS" />}
+                                {links.qp && <PmtLinkButton href={links.qp} label="QP" paper={p} msHref={links.ms} />}
+                                {links.ms && <PmtLinkButton href={links.ms} label="MS" paper={p} />}
                               </>
                             );
                           })()}

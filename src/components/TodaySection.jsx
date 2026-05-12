@@ -48,8 +48,8 @@ export default function TodaySection({ todaysPapers, onComplete, onStartTimer, d
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                {pmtLinks?.qp && <PmtLinkButton href={pmtLinks.qp} label="Q" />}
-                {pmtLinks?.ms && <PmtLinkButton href={pmtLinks.ms} label="MS" />}
+                {pmtLinks?.qp && <PmtLinkButton href={pmtLinks.qp} label="Q" paper={paper} msHref={pmtLinks.ms} />}
+                {pmtLinks?.ms && <PmtLinkButton href={pmtLinks.ms} label="MS" paper={paper} />}
                 {!paper.completed && (
                   <>
                     <button

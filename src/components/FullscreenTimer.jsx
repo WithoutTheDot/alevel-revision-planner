@@ -77,18 +77,64 @@ export default function FullscreenTimer() {
   const isOvertime = expectedSecs > 0 && elapsedSecs > expectedSecs;
   const progressPct = expectedSecs > 0 ? Math.min((elapsedSecs / expectedSecs) * 100, 100) : 0;
 
-  // ── Minimised pill ─────────────────────────────────────────────────────────
+  // ── Minimised pill → hover-expanded card ──────────────────────────────────
   if (!isFullscreen) {
+    const gradientClass = isOvertime ? 'from-rose-500 to-red-600' : 'from-indigo-500 to-violet-600';
+    const minsLeft = Math.floor((expectedSecs - elapsedSecs) / 60);
+    const minsOver = Math.floor((elapsedSecs - expectedSecs) / 60);
+
     return (
-      <div
-        className="fixed bottom-4 right-4 z-[55] flex items-center gap-2 bg-indigo-600 text-white rounded-full px-4 py-2 shadow-lg cursor-pointer hover:bg-indigo-700 transition-colors"
-        onClick={() => setFullscreen(true)}
-        title={session.displayName}
-      >
-        <span className={`font-mono text-sm font-bold ${isOvertime ? 'text-rose-200' : ''}`}>
-          {formatTime(elapsedSecs)}
-        </span>
-        <span className="text-xs max-w-[120px] truncate opacity-80">{session.displayName}</span>
+      <div className="fixed bottom-4 right-4 z-[55] group">
+        {/* Pill — always visible */}
+        <div
+          className={`flex items-center gap-2 bg-gradient-to-r ${gradientClass} text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 group-hover:opacity-0 group-hover:scale-95 group-hover:pointer-events-none`}
+        >
+          <span className={`font-mono text-sm font-bold tabular-nums ${isOvertime ? 'text-rose-200' : ''}`}>
+            {formatTime(elapsedSecs)}
+          </span>
+          <span className="text-xs max-w-[140px] truncate opacity-80">{session.displayName}</span>
+        </div>
+
+        {/* Expanded card — appears on hover */}
+        <div
+          className={`absolute bottom-0 right-0 w-56 rounded-2xl bg-gradient-to-br ${gradientClass} text-white shadow-2xl p-4 opacity-0 scale-95 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto origin-bottom-right`}
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-60 mb-0.5 truncate">
+            {session.displayName}
+          </p>
+
+          <p className={`text-4xl font-mono font-extrabold tabular-nums leading-none ${isOvertime ? 'text-rose-100' : ''}`}>
+            {formatTime(elapsedSecs)}
+          </p>
+
+          {!isOvertime && expectedSecs > 0 && (
+            <div className="mt-2 h-1 bg-white/20 rounded-full overflow-hidden">
+              <div
+                className="h-1 bg-white rounded-full transition-all duration-1000"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          )}
+
+          <p className="text-xs opacity-60 mt-1">
+            {isOvertime ? `${minsOver}m over` : `${minsLeft}m left`}
+          </p>
+
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={session.isRunning ? pauseSession : resumeSession}
+              className="flex-1 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-semibold transition-colors"
+            >
+              {session.isRunning ? 'Pause' : 'Resume'}
+            </button>
+            <button
+              onClick={() => setFullscreen(true)}
+              className="flex-1 py-1.5 rounded-lg bg-white text-indigo-700 text-xs font-semibold hover:bg-white/90 transition-colors"
+            >
+              Complete
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

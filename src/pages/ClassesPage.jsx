@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserClasses, createClass, joinClass, leaveClass, getClassLeaderboard, sendNudge } from '../firebase/db';
+import { getUserClasses, createClass, joinClass, leaveClass, getClassLeaderboard, sendNudge, rebuildUserPublicStatsFromCompletedPapers } from '../firebase/db';
 import { ALL_SUBJECTS } from '../lib/allSubjects';
 import { BADGE_DEFS, BADGE_ICONS, xpToLevel } from '../lib/badges';
 
@@ -103,6 +103,7 @@ export default function ClassesPage() {
     setLbLoading(true);
     setLbError('');
     try {
+      await rebuildUserPublicStatsFromCompletedPapers(currentUser.uid).catch(() => {});
       const { entries, subject } = await getClassLeaderboard(classId);
       setLbEntries(entries);
       setLbSubject(subject);
@@ -111,7 +112,7 @@ export default function ClassesPage() {
     } finally {
       setLbLoading(false);
     }
-  }, []);
+  }, [currentUser.uid]);
 
   useEffect(() => {
     if (activeTab !== 'leaderboard') return;

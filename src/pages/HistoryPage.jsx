@@ -60,23 +60,19 @@ export default function HistoryPage() {
     }
   }, [currentUser.uid]);
 
-  const handleViewChange = useCallback(async (v) => {
-    setView(v);
-    if (v === 'grid' && coverageData === null && !coverageLoading) {
-      setCoverageLoading(true);
-      setCoverageError('');
-      try {
-        const data = await getCoverageData(currentUser.uid);
-        setCoverageData(data);
-      } catch {
-        setCoverageError('Failed to load coverage data. Please try again.');
-      } finally {
-        setCoverageLoading(false);
-      }
-    }
-  }, [coverageData, coverageLoading, currentUser.uid]);
+  const handleViewChange = useCallback((v) => { setView(v); }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (view !== 'grid' || coverageData !== null || coverageLoading) return;
+    setCoverageLoading(true);
+    setCoverageError('');
+    getCoverageData(currentUser.uid)
+      .then(setCoverageData)
+      .catch(() => setCoverageError('Failed to load coverage data. Please try again.'))
+      .finally(() => setCoverageLoading(false));
+  }, [view, coverageData, coverageLoading, currentUser.uid]);
 
   async function loadMore() {
     if (!lastDoc || loadingMore) return;
