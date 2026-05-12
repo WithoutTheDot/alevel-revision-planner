@@ -54,4 +54,11 @@ export default defineConfig([
       'no-unused-vars': 'off',
     },
   },
+  // Node.js scripts — process, Buffer, __dirname etc. are Node globals
+  {
+    files: ['scripts/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
 ])

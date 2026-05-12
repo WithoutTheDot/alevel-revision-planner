@@ -50,8 +50,6 @@ if (!existsSync(MANIFEST_PATH)) {
   console.error('papers-manifest.json not found. Run scrape-all-papers.js --no-upload first.');
   process.exit(1);
 }
-const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
-
 // Upload progress: tracks which storage paths are confirmed uploaded
 const progress = existsSync(PROGRESS_PATH)
   ? JSON.parse(readFileSync(PROGRESS_PATH, 'utf8'))
@@ -64,10 +62,6 @@ function storagePathFromLocalName(filename) {
   // Local files are stored as: scraped_Subject_A-level_...pdf  (slashes → underscores)
   // Reverse: first segment is 'scraped', rest are the path
   return filename.replace(/_/g, '/');
-}
-
-function localPathForStoragePath(storagePath) {
-  return join(DOWNLOAD_DIR, storagePath.replace(/\//g, '_'));
 }
 
 if (!existsSync(DOWNLOAD_DIR)) {
@@ -106,7 +100,7 @@ if (toUpload.length === 0) {
 let uploadedBytes = 0;
 let done = 0, failed = 0, skipped = 0;
 
-for (const { filename, storagePath, localPath } of toUpload) {
+for (const { storagePath, localPath } of toUpload) {
   if (uploadedBytes >= LIMIT_BYTES) {
     skipped = toUpload.length - done - failed;
     break;

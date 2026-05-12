@@ -18,7 +18,7 @@
  * getDownloadURL() from Firebase Storage SDK with the same path.
  */
 
-import { readFileSync, mkdirSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 // ── Firebase Admin setup ─────────────────────────────────────────────────────
