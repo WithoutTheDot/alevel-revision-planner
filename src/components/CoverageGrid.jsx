@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BUILT_IN_FAMILIES } from '../lib/builtInFamilies';
 import { parseBoard, gradeColor } from '../lib/coverageUtils';
+import { getPmtLinks } from '../lib/pmtLinks';
 import { format, parseISO } from 'date-fns';
 
 const YEAR_FAMILIES = BUILT_IN_FAMILIES.filter(
@@ -14,6 +16,7 @@ function yearRange(start, end) {
 }
 
 export default function CoverageGrid({ coverageData, subjects = [] }) {
+  const navigate = useNavigate();
   const enrolledIds = useMemo(() => new Set(subjects.map((s) => s.id)), [subjects]);
 
   const visibleFamilies = useMemo(
@@ -153,12 +156,30 @@ export default function CoverageGrid({ coverageData, subjects = [] }) {
                           ? format(parseISO(entry.completedAt), 'd MMM yyyy')
                           : null;
 
+                        const links = getPmtLinks(fam.subject, paperPath);
+                        const isClickable = !!links?.qp;
+
+                        function handleCellClick() {
+                          if (!isClickable) return;
+                          const paper = {
+                            displayName: `${fam.name} ${y}`,
+                            subject: fam.subject,
+                            paperPath,
+                            duration: 90,
+                          };
+                          navigate('/view-paper', {
+                            state: { pdfUrl: links.qp, label: 'QP', paper, msUrl: links.ms ?? null },
+                          });
+                        }
+
                         return (
                           <td key={y} className="px-1 py-0.5 text-center">
                             <div
-                              title={tooltip ?? undefined}
+                              title={isClickable ? (tooltip ? `${tooltip} — click to open` : 'Click to open') : (tooltip ?? undefined)}
+                              onClick={isClickable ? handleCellClick : undefined}
                               className={
-                                'w-8 h-6 rounded flex items-center justify-center font-semibold cursor-default ' +
+                                'w-8 h-6 rounded flex items-center justify-center font-semibold ' +
+                                (isClickable ? 'cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition-shadow ' : 'cursor-default ') +
                                 (color
                                   ? color
                                   : 'border border-[var(--color-border)] text-[var(--color-text-muted)]')

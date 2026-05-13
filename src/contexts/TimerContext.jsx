@@ -110,7 +110,7 @@ export function TimerProvider({ children }) {
     startedAtRef.current = Date.now();
     setSession({ ...sessionData, elapsedSeconds: 0, isRunning: true, isPaused: false });
     startInterval();
-    setIsFullscreen(true);
+    setIsFullscreen(paperData.source !== 'viewer');
   }
 
   async function pauseSession() {
