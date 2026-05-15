@@ -56,3 +56,4 @@ screenshot-*.png
 
 #pdfs
 .pdf
+scripts/serviceAccountKey.json
