@@ -53,3 +53,6 @@ screenshot-*.png
 
 # Git worktrees
 .worktrees/
+
+#pdfs
+.pdf

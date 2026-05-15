@@ -23,6 +23,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const NO_DELETE  = args.includes('--no-delete');
 const LIMIT_MB   = parseFloat((args.find(a => a.startsWith('--limit-mb=')) ?? '').replace('--limit-mb=', '') || '900');
+const BUCKET_OVERRIDE = (args.find(a => a.startsWith('--bucket=')) ?? '').replace('--bucket=', '') || null;
 const LIMIT_BYTES = LIMIT_MB * 1024 * 1024;
 
 const DOWNLOAD_DIR   = join(__dirname, 'downloaded-papers');
@@ -38,9 +39,10 @@ if (!existsSync(keyPath)) {
 }
 const { default: admin } = await import('firebase-admin');
 const serviceAccount = JSON.parse(readFileSync(keyPath, 'utf8'));
+const bucketName = BUCKET_OVERRIDE ?? `${serviceAccount.project_id}.appspot.com`;
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: `${serviceAccount.project_id}.appspot.com`,
+  storageBucket: bucketName,
 });
 const bucket = admin.storage().bucket();
 console.log(`Uploading to gs://${bucket.name}`);

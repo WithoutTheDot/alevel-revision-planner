@@ -1,3 +1,5 @@
+import { PMT_LOOKUP } from './pmtManifestLookup.js';
+
 const PMT_BASE = 'https://pmt.physicsandmathstutor.com/download/';
 const OCR_BASE = 'https://www.ocr.org.uk/Images/';
 
@@ -178,26 +180,24 @@ function furtherMathsLinks(paperPath) {
   const parts = paperPath.split('-');
   if (parts.length < 3) return null;
 
-  const firstPart = parts[0]; // 'ocr' or 'foreign'
+  const board = parts[0]; // 'ocr', 'aqa', or 'edexcel'
+  const year = parts[1];
+  const paperSuffix = parts.slice(2).join('-');
 
-  if (firstPart === 'ocr') {
-    const year = parts[1];
-    const paperSuffix = parts.slice(2).join('-');
-
+  if (board === 'ocr') {
     const session = fmSession('ocr', year);
     if (!session) return null;
 
     const paperFolderMap = {
-      'pure-core-1':    'Pure-Core-1',
-      'pure-core-2':    'Pure-Core-2',
-      'mechanics':      'Mechanics',
-      'statistics':     'Statistics',
-      'discrete':       'Discrete',
+      'pure-core-1':     'Pure-Core-1',
+      'pure-core-2':     'Pure-Core-2',
+      'mechanics':       'Mechanics',
+      'statistics':      'Statistics',
+      'discrete':        'Discrete',
       'additional-pure': 'Additional-Pure',
     };
     const paperFolder = paperFolderMap[paperSuffix];
     if (!paperFolder) return null;
-
     const dir = 'Maths/A-level/Papers/OCR-Further';
     return {
       qp: buildPmtUrl(dir, paperFolder, session, 'QP'),
@@ -205,76 +205,137 @@ function furtherMathsLinks(paperPath) {
     };
   }
 
-  if (firstPart === 'foreign') {
-    if (parts.length < 4) return null;
-    const board = parts[1]; // 'aqa' or 'edexcel'
-    const year = parts[2];
-    const paperSuffix = parts.slice(3).join('-');
+  if (board === 'aqa') {
+    const session = fmSession('aqa', year);
+    if (!session) return null;
 
-    if (board === 'aqa') {
-      const session = fmSession('aqa', year);
-      if (!session) return null;
+    const paperFolderMap = {
+      'core-pure-1': 'Paper-1',
+      'core-pure-2': 'Paper-2',
+      'mechanics':   'Paper-3-Mechanics',
+      'statistics':  'Paper-3-Statistics',
+      'discrete':    'Paper-3-Discrete',
+    };
+    const paperFolder = paperFolderMap[paperSuffix];
+    if (!paperFolder) return null;
+    const dir = 'Maths/A-level/Papers/AQA-Further';
+    return {
+      qp: buildPmtUrl(dir, paperFolder, session, 'QP'),
+      ms: buildPmtUrl(dir, paperFolder, session, 'MS'),
+    };
+  }
 
-      const paperFolderMap = {
-        'core-pure-1': 'Paper-1',
-        'core-pure-2': 'Paper-2',
-        'mechanics':   'Paper-3-Mechanics',
-        'statistics':  'Paper-3-Statistics',
-        'discrete':    'Paper-3-Discrete',
-      };
-      const paperFolder = paperFolderMap[paperSuffix];
-      if (!paperFolder) return null;
-      const dir = 'Maths/A-level/Papers/AQA-Further';
-      return {
-        qp: buildPmtUrl(dir, paperFolder, session, 'QP'),
-        ms: buildPmtUrl(dir, paperFolder, session, 'MS'),
-      };
-    }
+  if (board === 'edexcel') {
+    const session = fmSession('edexcel', year);
+    if (!session) return null;
 
-    if (board === 'edexcel') {
-      const session = fmSession('edexcel', year);
-      if (!session) return null;
-
-      const paperFolderMap = {
-        'core-pure-1':         'Core-Pure-1',
-        'core-pure-2':         'Core-Pure-2',
-        'further-pure-1':      'Further-Pure-1',
-        'further-pure-2':      'Further-Pure-2',
-        'further-mechanics-1': 'Mechanics-1',
-        'further-mechanics-2': 'Mechanics-2',
-        'statistics-1':        'Statistics-1',
-        'statistics-2':        'Statistics-2',
-        'decision-1':          'Decision-1',
-        'decision-2':          'Decision-2',
-      };
-      const paperFolder = paperFolderMap[paperSuffix];
-      if (!paperFolder) return null;
-      const dir = 'Maths/A-level/Papers/Edexcel-Further';
-      return {
-        qp: buildPmtUrl(dir, paperFolder, session, 'QP'),
-        ms: buildPmtUrl(dir, paperFolder, session, 'MS'),
-      };
-    }
+    const paperFolderMap = {
+      'core-pure-1':         'Core-Pure-1',
+      'core-pure-2':         'Core-Pure-2',
+      'further-pure-1':      'Further-Pure-1',
+      'further-pure-2':      'Further-Pure-2',
+      'further-mechanics-1': 'Mechanics-1',
+      'further-mechanics-2': 'Mechanics-2',
+      'statistics-1':        'Statistics-1',
+      'statistics-2':        'Statistics-2',
+      'decision-1':          'Decision-1',
+      'decision-2':          'Decision-2',
+    };
+    const paperFolder = paperFolderMap[paperSuffix];
+    if (!paperFolder) return null;
+    const dir = 'Maths/A-level/Papers/Edexcel-Further';
+    return {
+      qp: buildPmtUrl(dir, paperFolder, session, 'QP'),
+      ms: buildPmtUrl(dir, paperFolder, session, 'MS'),
+    };
   }
 
   return null;
 }
 
+// Generic lookup for subjects using "{board}-{year}-paper{n}" paperPath convention.
+// boardMap: lowercase board token → lookup board string (e.g. 'aqa' → 'AQA')
+function manifestLinks(appSubject, boardMap, paperPath) {
+  const m = paperPath.match(/^([a-z]+)-(\d{4})-paper(\d+)$/);
+  if (!m) return null;
+  const [, boardToken, year, n] = m;
+  const board = boardMap[boardToken];
+  if (!board) return null;
+  return PMT_LOOKUP[`${appSubject}|${board}|Paper-${n}|${year}`] ?? null;
+}
+
+function chemistryLinks(paperPath) {
+  // OCR-A: ocra-{year}-0{n}
+  const ocrA = paperPath.match(/^ocra-(\d{4})-0([123])$/);
+  if (ocrA) return PMT_LOOKUP[`chemistry|OCR-A|Paper-${ocrA[2]}|${ocrA[1]}`] ?? null;
+  return manifestLinks('chemistry', { aqa: 'AQA', edexcel: 'Edexcel' }, paperPath);
+}
+
+function biologyLinks(paperPath) {
+  // OCR-A: ocra-{year}-{name} mapped to Paper-1/2/3
+  const ocrAFolderMap = {
+    'biological-processes': 'Paper-1',
+    'biological-diversity':  'Paper-2',
+    'unified-biology':       'Paper-3',
+  };
+  const ocrA = paperPath.match(/^ocra-(\d{4})-(.+)$/);
+  if (ocrA) {
+    const folder = ocrAFolderMap[ocrA[2]];
+    return folder ? (PMT_LOOKUP[`biology|OCR-A|${folder}|${ocrA[1]}`] ?? null) : null;
+  }
+  return manifestLinks('biology', { aqa: 'AQA' }, paperPath);
+}
+
+function computerScienceLinks(paperPath) {
+  // Convention: paper{n}-{year} (AQA only)
+  const m = paperPath.match(/^paper(\d+)-(\d{4})$/);
+  if (!m) return null;
+  return PMT_LOOKUP[`computerScience|AQA|Paper-${m[1]}|${m[2]}`] ?? null;
+}
+
+function psychologyLinks(paperPath) {
+  return manifestLinks('psychology', { aqa: 'AQA', edexcel: 'Edexcel' }, paperPath);
+}
+
+function economicsLinks(paperPath) {
+  // OCR new spec: ocr-{year}-paper{n}
+  const ocr = paperPath.match(/^ocr-(\d{4})-paper(\d+)$/);
+  if (ocr) return PMT_LOOKUP[`economics|OCR|Paper-${ocr[2]}|${ocr[1]}`] ?? null;
+  return manifestLinks('economics', { aqa: 'AQA' }, paperPath);
+}
+
+function geographyLinks(paperPath) {
+  return manifestLinks('geography', { aqa: 'AQA', edexcel: 'Edexcel' }, paperPath);
+}
+
+function englishLinks(appSubject, paperPath) {
+  return manifestLinks(appSubject, { edexcel: 'Edexcel', ocr: 'OCR' }, paperPath);
+}
+
 /**
  * Returns PDF links for a paper, or null if no link is available.
  * OCR A Maths links are on ocr.org.uk; all others on pmt.physicsandmathstutor.com.
- * @param {string} subject - 'maths' | 'physics' | 'computerScience' | 'furtherMaths'
+ * @param {string} subject - e.g. 'maths', 'chemistry', 'biology', 'computerScience'
  * @param {string} paperPath - e.g. 'ocr-2023-pure', 'aqa-2023-paper1'
  * @returns {{ qp: string, ms: string } | null}
  */
 export function getPmtLinks(subject, paperPath) {
   if (!subject || !paperPath) return null;
+  // Strip legacy "foreign-" prefix from stored Firestore paperPaths
+  const path = paperPath.startsWith('foreign-') ? paperPath.slice(8) : paperPath;
 
   switch (subject) {
-    case 'maths':           return mathsLinks(paperPath);
-    case 'physics':         return physicsLinks(paperPath);
-    case 'computerScience': return null;
-    case 'furtherMaths':    return furtherMathsLinks(paperPath);
+    case 'maths':           return mathsLinks(path);
+    case 'physics':         return physicsLinks(path);
+    case 'furtherMaths':    return furtherMathsLinks(path);
+    case 'chemistry':       return chemistryLinks(path);
+    case 'biology':         return biologyLinks(path);
+    case 'computerScience': return computerScienceLinks(path);
+    case 'psychology':      return psychologyLinks(path);
+    case 'economics':       return economicsLinks(path);
+    case 'geography':       return geographyLinks(path);
+    case 'english':         return englishLinks('english', path);
+    case 'englishLang':     return englishLinks('englishLang', path);
     default:                return null;
   }
 }

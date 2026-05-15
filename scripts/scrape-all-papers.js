@@ -22,10 +22,41 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { tmpdir } from 'os';
+import { tmpdir, cpus } from 'os';
 import { randomBytes } from 'crypto';
 
 const execFileAsync = promisify(execFile);
+
+// ── Concurrency controls ──────────────────────────────────────────────────────
+const DOWNLOAD_CONCURRENCY = 10;
+const COMPRESS_CONCURRENCY = Math.min(4, cpus().length);
+
+class Semaphore {
+  constructor(n) { this._n = n; this._q = []; }
+  acquire() {
+    if (this._n > 0) { this._n--; return Promise.resolve(); }
+    return new Promise(r => this._q.push(r));
+  }
+  release() { if (this._q.length) this._q.shift()(); else this._n++; }
+}
+const compressSem = new Semaphore(COMPRESS_CONCURRENCY);
+
+async function runPool(items, concurrency, fn) {
+  let i = 0;
+  const worker = async () => { while (i < items.length) await fn(items[i++]); };
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+}
+
+// Serialised manifest saves — prevents interleaved writes from concurrent workers
+let _savePending = false;
+function scheduleManifestSave(manifest, path) {
+  if (_savePending) return;
+  _savePending = true;
+  setImmediate(() => {
+    writeFileSync(path, JSON.stringify(manifest, null, 2));
+    _savePending = false;
+  });
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -115,15 +146,29 @@ function localPathForUrl(pdfUrl) {
   return join(DOWNLOAD_DIR, sp.replace(/\//g, '_'));
 }
 
-async function downloadBuffer(url) {
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120',
-      'Referer': 'https://www.physicsandmathstutor.com/',
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return Buffer.from(await res.arrayBuffer());
+async function downloadBuffer(url, retries = 4) {
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120',
+    'Referer': 'https://www.physicsandmathstutor.com/',
+  };
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const res = await fetch(url, { headers });
+    if (res.status === 429 || res.status >= 500) {
+      const wait = (attempt + 1) * 3000;
+      process.stdout.write(` [${res.status} backoff ${wait/1000}s]`);
+      await new Promise(r => setTimeout(r, wait));
+      continue;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return Buffer.from(await res.arrayBuffer());
+  }
+  throw new Error(`Failed after ${retries} attempts`);
+}
+
+async function compressPdfLimited(buffer) {
+  await compressSem.acquire();
+  try { return await compressPdf(buffer); }
+  finally { compressSem.release(); }
 }
 
 async function compressPdf(buffer) {
@@ -321,14 +366,16 @@ console.log(`${toDownload.length} to download (${alreadyDone.size} already done)
 
 let done = 0, failed = 0;
 
-for (const entry of toDownload) {
+console.log(`Concurrency: ${DOWNLOAD_CONCURRENCY} workers, ${COMPRESS_CONCURRENCY} compressors`);
+
+await runPool(toDownload, DOWNLOAD_CONCURRENCY, async (entry) => {
   const { subject, url: pdfUrl } = entry;
   const storagePath = storagePathForUrl(pdfUrl);
   const label = storagePath?.split('/').slice(-3).join('/') ?? pdfUrl;
-  process.stdout.write(`[${done + failed + 1}/${toDownload.length}] ${label}... `);
+  const idx = done + failed + 1;
+  process.stdout.write(`[${idx}/${toDownload.length}] ${label}... `);
 
   try {
-    // Check if already in Storage
     if (bucket) {
       const [exists] = await bucket.file(storagePath).exists();
       if (exists) {
@@ -336,12 +383,13 @@ for (const entry of toDownload) {
         manifest.downloaded.push({ subject, url: pdfUrl, storagePath });
         alreadyDone.add(pdfUrl);
         done++;
-        continue;
+        scheduleManifestSave(manifest, MANIFEST_PATH);
+        return;
       }
     }
 
     const rawBuffer = await downloadBuffer(pdfUrl);
-    const buffer = await compressPdf(rawBuffer);
+    const buffer = await compressPdfLimited(rawBuffer);
     const rawKb  = (rawBuffer.length / 1024).toFixed(0);
     const kb     = (buffer.length / 1024).toFixed(0);
     const saved  = rawBuffer.length !== buffer.length ? ` (${rawKb}→${kb}KB)` : ` (${kb}KB)`;
@@ -358,17 +406,16 @@ for (const entry of toDownload) {
     manifest.downloaded.push({ subject, url: pdfUrl, storagePath });
     alreadyDone.add(pdfUrl);
     done++;
+    scheduleManifestSave(manifest, MANIFEST_PATH);
 
-    // Save progress every 20 files
-    if (done % 20 === 0) writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
-
-    await new Promise(r => setTimeout(r, 400)); // polite delay
+    await new Promise(r => setTimeout(r, 400));
   } catch (e) {
     console.log(`FAILED: ${e.message}`);
     manifest.failed.push({ subject, url: pdfUrl, error: e.message });
     failed++;
+    scheduleManifestSave(manifest, MANIFEST_PATH);
   }
-}
+});
 
 writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
 console.log(`\n=== Done: ${done} downloaded, ${failed} failed ===`);

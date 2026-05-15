@@ -118,8 +118,11 @@ describe('getPmtLinks', () => {
   });
 
   // --- Computer Science ---
-  it('computerScience → null', () => {
-    expect(getPmtLinks('computerScience', 'paper1-2023')).toBeNull();
+  it('computerScience AQA paper1 2023 → lookup URL', () => {
+    const links = getPmtLinks('computerScience', 'paper1-2023');
+    expect(links).not.toBeNull();
+    expect(links.qp).toContain('Computer-Science');
+    expect(links.ms).toContain('Computer-Science');
   });
 
   // --- Further Maths: OCR A ---
@@ -149,50 +152,50 @@ describe('getPmtLinks', () => {
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/OCR-Further/Pure-Core-2/QP/June 2019 QP.pdf`);
   });
 
-  // --- Further Maths: Foreign AQA ---
-  it('furtherMaths foreign AQA 2021 → null (no AQA FM papers that year)', () => {
-    expect(getPmtLinks('furtherMaths', 'foreign-aqa-2021-core-pure-1')).toBeNull();
+  // --- Further Maths: AQA ---
+  it('furtherMaths AQA 2021 → null (no AQA FM papers that year)', () => {
+    expect(getPmtLinks('furtherMaths', 'aqa-2021-core-pure-1')).toBeNull();
   });
 
-  it('furtherMaths foreign AQA core-pure-1 2022 → AQA-Further Paper-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-aqa-2022-core-pure-1');
+  it('furtherMaths AQA core-pure-1 2022 → AQA-Further Paper-1', () => {
+    const links = getPmtLinks('furtherMaths', 'aqa-2022-core-pure-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/AQA-Further/Paper-1/QP/June 2022 QP.pdf`);
     expect(links.ms).toBe(`${PMT}Maths/A-level/Papers/AQA-Further/Paper-1/MS/June 2022 MS.pdf`);
   });
 
-  it('furtherMaths foreign AQA 2020 → null (no AQA FM papers that year)', () => {
-    expect(getPmtLinks('furtherMaths', 'foreign-aqa-2020-core-pure-1')).toBeNull();
+  it('furtherMaths AQA 2020 → null (no AQA FM papers that year)', () => {
+    expect(getPmtLinks('furtherMaths', 'aqa-2020-core-pure-1')).toBeNull();
   });
 
-  it('furtherMaths foreign AQA mechanics → AQA-Further Paper-3-Mechanics', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-aqa-2023-mechanics');
+  it('furtherMaths AQA mechanics → AQA-Further Paper-3-Mechanics', () => {
+    const links = getPmtLinks('furtherMaths', 'aqa-2023-mechanics');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/AQA-Further/Paper-3-Mechanics/QP/June 2023 QP.pdf`);
   });
 
-  // --- Further Maths: Foreign Edexcel ---
-  it('furtherMaths foreign Edexcel core-pure-1 → Edexcel-Further Core-Pure-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2022-core-pure-1');
+  // --- Further Maths: Edexcel ---
+  it('furtherMaths Edexcel core-pure-1 → Edexcel-Further Core-Pure-1', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2022-core-pure-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Core-Pure-1/QP/June 2022 QP.pdf`);
     expect(links.ms).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Core-Pure-1/MS/June 2022 MS.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel further-pure-1 2023 → Further-Pure-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2023-further-pure-1');
+  it('furtherMaths Edexcel further-pure-1 2023 → Further-Pure-1', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2023-further-pure-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Further-Pure-1/QP/June 2023 QP.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel further-mechanics-1 → Mechanics-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2022-further-mechanics-1');
+  it('furtherMaths Edexcel further-mechanics-1 → Mechanics-1', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2022-further-mechanics-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Mechanics-1/QP/June 2022 QP.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel 2020 → June 2020 (Edexcel ran normally)', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2020-core-pure-1');
+  it('furtherMaths Edexcel 2020 → June 2020 (Edexcel ran normally)', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2020-core-pure-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Core-Pure-1/QP/June 2020 QP.pdf`);
   });
@@ -216,32 +219,32 @@ describe('getPmtLinks', () => {
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/OCR-Further/Statistics/QP/Nov 2020 QP.pdf`);
   });
 
-  it('furtherMaths foreign AQA statistics → AQA-Further Paper-3-Statistics', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-aqa-2022-statistics');
+  it('furtherMaths AQA statistics → AQA-Further Paper-3-Statistics', () => {
+    const links = getPmtLinks('furtherMaths', 'aqa-2022-statistics');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/AQA-Further/Paper-3-Statistics/QP/June 2022 QP.pdf`);
   });
 
-  it('furtherMaths foreign AQA discrete → AQA-Further Paper-3-Discrete', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-aqa-2023-discrete');
+  it('furtherMaths AQA discrete → AQA-Further Paper-3-Discrete', () => {
+    const links = getPmtLinks('furtherMaths', 'aqa-2023-discrete');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/AQA-Further/Paper-3-Discrete/QP/June 2023 QP.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel statistics-1 → Edexcel-Further Statistics-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2022-statistics-1');
+  it('furtherMaths Edexcel statistics-1 → Edexcel-Further Statistics-1', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2022-statistics-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Statistics-1/QP/June 2022 QP.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel decision-1 → Edexcel-Further Decision-1', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2023-decision-1');
+  it('furtherMaths Edexcel decision-1 → Edexcel-Further Decision-1', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2023-decision-1');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Decision-1/QP/June 2023 QP.pdf`);
   });
 
-  it('furtherMaths foreign Edexcel decision-2 → Edexcel-Further Decision-2', () => {
-    const links = getPmtLinks('furtherMaths', 'foreign-edexcel-2022-decision-2');
+  it('furtherMaths Edexcel decision-2 → Edexcel-Further Decision-2', () => {
+    const links = getPmtLinks('furtherMaths', 'edexcel-2022-decision-2');
     expect(links).not.toBeNull();
     expect(links.qp).toBe(`${PMT}Maths/A-level/Papers/Edexcel-Further/Decision-2/QP/June 2022 QP.pdf`);
   });
@@ -252,7 +255,7 @@ describe('getPmtLinks', () => {
 
   // --- Unknown subjects / guard clauses ---
   it('unknown subject → null', () => {
-    expect(getPmtLinks('chemistry', 'aqa-2022-paper1')).toBeNull();
+    expect(getPmtLinks('badSubject', 'aqa-2022-paper1')).toBeNull();
   });
 
   it('null subject → null', () => {

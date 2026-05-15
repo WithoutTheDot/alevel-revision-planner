@@ -19,6 +19,7 @@ import {
 import { db } from '../config';
 import { updateStreak, awardXpAndBadges } from './social';
 import { syncReviewQueueForCompletionEdit } from './review';
+import { cleanDisplayName } from '../../lib/paperPaths';
 
 // ─── Completed Papers ───────────────────────────────────────────────────────
 
@@ -305,7 +306,7 @@ export async function getAllCompletedPapers(userId, { limit: limitCount = 50, st
   const hasMore = snap.docs.length > limitCount;
   const docs = hasMore ? snap.docs.slice(0, limitCount) : snap.docs;
   return {
-    papers: docs.map((d) => ({ id: d.id, ...d.data() })),
+    papers: docs.map((d) => { const p = { id: d.id, ...d.data() }; if (p.displayName) p.displayName = cleanDisplayName(p.displayName); return p; }),
     lastDoc: docs.length > 0 ? docs[docs.length - 1] : null,
     hasMore,
   };

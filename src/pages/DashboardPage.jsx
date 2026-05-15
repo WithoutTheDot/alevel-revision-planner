@@ -5,7 +5,7 @@ import { getDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubjects } from '../contexts/SubjectsContext';
-import { getWeeklySchedule, getTermCalendar, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, getAllCompletedPapers, computeTopicFrequency, completePaper } from '../firebase/db';
+import { getWeeklySchedule, getTermCalendar, getExamTimetable, getUserClasses, getClassLeaderboard, dismissOverdueWeek, getUserSettings, getAllCompletedPapers, computeTopicFrequency, completePaper, cleanScheduleData } from '../firebase/db';
 import { formatTime } from '../lib/timeUtils';
 import SubjectBadge from '../components/SubjectBadge';
 import WeekTypeBadge from '../components/WeekTypeBadge';
@@ -148,7 +148,7 @@ export default function DashboardPage() {
     if (!currentUser?.uid || !weekId) return;
     const ref = doc(db, 'users', currentUser.uid, 'weeklySchedules', weekId);
     const unsub = onSnapshot(ref, (snap) => {
-      setSchedule(snap.exists() ? snap.data() : null);
+      setSchedule(snap.exists() ? cleanScheduleData(snap.data()) : null);
     });
     return unsub;
   }, [currentUser.uid, weekId]);

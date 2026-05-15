@@ -9,6 +9,7 @@ import {
   runTransaction,
 } from 'firebase/firestore';
 import { db } from '../config';
+import { cleanDisplayName } from '../../lib/paperPaths';
 
 // ─── Week Templates ─────────────────────────────────────────────────────────
 // Schema per plan:
@@ -123,9 +124,20 @@ export async function clearWeekType(userId, mondayDateStr) {
 
 // ─── Weekly Schedules ───────────────────────────────────────────────────────
 
+/** Strip legacy "Foreign ..." display names from a raw weekly schedule object. */
+export function cleanScheduleData(data) {
+  if (!data || !Array.isArray(data.papers)) return data;
+  return {
+    ...data,
+    papers: data.papers.map((p) =>
+      p.displayName ? { ...p, displayName: cleanDisplayName(p.displayName) } : p
+    ),
+  };
+}
+
 export async function getWeeklySchedule(userId, weekId) {
   const snap = await getDoc(doc(db, 'users', userId, 'weeklySchedules', weekId));
-  return snap.exists() ? snap.data() : null;
+  return snap.exists() ? cleanScheduleData(snap.data()) : null;
 }
 
 export async function dismissOverdueWeek(userId, weekId) {

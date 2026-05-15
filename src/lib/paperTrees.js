@@ -43,16 +43,9 @@ const mathsEdexcelPaperNode = {
   ],
 };
 
-// Maths Foreign years: 2018-2024 per plan
+// Maths AQA/Edexcel years: 2018-2024 per plan
 const mathsAqaYearNode     = { options: yearOptions(2018, 2024, mathsAqaPaperNode) };
 const mathsEdexcelYearNode = { options: yearOptions(2018, 2024, mathsEdexcelPaperNode) };
-
-const mathsForeignBoardNode = {
-  options: [
-    { label: 'AQA', value: 'aqa', next: mathsAqaYearNode },
-    { label: 'Edexcel', value: 'edexcel', next: mathsEdexcelYearNode },
-  ],
-};
 
 const mathsMadasNode = {
   options: [
@@ -65,8 +58,9 @@ export const maths = {
   options: [
     { label: 'MADAS', value: 'madas', next: mathsMadasNode },
     { label: 'OCR', value: 'ocr', next: mathsOcrYearNode },
+    { label: 'AQA', value: 'aqa', next: mathsAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: mathsEdexcelYearNode },
     { label: 'Knowledge Organiser', value: 'knowledge-organiser', terminal: true },
-    { label: 'Foreign Board', value: 'foreign', next: mathsForeignBoardNode },
   ],
 };
 
@@ -113,21 +107,15 @@ const fmEdexcelPaperNode = {
   ],
 };
 
-// FM Foreign years: 2019-2024 per plan
+// FM AQA/Edexcel years: 2019-2024 per plan
 const fmAqaYearNode     = { options: yearOptions(2019, 2024, fmAqaPaperNode) };
 const fmEdexcelYearNode = { options: yearOptions(2019, 2024, fmEdexcelPaperNode) };
-
-const fmForeignBoardNode = {
-  options: [
-    { label: 'AQA', value: 'aqa', next: fmAqaYearNode },
-    { label: 'Edexcel', value: 'edexcel', next: fmEdexcelYearNode },
-  ],
-};
 
 export const furtherMaths = {
   options: [
     { label: 'OCR', value: 'ocr', next: fmOcrYearNode },
-    { label: 'Foreign Board', value: 'foreign', next: fmForeignBoardNode },
+    { label: 'AQA', value: 'aqa', next: fmAqaYearNode },
+    { label: 'Edexcel', value: 'edexcel', next: fmEdexcelYearNode },
     // maxPerWeek: 2 is enforced in the generator, not the tree
     { label: 'Textbook', value: 'textbook', terminal: true, maxPerWeek: 2 },
   ],
