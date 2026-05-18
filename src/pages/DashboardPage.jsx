@@ -88,7 +88,10 @@ export default function DashboardPage() {
   const [topReviewTopic, setTopReviewTopic] = useState(null); // { topic, count, subject }
 
   const todayDayName = getTodayDayName();
-  const todaysPapers = getTodaysPapers(schedule, todayDayName);
+  const todaysPapers = getTodaysPapers(schedule, todayDayName).map(({ paper, index }) => ({
+    paper: { ...paper, weekId },
+    index,
+  }));
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -626,8 +629,10 @@ export default function DashboardPage() {
       {completing && (() => {
         const timerKey = `timer_${weekId}_${completing.index}`;
         const timerData = getTimerData(timerKey);
-        // Prefer the new TimerContext session elapsed time; fall back to legacy localStorage timer
-        const timerSecs = session?.elapsedSeconds != null
+        const sessionMatchesPaper = session
+          && session.weekId === weekId
+          && session.paperIndex === completing.index;
+        const timerSecs = sessionMatchesPaper && session.elapsedSeconds != null
           ? Math.round(session.elapsedSeconds)
           : (timerData ? Math.round(getElapsed(timerKey) * 60) : null);
         return (

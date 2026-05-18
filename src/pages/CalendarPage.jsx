@@ -265,7 +265,7 @@ export default function CalendarPage() {
   });
 
   // Carry index alongside each paper so unscheduled list doesn't need findIndex
-  const papersWithIdx = (schedule?.papers || []).map((p, idx) => ({ ...p, _idx: idx }));
+  const papersWithIdx = (schedule?.papers || []).map((p, idx) => ({ ...p, _idx: idx, weekId }));
 
   const scheduledByDay = {};
   DAYS.forEach((d) => { scheduledByDay[d] = []; });

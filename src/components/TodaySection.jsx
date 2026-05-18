@@ -32,7 +32,7 @@ export default function TodaySection({ todaysPapers, onComplete, onStartTimer, d
       </h2>
       <div className="flex flex-col gap-2">
         {todaysPapers.map(({ paper, index }) => {
-          const pmtLinks = getPmtLinks(paper.paperPath, paper.subject);
+          const pmtLinks = getPmtLinks(paper.subject, paper.paperPath);
           return (
             <div
               key={index}
