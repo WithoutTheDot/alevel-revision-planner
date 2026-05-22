@@ -362,6 +362,7 @@ export default function DashboardPage() {
             }}
             onStartTimer={(paper, index) => setStartingTimer({ paper, index })}
             dayName={todayDayName}
+            weekId={weekId}
           />
           {/* Stat cards */}
           <div className={`grid gap-3 ${reviewModeEnabled ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
@@ -594,8 +595,8 @@ export default function DashboardPage() {
                             if (!links) return null;
                             return (
                               <>
-                                {links.qp && <PmtLinkButton href={links.qp} label="QP" paper={p} msHref={links.ms} />}
-                                {links.ms && <PmtLinkButton href={links.ms} label="MS" paper={p} />}
+                                {links.qp && <PmtLinkButton href={links.qp} label="QP" paper={{ ...p, weekId, _idx: idx }} msHref={links.ms} />}
+                                {links.ms && <PmtLinkButton href={links.ms} label="MS" paper={{ ...p, weekId, _idx: idx }} />}
                               </>
                             );
                           })()}

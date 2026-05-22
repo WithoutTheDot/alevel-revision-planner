@@ -11,7 +11,7 @@ import { getPmtLinks } from '../lib/pmtLinks';
  *   onStartTimer  — (paper, index) => void — opens timer modal
  *   dayName       — string e.g. 'Monday'
  */
-export default function TodaySection({ todaysPapers, onComplete, onStartTimer, dayName }) {
+export default function TodaySection({ todaysPapers, onComplete, onStartTimer, dayName, weekId }) {
   if (!todaysPapers || todaysPapers.length === 0) {
     return (
       <section className="mb-6">
@@ -33,6 +33,7 @@ export default function TodaySection({ todaysPapers, onComplete, onStartTimer, d
       <div className="flex flex-col gap-2">
         {todaysPapers.map(({ paper, index }) => {
           const pmtLinks = getPmtLinks(paper.subject, paper.paperPath);
+          const paperWithCtx = { ...paper, weekId, _idx: index };
           return (
             <div
               key={index}
@@ -48,8 +49,8 @@ export default function TodaySection({ todaysPapers, onComplete, onStartTimer, d
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                {pmtLinks?.qp && <PmtLinkButton href={pmtLinks.qp} label="Q" paper={paper} msHref={pmtLinks.ms} />}
-                {pmtLinks?.ms && <PmtLinkButton href={pmtLinks.ms} label="MS" paper={paper} />}
+                {pmtLinks?.qp && <PmtLinkButton href={pmtLinks.qp} label="Q" paper={paperWithCtx} msHref={pmtLinks.ms} />}
+                {pmtLinks?.ms && <PmtLinkButton href={pmtLinks.ms} label="MS" paper={paperWithCtx} />}
                 {!paper.completed && (
                   <>
                     <button

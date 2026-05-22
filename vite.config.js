@@ -7,7 +7,12 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     setupFiles: ['./src/test/setup.js'],
-    include: ['src/lib/__tests__/**/*.test.js', 'src/lib/**/*.test.js', 'src/firebase/db/**/*.test.js'],
+    include: [
+      'src/lib/__tests__/**/*.test.js',
+      'src/lib/**/*.test.js',
+      'src/firebase/db/**/*.test.js',
+      'src/components/__tests__/**/*.test.jsx',
+    ],
   },
   build: {
     rollupOptions: {
