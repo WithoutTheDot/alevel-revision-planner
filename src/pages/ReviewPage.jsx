@@ -22,6 +22,7 @@ export default function ReviewPage() {
   const [addTopic, setAddTopic] = useState('');
   const [addSubject, setAddSubject] = useState('');
   const [addSubmitting, setAddSubmitting] = useState(false);
+  const [filterSubject, setFilterSubject] = useState('');
 
   const { loading, error } = useAsyncData(useCallback(async () => {
     const [queue, { papers }] = await Promise.all([
@@ -34,9 +35,11 @@ export default function ReviewPage() {
     })));
   }, [currentUser.uid]), [currentUser.uid]);
 
-  const queuePending   = reviewQueue.filter((i) => i.status === 'pending');
-  const queueScheduled = reviewQueue.filter((i) => i.status === 'scheduled');
-  const queueDone      = reviewQueue.filter((i) => i.status === 'done');
+  const filteredQueue  = filterSubject ? reviewQueue.filter((i) => i.subject === filterSubject) : reviewQueue;
+  const queuePending   = filteredQueue.filter((i) => i.status === 'pending');
+  const queueScheduled = filteredQueue.filter((i) => i.status === 'scheduled');
+  const queueDone      = filteredQueue.filter((i) => i.status === 'done');
+  const queueSubjects  = Array.from(new Set(reviewQueue.map((i) => i.subject))).filter(Boolean);
 
   async function handleQueueForWeek(item) {
     const d = new Date(weekPickerValue);
@@ -198,6 +201,33 @@ export default function ReviewPage() {
         </form>
       )}
 
+
+      {queueSubjects.length > 1 && (
+        <div className="mb-4 flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-[var(--color-text-muted)]">Filter by subject:</span>
+          <button
+            type="button"
+            onClick={() => setFilterSubject('')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${filterSubject === '' ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'}`}
+          >
+            All
+          </button>
+          {queueSubjects.map((key) => {
+            const meta = subjectMeta[key];
+            const active = filterSubject === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setFilterSubject(active ? '' : key)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${active ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]'}`}
+              >
+                {meta?.label ?? key}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {(error || actionError) && (
         <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error || actionError}</div>
