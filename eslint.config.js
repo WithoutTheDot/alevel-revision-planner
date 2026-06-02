@@ -61,4 +61,20 @@ export default defineConfig([
       globals: { ...globals.node },
     },
   },
+  // Vercel API routes — Node ESM (process, URL, etc.)
+  {
+    files: ['api/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+      parserOptions: { sourceType: 'module' },
+    },
+  },
+  // Firebase Cloud Functions — Node CommonJS (require, exports, __dirname)
+  {
+    files: ['functions/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+      parserOptions: { sourceType: 'commonjs' },
+    },
+  },
 ])
