@@ -11,6 +11,7 @@ import {
   rebuildUserPublicStatsFromCompletedPapers, computeWeeklyRollups,
   reconcileBadgesForUser,
   saveUserProfile,
+  getMcpSettings, generateMcpApiKey, revokeMcpApiKey,
 } from '../firebase/db';
 import { BUILT_IN_FAMILIES, BUILT_IN_FAMILIES_MAP, recomputePaths } from '../lib/builtInFamilies';
 import { getDefaultDurationForPath } from '../lib/generateSchedule';
@@ -108,6 +109,14 @@ export default function SettingsPage() {
   const [reconcileResult, setReconcileResult] = useState(null);
   const [badgeReconciling, setBadgeReconciling] = useState(false);
   const [badgeReconcileResult, setBadgeReconcileResult] = useState(null);
+
+  const [mcpKey, setMcpKey] = useState(null); // null = not loaded, '' = none, string = key
+  const [mcpKeyLoading, setMcpKeyLoading] = useState(false);
+  const [mcpKeyCopied, setMcpKeyCopied] = useState(false);
+  const [mcpUrlCopied, setMcpUrlCopied] = useState(false);
+  const [mcpBearerCopied, setMcpBearerCopied] = useState(false);
+  const [mcpKeyVisible, setMcpKeyVisible] = useState(false);
+  const [mcpGuideOpen, setMcpGuideOpen] = useState(false);
 
   const [showFmModules, setShowFmModules] = useState(false);
   const [fmModules, setFmModules] = useState(() => profile?.furtherMathsModules ?? []);
@@ -221,6 +230,67 @@ export default function SettingsPage() {
     } finally {
       setBadgeReconciling(false);
     }
+  }
+
+  // Load MCP key when Account tab is opened
+  useEffect(() => {
+    if (tab !== 'Account' || mcpKey !== null) return;
+    getMcpSettings(currentUser.uid)
+      .then((s) => setMcpKey(s?.apiKey || ''))
+      .catch(() => setMcpKey(''));
+  }, [tab, currentUser.uid, mcpKey]);
+
+  async function handleGenerateMcpKey() {
+    setMcpKeyLoading(true);
+    setError('');
+    try {
+      const key = await generateMcpApiKey(currentUser.uid);
+      setMcpKey(key);
+      setMcpKeyVisible(true);
+    } catch (e) {
+      setError('Failed to generate key: ' + e.message);
+    } finally {
+      setMcpKeyLoading(false);
+    }
+  }
+
+  async function handleRevokeMcpKey() {
+    if (!window.confirm('Revoke this API key? Claude will lose access until you generate a new one.')) return;
+    setMcpKeyLoading(true);
+    try {
+      await revokeMcpApiKey(currentUser.uid);
+      setMcpKey('');
+      setMcpKeyVisible(false);
+    } catch (e) {
+      setError('Failed to revoke key: ' + e.message);
+    } finally {
+      setMcpKeyLoading(false);
+    }
+  }
+
+  const MCP_URL = import.meta.env.VITE_MCP_URL || '';
+
+  function handleCopyMcpKey() {
+    if (!mcpKey) return;
+    navigator.clipboard.writeText(mcpKey).then(() => {
+      setMcpKeyCopied(true);
+      setTimeout(() => setMcpKeyCopied(false), 2000);
+    });
+  }
+
+  function handleCopyMcpUrl() {
+    navigator.clipboard.writeText(MCP_URL).then(() => {
+      setMcpUrlCopied(true);
+      setTimeout(() => setMcpUrlCopied(false), 2000);
+    });
+  }
+
+  function handleCopyMcpBearer() {
+    if (!mcpKey) return;
+    navigator.clipboard.writeText(`Bearer ${mcpKey}`).then(() => {
+      setMcpBearerCopied(true);
+      setTimeout(() => setMcpBearerCopied(false), 2000);
+    });
   }
 
   async function saveFmModules() {
@@ -701,6 +771,156 @@ export default function SettingsPage() {
                           : 'All badges up to date'}
                       </span>
                     )}
+                  </div>
+                </div>
+                <div className="border-t border-[var(--color-border)] pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">Claude AI Integration</p>
+                    {mcpKey && (
+                      <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-success-text)] font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success-text)] inline-block" />
+                        Key active
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Step 1 */}
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">1</span>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-[var(--color-text-primary)] mb-1.5">Generate your API key</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            onClick={handleGenerateMcpKey}
+                            disabled={mcpKeyLoading}
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
+                            {mcpKeyLoading ? 'Working…' : mcpKey ? 'Regenerate' : 'Generate key'}
+                          </button>
+                          {mcpKey && (
+                            <button
+                              onClick={handleRevokeMcpKey}
+                              disabled={mcpKeyLoading}
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-[var(--radius-md)] text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-[var(--color-danger-bg)] disabled:opacity-50 transition-colors">
+                              Revoke
+                            </button>
+                          )}
+                        </div>
+                        {mcpKey && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded font-mono text-[var(--color-text-secondary)] truncate">
+                              {mcpKeyVisible ? mcpKey : mcpKey.slice(0, 8) + '••••••••••••••••••••••••••••••'}
+                            </code>
+                            <button onClick={() => setMcpKeyVisible((v) => !v)}
+                              className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                              {mcpKeyVisible ? 'Hide' : 'Show'}
+                            </button>
+                            <button onClick={handleCopyMcpKey}
+                              className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                              {mcpKeyCopied ? 'Copied' : 'Copy'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="flex gap-3">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">2</span>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-[var(--color-text-primary)] mb-1">Open Claude.ai integrations</p>
+                        <p className="text-xs text-[var(--color-text-muted)] mb-1.5">
+                          Go to <strong>claude.ai</strong> → profile (bottom left) → <strong>Settings</strong> → <strong>Integrations</strong> → <strong>Add custom integration</strong>.
+                        </p>
+                        <p className="text-xs text-[var(--color-text-muted)]">Requires Claude Pro or Team plan.</p>
+                      </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="flex gap-3">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">3</span>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-[var(--color-text-primary)] mb-2">Paste these values into Claude</p>
+                        <div className="space-y-2">
+                          <div>
+                            <p className="text-xs text-[var(--color-text-muted)] mb-1">Name</p>
+                            <div className="flex items-center gap-2">
+                              <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded text-[var(--color-text-secondary)]">Pastpapers</code>
+                              <button onClick={() => navigator.clipboard.writeText('Pastpapers')}
+                                className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">Copy</button>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-[var(--color-text-muted)] mb-1">Server URL</p>
+                            <div className="flex items-center gap-2">
+                              <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded text-[var(--color-text-secondary)] truncate">
+                                {MCP_URL || <span className="italic opacity-60">set VITE_MCP_URL in your environment</span>}
+                              </code>
+                              {MCP_URL && (
+                                <button onClick={handleCopyMcpUrl}
+                                  className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                                  {mcpUrlCopied ? 'Copied' : 'Copy'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-[var(--color-text-muted)] mb-1">Auth header name</p>
+                            <div className="flex items-center gap-2">
+                              <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded text-[var(--color-text-secondary)]">Authorization</code>
+                              <button onClick={() => navigator.clipboard.writeText('Authorization')}
+                                className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">Copy</button>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-[var(--color-text-muted)] mb-1">Auth header value</p>
+                            <div className="flex items-center gap-2">
+                              <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded font-mono text-[var(--color-text-secondary)] truncate">
+                                {mcpKey ? `Bearer ${mcpKeyVisible ? mcpKey : mcpKey.slice(0, 8) + '••••••••••••'}` : 'generate a key first'}
+                              </code>
+                              {mcpKey && (
+                                <button onClick={handleCopyMcpBearer}
+                                  className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                                  {mcpBearerCopied ? 'Copied' : 'Copy'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* What Claude can do */}
+                    <div className="flex gap-3">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-xs flex items-center justify-center text-[var(--color-text-muted)] mt-0.5">?</span>
+                      <div className="flex-1">
+                        <button
+                          onClick={() => setMcpGuideOpen((v) => !v)}
+                          className="text-xs font-medium text-[var(--color-text-primary)] flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
+                          What can Claude help with?
+                          <span className="text-[var(--color-text-muted)]">{mcpGuideOpen ? '▲' : '▼'}</span>
+                        </button>
+                        {mcpGuideOpen && (
+                          <ul className="mt-2 space-y-1 text-xs text-[var(--color-text-muted)]">
+                            {[
+                              ['Revision overview', 'Full picture of stats, subjects, history and upcoming papers'],
+                              ['Focus today', 'Specific recommendation on what to work on right now'],
+                              ['Grade trends', 'Whether grades are improving and where you\'re weakest'],
+                              ['Exam countdown', 'Days left per exam, readiness verdict, urgent flags'],
+                              ['Gap analysis', 'Which paper years or series you haven\'t touched'],
+                              ['Review topics', 'Topics flagged across sessions grouped and ranked'],
+                              ['Deep topic review', 'Concept, common mistakes, worked example, exam technique'],
+                              ['Question sheet', 'Generates a printable HTML practice sheet with hidden answers'],
+                            ].map(([title, desc]) => (
+                              <li key={title} className="flex gap-1.5">
+                                <span className="shrink-0 text-[var(--color-accent)]">•</span>
+                                <span><strong className="text-[var(--color-text-secondary)]">{title}</strong> — {desc}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="border-t border-[var(--color-border)] pt-3 space-y-3">

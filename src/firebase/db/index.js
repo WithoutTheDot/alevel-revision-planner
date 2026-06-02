@@ -6,3 +6,4 @@ export * from './review';
 export * from './admin';
 export * from './completion';
 export * from './reconciliation';
+export * from './mcp';

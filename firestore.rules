@@ -46,5 +46,14 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
+
+    // MCP API key reverse-lookup. Only the Cloud Function (admin SDK) reads these.
+    // Authenticated users may create/delete their own key entry.
+    match /mcpApiKeys/{apiKey} {
+      allow read: if false;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
   }
 }
