@@ -79,7 +79,6 @@ export default function TimerWidget({ nextPaper, weekId, getTimerData, onComplet
             <div
               className="h-1.5 bg-[var(--color-surface)] rounded-full"
               style={{ width: `${progressPct}%`, transition: 'width 1000ms linear' }}
-              style={{ width: `${progressPct}%` }}
             />
           </div>
         </div>

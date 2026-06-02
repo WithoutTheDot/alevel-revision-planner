@@ -117,6 +117,7 @@ export default function SettingsPage() {
   const [mcpBearerCopied, setMcpBearerCopied] = useState(false);
   const [mcpKeyVisible, setMcpKeyVisible] = useState(false);
   const [mcpGuideOpen, setMcpGuideOpen] = useState(false);
+  const [mcpError, setMcpError] = useState('');
 
   const [showFmModules, setShowFmModules] = useState(false);
   const [fmModules, setFmModules] = useState(() => profile?.furtherMathsModules ?? []);
@@ -242,13 +243,16 @@ export default function SettingsPage() {
 
   async function handleGenerateMcpKey() {
     setMcpKeyLoading(true);
-    setError('');
+    setMcpError('');
     try {
       const key = await generateMcpApiKey(currentUser.uid);
       setMcpKey(key);
       setMcpKeyVisible(true);
     } catch (e) {
-      setError('Failed to generate key: ' + e.message);
+      const msg = e?.code === 'permission-denied'
+        ? 'Permission denied — deploy Firestore rules first: firebase deploy --only firestore:rules'
+        : 'Failed to generate key: ' + e.message;
+      setMcpError(msg);
     } finally {
       setMcpKeyLoading(false);
     }
@@ -257,12 +261,13 @@ export default function SettingsPage() {
   async function handleRevokeMcpKey() {
     if (!window.confirm('Revoke this API key? Claude will lose access until you generate a new one.')) return;
     setMcpKeyLoading(true);
+    setMcpError('');
     try {
       await revokeMcpApiKey(currentUser.uid);
       setMcpKey('');
       setMcpKeyVisible(false);
     } catch (e) {
-      setError('Failed to revoke key: ' + e.message);
+      setMcpError('Failed to revoke key: ' + e.message);
     } finally {
       setMcpKeyLoading(false);
     }
@@ -783,6 +788,12 @@ export default function SettingsPage() {
                       </span>
                     )}
                   </div>
+
+                  {mcpError && (
+                    <div className="mb-3 p-2.5 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-xs">
+                      {mcpError}
+                    </div>
+                  )}
 
                   {/* Step 1 */}
                   <div className="space-y-3">
