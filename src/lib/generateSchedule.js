@@ -3,12 +3,6 @@ import { weightedRandom, weightedRandomChoice } from './random';
 import { getDisplayName, getPaperPath } from './paperPaths';
 import { FM_ALL_OPTIONAL_VALUES } from './allSubjects';
 
-// ─── getAllPaperPaths ─────────────────────────────────────────────────────────
-
-/**
- * Recursively collect all terminal paper paths from a tree node.
- * Returns array of path arrays (each array is a sequence of values).
- */
 function collectPaths(node, pathSoFar) {
   const results = [];
   for (const opt of node.options) {
@@ -22,10 +16,6 @@ function collectPaths(node, pathSoFar) {
   return results;
 }
 
-/**
- * Returns all built-in paper paths across all subjects.
- * Each entry: { subject, paperPath, displayName }
- */
 export function getAllPaperPaths() {
   const result = [];
   for (const [subject, tree] of Object.entries(SUBJECT_TREES)) {
@@ -56,11 +46,7 @@ export function getDefaultDurationForPath(path, subject) {
 }
 const DEFAULT_BREAK    = 10; // minutes — plan default
 
-/**
- * Recursively collect all leaf paths from a tree node, each with a combined weight
- * (product of raw option weights along the path, defaulting to 1).
- * Returns [{ path: string[], weight: number }]
- */
+// each leaf's weight is the product of raw option weights along its path
 function collectLeafPaths(node, pathSoFar = [], weightSoFar = 1) {
   const results = [];
   for (const opt of node.options) {
@@ -75,16 +61,6 @@ function collectLeafPaths(node, pathSoFar = [], weightSoFar = 1) {
   return results;
 }
 
-/**
- * Select one paper for a given subject using coverage-first weighted selection.
- *
- * @param {string}   subject
- * @param {Set}      weekExcluded  - paperPath strings already chosen this week (weight = 0)
- * @param {string[]} recentPaths   - completed in past N weeks (weight × 0.01)
- * @param {object}   durations     - { paperPath: minutes, _default: 90 }
- * @param {object}   [customPapers] - map from familyId to family data
- * @param {string[]} [allTimePaths] - all ever-completed paper paths (weight × 0.05 if seen, 1.0 if unseen)
- */
 export function selectPaper(subject, weekExcluded, recentPaths, durations, customPapers, allTimePaths = [], subjectConfig = {}) {
   const tree = SUBJECT_TREES[subject];
   const recentSet = new Set(recentPaths);
@@ -168,8 +144,6 @@ export function selectPaper(subject, weekExcluded, recentPaths, durations, custo
   return { subject, path: chosen.path, paperPath: chosen.paperPath, displayName: chosen.displayName, duration: chosen.duration };
 }
 
-// ─── Scheduling ──────────────────────────────────────────────────────────────
-
 function toMinutes(timeStr) {
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
@@ -181,11 +155,7 @@ function fromMinutes(mins) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
-/**
- * Bin-pack papers into timeBlocks (longest-fit-decreasing).
- * timeBlocks: [{ day: string, startTime: string, endTime: string }]
- * breakMinutes: gap between papers in a block
- */
+// bin-packs papers into timeBlocks, longest-fit-decreasing
 function schedulePapers(papers, timeBlocks, breakMinutes) {
   const sorted = [...papers].sort((a, b) => b.duration - a.duration);
 
@@ -196,7 +166,6 @@ function schedulePapers(papers, timeBlocks, breakMinutes) {
     cursor: toMinutes(b.startTime),
   }));
 
-  // First pass: longest-fit-decreasing with break-shrinking
   const scheduled = sorted.map((paper) => {
     for (const slot of slots) {
       let gap = slot.cursor > slot.start ? breakMinutes : 0;
@@ -219,16 +188,15 @@ function schedulePapers(papers, timeBlocks, breakMinutes) {
     return { ...paper, scheduledDay: null, scheduledStart: null, scheduledEnd: null };
   });
 
-  // Second pass: gap-fill with unscheduled papers (shortest first)
+  // gap-fill pass: retry anything that didn't fit, shortest first, against remaining capacity
   const unscheduled = scheduled.filter((p) => p.scheduledDay === null);
   if (unscheduled.length > 0) {
     unscheduled.sort((a, b) => a.duration - b.duration);
-    // Sort slots by remaining capacity descending
     const slotsByCapacity = [...slots].sort((a, b) => (b.end - b.cursor) - (a.end - a.cursor));
     for (const slot of slotsByCapacity) {
       for (let i = 0; i < unscheduled.length; i++) {
         const paper = unscheduled[i];
-        if (paper.scheduledDay !== null) continue; // already placed in a previous iteration
+        if (paper.scheduledDay !== null) continue;
         const gap = slot.cursor > slot.start ? breakMinutes : 0;
         let startAt = slot.cursor + gap;
         if (startAt + paper.duration > slot.end && gap > 0) {
@@ -243,7 +211,7 @@ function schedulePapers(papers, timeBlocks, breakMinutes) {
             scheduledStart: fromMinutes(startAt),
             scheduledEnd: fromMinutes(startAt + paper.duration),
           };
-          unscheduled[i] = scheduled[idx]; // mark as placed
+          unscheduled[i] = scheduled[idx];
         }
       }
     }
@@ -252,21 +220,6 @@ function schedulePapers(papers, timeBlocks, breakMinutes) {
   return scheduled;
 }
 
-// ─── Main generator ──────────────────────────────────────────────────────────
-
-/**
- * Generate a weekly schedule.
- *
- * Template shape (from Firestore):
- * {
- *   subjects: string[],
- *   maxPapersPerSubject: number,
- *   mostCommonPapersPerSubject: number,
- *   maxTotalPapers: number,
- *   breakDuration: number,   // minutes between papers
- *   timeBlocks: [{ day, startTime, endTime }]
- * }
- */
 export function generateWeeklySchedule(userId, weekStart, weekType, template, recentPaths, durations, customPapers, allTimePaths = [], subjectConfig = {}) {
   const {
     subjects = [],
@@ -279,7 +232,6 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
 
   const recentSet = new Set(recentPaths);
 
-  // Step 1: determine per-subject counts
   const counts = {};
   let total = 0;
   for (const subject of subjects) {
@@ -292,7 +244,6 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
   if (total > maxTotalPapers) {
     const requested = total;
     let excess = total - maxTotalPapers;
-    // Sort subjects by count descending to reduce the biggest first
     const sorted = [...subjects].sort((a, b) => counts[b] - counts[a]);
     for (const subject of sorted) {
       if (excess <= 0) break;
@@ -303,10 +254,9 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
     warnings.push(`Schedule trimmed from ${requested} to ${maxTotalPapers} papers (template limit).`);
   }
 
-  // Step 2: select papers
   const papers = [];
-  const weekExcluded = new Set(); // hard-exclude: no dups within a week
-  // Textbook is special: can appear up to 2× — track separately, don't add to weekExcluded
+  const weekExcluded = new Set();
+  // textbook can appear up to 2x a week, so it's tracked separately and never added to weekExcluded
   let textbookCount = 0;
 
   for (const subject of subjects) {
@@ -321,9 +271,8 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
       const isTextbook = paper.paperPath === 'textbook';
 
       if (isTextbook) {
-        if (textbookCount >= 2) continue; // cap reached
+        if (textbookCount >= 2) continue;
         textbookCount++;
-        // Don't add textbook to weekExcluded so the second one can be selected
         papers.push({ ...paper, paperId: crypto.randomUUID(), completed: false, marks: null, grade: null });
         picked++;
         continue;
@@ -336,13 +285,12 @@ export function generateWeeklySchedule(userId, weekStart, weekType, template, re
     }
   }
 
-  // Step 3: shuffle so papers are interleaved across subjects
+  // interleave subjects instead of grouping them
   for (let i = papers.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [papers[i], papers[j]] = [papers[j], papers[i]];
   }
 
-  // Step 4: schedule into time blocks
   const scheduledPapers = timeBlocks.length > 0
     ? schedulePapers(papers, timeBlocks, breakDuration)
     : papers.map((p) => ({ ...p, scheduledDay: null, scheduledStart: null, scheduledEnd: null }));

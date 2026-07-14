@@ -138,9 +138,9 @@ async function resolveUid(req) {
   if (!auth.startsWith('Bearer ')) return null;
   const key = auth.slice(7).trim();
   if (!key) return null;
-  const snap = await db.collection('mcpApiKeys').doc(key).get();
-  if (!snap.exists) return null;
-  return snap.data().uid || null;
+  const snap = await db.collectionGroup('settings').where('apiKey', '==', key).limit(1).get();
+  if (snap.empty) return null;
+  return snap.docs[0].ref.parent.parent?.id || null;
 }
 
 // ── Tool implementations ──────────────────────────────────────────────────────

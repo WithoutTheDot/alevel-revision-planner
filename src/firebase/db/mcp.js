@@ -12,34 +12,23 @@ function randomApiKey() {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Returns { keyHint, createdAt } — the full key is never returned after creation
 export async function getMcpSettings(userId) {
   const snap = await getDoc(doc(db, 'users', userId, 'settings', 'mcp'));
-  return snap.exists() ? snap.data() : null;
+  if (!snap.exists()) return null;
+  const { keyHint, createdAt } = snap.data();
+  return { keyHint, createdAt };
 }
 
+// Returns the full key exactly once — caller must display and discard it
 export async function generateMcpApiKey(userId) {
-  // Remove old key from reverse-lookup collection if one exists
-  const existing = await getMcpSettings(userId);
-  if (existing?.apiKey) {
-    await deleteDoc(doc(db, 'mcpApiKeys', existing.apiKey)).catch(() => {});
-  }
-
   const apiKey = randomApiKey();
   const createdAt = new Date().toISOString();
-
-  // Reverse-lookup: mcpApiKeys/{key} → { uid }
-  await setDoc(doc(db, 'mcpApiKeys', apiKey), { uid: userId, createdAt });
-
-  // User-side storage: users/{uid}/settings/mcp → { apiKey, createdAt }
-  await setDoc(doc(db, 'users', userId, 'settings', 'mcp'), { apiKey, createdAt });
-
-  return apiKey;
+  const keyHint = apiKey.slice(-4);
+  await setDoc(doc(db, 'users', userId, 'settings', 'mcp'), { apiKey, keyHint, createdAt });
+  return { apiKey, keyHint, createdAt };
 }
 
 export async function revokeMcpApiKey(userId) {
-  const existing = await getMcpSettings(userId);
-  if (existing?.apiKey) {
-    await deleteDoc(doc(db, 'mcpApiKeys', existing.apiKey)).catch(() => {});
-  }
   await deleteDoc(doc(db, 'users', userId, 'settings', 'mcp'));
 }

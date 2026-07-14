@@ -3,12 +3,7 @@ import { format, startOfWeek, parseISO } from 'date-fns';
 import { db } from '../config';
 import { BADGE_DEFS, xpToLevel } from '../../lib/badges';
 
-/**
- * Rebuilds the userPublicStats document by scanning the canonical completedPapers log.
- * Fixes drift in studyMinutes, papersCompleted, and subject-specific counts.
- *
- * @param {string} uid User ID
- */
+// rebuilds userPublicStats from the completedPapers log, fixes any drift in the counters
 export async function rebuildUserPublicStatsFromCompletedPapers(uid) {
   const colRef = collection(db, 'users', uid, 'completedPapers');
   let papersCompleted = 0;
@@ -53,15 +48,8 @@ export async function rebuildUserPublicStatsFromCompletedPapers(uid) {
   return { papersCompleted, studyMinutes: Math.round(totalSeconds / 60) };
 }
 
-/**
- * Checks all badge definitions against the user's current stats and awards any
- * missing badges they've already earned. Safe to call repeatedly.
- *
- * @param {string} uid User ID
- * @returns {{ newBadges: string[], xpAwarded: number }}
- */
+// safe to call repeatedly, only awards badges that are missing
 export async function reconcileBadgesForUser(uid) {
-  // Build context from completedPapers (authoritative)
   const colRef = collection(db, 'users', uid, 'completedPapers');
   let papersCompleted = 0;
   const subjectCounts = {};
@@ -81,7 +69,6 @@ export async function reconcileBadgesForUser(uid) {
     lastDoc = snap.docs[snap.docs.length - 1];
   }
 
-  // Get current public stats (for longestStreak + existing badgeIds)
   const statsRef = doc(db, 'userPublicStats', uid);
   const statsSnap = await getDoc(statsRef);
   const stats = statsSnap.exists() ? statsSnap.data() : {};
@@ -90,7 +77,6 @@ export async function reconcileBadgesForUser(uid) {
 
   const ctx = { papersCompleted, longestStreak, subjectCounts };
 
-  // Find badges earned but not yet awarded
   const missing = BADGE_DEFS.filter(
     (b) => !existingBadgeIds.includes(b.id) && b.check(ctx)
   );
@@ -100,7 +86,6 @@ export async function reconcileBadgesForUser(uid) {
   const xpAwarded = missing.reduce((sum, b) => sum + b.xpReward, 0);
   const newBadgeIds = missing.map((b) => b.id);
 
-  // Award XP + update badgeIds
   const currentXp = stats.xp ?? 0;
   const newXp = currentXp + xpAwarded;
   await updateDoc(statsRef, {
@@ -110,7 +95,6 @@ export async function reconcileBadgesForUser(uid) {
     lastUpdated: serverTimestamp(),
   });
 
-  // Write badge docs
   for (const b of missing) {
     await setDoc(doc(db, 'users', uid, 'badges', b.id), {
       badgeId: b.id,
@@ -122,17 +106,10 @@ export async function reconcileBadgesForUser(uid) {
   return { newBadges: newBadgeIds, xpAwarded };
 }
 
-/**
- * Produces per-week counts and study hours from completedPapers.
- * Stores results in users/{uid}/rollups/weekly.
- *
- * @param {string} uid User ID
- */
 export async function computeWeeklyRollups(uid) {
   const colRef = collection(db, 'users', uid, 'completedPapers');
   const weeklyStats = {}; // { weekId: { count: number, seconds: number } }
 
-  // We fetch all to build the full history of rollups
   const snap = await getDocs(colRef);
   
   snap.forEach((d) => {
@@ -152,7 +129,6 @@ export async function computeWeeklyRollups(uid) {
     }
   });
 
-  // Write each week to the rollups subcollection
   for (const [weekId, stats] of Object.entries(weeklyStats)) {
     const rollupRef = doc(db, 'users', uid, 'rollups', 'weekly', 'weeks', weekId);
     await setDoc(rollupRef, {

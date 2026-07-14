@@ -27,12 +27,6 @@ export function offsetToTime(px) {
 
 export { PX_PER_MIN, TOTAL_MINS };
 
-/**
- * Returns papers from a weekly schedule that are scheduled for a given day name.
- * @param {object|null} schedule - weekly schedule object ({ papers: [...] })
- * @param {string} dayName - e.g. 'Monday', 'Tuesday', etc.
- * @returns {Array<{ paper: object, index: number }>}
- */
 export function getTodaysPapers(schedule, dayName) {
   if (!schedule?.papers) return [];
   return schedule.papers
@@ -40,9 +34,6 @@ export function getTodaysPapers(schedule, dayName) {
     .filter(({ paper }) => paper.scheduledDay === dayName);
 }
 
-/**
- * Returns today's day name (Monday–Sunday) matching the format used by schedule papers.
- */
 export function getTodayDayName() {
   const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return DAYS[new Date().getDay()];

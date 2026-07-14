@@ -2,13 +2,6 @@ import { updatePaper } from './schedule';
 import { recordCompletion, logAdhocPaper } from './papers';
 import { addReviewTopics } from './review';
 
-/**
- * Orchestrates the completion of a paper (scheduled or ad-hoc).
- * Centralizes schedule updates, history logging, stats, and review queue syncing.
- *
- * @param {string} uid User ID
- * @param {object} ctx Completion context
- */
 export async function completePaper(uid, ctx) {
   const {
     source,
@@ -45,7 +38,6 @@ export async function completePaper(uid, ctx) {
       expectedTime,
     });
   } else {
-    // Scheduled paper: 1. Update the schedule entry
     if (weekId && paperIndex != null) {
       await updatePaper(uid, weekId, paperIndex, {
         marks: marks ?? null,
@@ -56,7 +48,6 @@ export async function completePaper(uid, ctx) {
       });
     }
 
-    // 2. Record in the canonical completion history (this also updates public stats)
     completionResult = await recordCompletion(uid, {
       paperPath,
       subject,
@@ -73,7 +64,6 @@ export async function completePaper(uid, ctx) {
     });
   }
 
-  // 3. Sync review queue (best-effort)
   if (reviewTopics?.length > 0) {
     await addReviewTopics(uid, reviewTopics, subject).catch((err) => {
       console.error('Failed to sync review topics in completePaper:', err);

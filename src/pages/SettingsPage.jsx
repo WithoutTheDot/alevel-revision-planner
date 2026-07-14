@@ -110,7 +110,8 @@ export default function SettingsPage() {
   const [badgeReconciling, setBadgeReconciling] = useState(false);
   const [badgeReconcileResult, setBadgeReconcileResult] = useState(null);
 
-  const [mcpKey, setMcpKey] = useState(null); // null = not loaded, '' = none, string = key
+  const [mcpInfo, setMcpInfo] = useState(null); // null = not loaded, '' = none, { keyHint, createdAt } = exists
+  const [revealedKey, setRevealedKey] = useState(null); // full key, only known right after generating
   const [mcpKeyLoading, setMcpKeyLoading] = useState(false);
   const [mcpKeyCopied, setMcpKeyCopied] = useState(false);
   const [mcpUrlCopied, setMcpUrlCopied] = useState(false);
@@ -235,18 +236,19 @@ export default function SettingsPage() {
 
   // Load MCP key when Account tab is opened
   useEffect(() => {
-    if (tab !== 'Account' || mcpKey !== null) return;
+    if (tab !== 'Account' || mcpInfo !== null) return;
     getMcpSettings(currentUser.uid)
-      .then((s) => setMcpKey(s?.apiKey || ''))
-      .catch(() => setMcpKey(''));
-  }, [tab, currentUser.uid, mcpKey]);
+      .then((s) => setMcpInfo(s || ''))
+      .catch(() => setMcpInfo(''));
+  }, [tab, currentUser.uid, mcpInfo]);
 
   async function handleGenerateMcpKey() {
     setMcpKeyLoading(true);
     setMcpError('');
     try {
-      const key = await generateMcpApiKey(currentUser.uid);
-      setMcpKey(key);
+      const { apiKey, keyHint, createdAt } = await generateMcpApiKey(currentUser.uid);
+      setRevealedKey(apiKey);
+      setMcpInfo({ keyHint, createdAt });
       setMcpKeyVisible(true);
     } catch (e) {
       const msg = e?.code === 'permission-denied'
@@ -264,7 +266,8 @@ export default function SettingsPage() {
     setMcpError('');
     try {
       await revokeMcpApiKey(currentUser.uid);
-      setMcpKey('');
+      setMcpInfo('');
+      setRevealedKey(null);
       setMcpKeyVisible(false);
     } catch (e) {
       setMcpError('Failed to revoke key: ' + e.message);
@@ -276,8 +279,8 @@ export default function SettingsPage() {
   const MCP_URL = import.meta.env.VITE_MCP_URL || '';
 
   function handleCopyMcpKey() {
-    if (!mcpKey) return;
-    navigator.clipboard.writeText(mcpKey).then(() => {
+    if (!revealedKey) return;
+    navigator.clipboard.writeText(revealedKey).then(() => {
       setMcpKeyCopied(true);
       setTimeout(() => setMcpKeyCopied(false), 2000);
     });
@@ -291,8 +294,8 @@ export default function SettingsPage() {
   }
 
   function handleCopyMcpBearer() {
-    if (!mcpKey) return;
-    navigator.clipboard.writeText(`Bearer ${mcpKey}`).then(() => {
+    if (!revealedKey) return;
+    navigator.clipboard.writeText(`Bearer ${revealedKey}`).then(() => {
       setMcpBearerCopied(true);
       setTimeout(() => setMcpBearerCopied(false), 2000);
     });
@@ -781,7 +784,7 @@ export default function SettingsPage() {
                 <div className="border-t border-[var(--color-border)] pt-4">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-sm font-medium text-[var(--color-text-primary)]">Claude AI Integration</p>
-                    {mcpKey && (
+                    {mcpInfo && (
                       <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-success-text)] font-medium">
                         <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success-text)] inline-block" />
                         Key active
@@ -795,7 +798,6 @@ export default function SettingsPage() {
                     </div>
                   )}
 
-                  {/* Step 1 */}
                   <div className="space-y-3">
                     <div className="flex gap-3">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">1</span>
@@ -806,9 +808,9 @@ export default function SettingsPage() {
                             onClick={handleGenerateMcpKey}
                             disabled={mcpKeyLoading}
                             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
-                            {mcpKeyLoading ? 'Working…' : mcpKey ? 'Regenerate' : 'Generate key'}
+                            {mcpKeyLoading ? 'Working…' : mcpInfo ? 'Regenerate' : 'Generate key'}
                           </button>
-                          {mcpKey && (
+                          {mcpInfo && (
                             <button
                               onClick={handleRevokeMcpKey}
                               disabled={mcpKeyLoading}
@@ -817,25 +819,35 @@ export default function SettingsPage() {
                             </button>
                           )}
                         </div>
-                        {mcpKey && (
+                        {mcpInfo && (
                           <div className="mt-2 flex items-center gap-2">
                             <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded font-mono text-[var(--color-text-secondary)] truncate">
-                              {mcpKeyVisible ? mcpKey : mcpKey.slice(0, 8) + '••••••••••••••••••••••••••••••'}
+                              {revealedKey
+                                ? (mcpKeyVisible ? revealedKey : revealedKey.slice(0, 8) + '••••••••••••••••••••••••••••••')
+                                : `•••••••••••••••••••••••••••• ${mcpInfo.keyHint || ''}`}
                             </code>
-                            <button onClick={() => setMcpKeyVisible((v) => !v)}
-                              className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
-                              {mcpKeyVisible ? 'Hide' : 'Show'}
-                            </button>
-                            <button onClick={handleCopyMcpKey}
-                              className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
-                              {mcpKeyCopied ? 'Copied' : 'Copy'}
-                            </button>
+                            {revealedKey && (
+                              <button onClick={() => setMcpKeyVisible((v) => !v)}
+                                className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                                {mcpKeyVisible ? 'Hide' : 'Show'}
+                              </button>
+                            )}
+                            {revealedKey && (
+                              <button onClick={handleCopyMcpKey}
+                                className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
+                                {mcpKeyCopied ? 'Copied' : 'Copy'}
+                              </button>
+                            )}
                           </div>
+                        )}
+                        {mcpInfo && !revealedKey && (
+                          <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                            The full key is only shown once, right after you generate it. Regenerate if you need it again.
+                          </p>
                         )}
                       </div>
                     </div>
 
-                    {/* Step 2 */}
                     <div className="flex gap-3">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">2</span>
                       <div className="flex-1">
@@ -847,7 +859,6 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    {/* Step 3 */}
                     <div className="flex gap-3">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-xs flex items-center justify-center font-semibold mt-0.5">3</span>
                       <div className="flex-1">
@@ -887,9 +898,11 @@ export default function SettingsPage() {
                             <p className="text-xs text-[var(--color-text-muted)] mb-1">Auth header value</p>
                             <div className="flex items-center gap-2">
                               <code className="flex-1 text-xs bg-[var(--color-surface-alt,var(--color-border))] px-2 py-1.5 rounded font-mono text-[var(--color-text-secondary)] truncate">
-                                {mcpKey ? `Bearer ${mcpKeyVisible ? mcpKey : mcpKey.slice(0, 8) + '••••••••••••'}` : 'generate a key first'}
+                                {revealedKey
+                                  ? `Bearer ${mcpKeyVisible ? revealedKey : revealedKey.slice(0, 8) + '••••••••••••'}`
+                                  : mcpInfo ? `Bearer •••••••••••• ${mcpInfo.keyHint || ''}` : 'generate a key first'}
                               </code>
-                              {mcpKey && (
+                              {revealedKey && (
                                 <button onClick={handleCopyMcpBearer}
                                   className="shrink-0 px-2 py-1.5 text-xs rounded border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] transition-colors">
                                   {mcpBearerCopied ? 'Copied' : 'Copy'}

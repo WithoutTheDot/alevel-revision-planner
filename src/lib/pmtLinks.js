@@ -312,13 +312,7 @@ function englishLinks(appSubject, paperPath) {
   return manifestLinks(appSubject, { edexcel: 'Edexcel', ocr: 'OCR' }, paperPath);
 }
 
-/**
- * Returns PDF links for a paper, or null if no link is available.
- * OCR A Maths links are on ocr.org.uk; all others on pmt.physicsandmathstutor.com.
- * @param {string} subject - e.g. 'maths', 'chemistry', 'biology', 'computerScience'
- * @param {string} paperPath - e.g. 'ocr-2023-pure', 'aqa-2023-paper1'
- * @returns {{ qp: string, ms: string } | null}
- */
+// OCR A Maths links live on ocr.org.uk; everything else is pmt.physicsandmathstutor.com
 export function getPmtLinks(subject, paperPath) {
   if (!subject || !paperPath) return null;
   // Strip legacy "foreign-" prefix from stored Firestore paperPaths

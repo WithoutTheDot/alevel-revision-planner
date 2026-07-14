@@ -1,9 +1,3 @@
-/**
- * Pure XP calculation — no Firebase dependency.
- * @param {{ grade?: string, timeTaken?: number, expectedTime?: number }} paperData
- * @param {{ currentStreak?: number }} stats
- * @returns {{ base: number, gradeBonus: number, timeBonus: number, streakBonus: number, total: number }}
- */
 export function calculateXp(paperData, stats) {
   const base = 25;
   const gradeBonus = (paperData.grade === 'A' || paperData.grade === 'A*') ? 25 : 0;
@@ -28,13 +22,6 @@ export function calculateXp(paperData, stats) {
   return { base, gradeBonus, timeBonus, streakBonus, total };
 }
 
-/**
- * Pure streak date logic.
- * @param {string} today  ISO date string 'YYYY-MM-DD'
- * @param {string} last   ISO date string of last study date (or '' if none)
- * @param {number} current  current streak value
- * @returns {{ newStreak: number, alreadyCounted: boolean }}
- */
 export function computeNextStreak(today, last, current) {
   if (last === today) return { newStreak: current, alreadyCounted: true };
   const yesterday = new Date(today);

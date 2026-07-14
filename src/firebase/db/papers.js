@@ -21,16 +21,7 @@ import { updateStreak, awardXpAndBadges } from './social';
 import { syncReviewQueueForCompletionEdit } from './review';
 import { cleanDisplayName } from '../../lib/paperPaths';
 
-// ─── Completed Papers ───────────────────────────────────────────────────────
-
-/**
- * Computes total study seconds from the canonical completion history.
- * This intentionally does NOT use cached/incremental counters in userPublicStats.
- *
- * Rules:
- * - Only sums finite numeric actualDurationSeconds values > 0
- * - Missing/invalid/null values count as 0 (we don't fabricate study time)
- */
+// sums from the completedPapers log directly, not the cached counters in userPublicStats
 export async function getTotalStudySecondsFromCompletedPapers(userId) {
   const colRef = collection(db, 'users', userId, 'completedPapers');
   let total = 0;
@@ -73,7 +64,6 @@ export async function updateCompletion(userId, paperId, updates) {
   }
   await updateDoc(ref, updateData);
 
-  // Sync review queue if topics changed
   if ('reviewTopics' in updates) {
     await syncReviewQueueForCompletionEdit(userId, {
       subject: prevData.subject,
@@ -83,18 +73,12 @@ export async function updateCompletion(userId, paperId, updates) {
   }
 }
 
-/**
- * Returns paperPath strings completed across all time.
- */
 export async function getAllCompletedPaperPaths(userId) {
   const snap = await getDocs(collection(db, 'users', userId, 'completedPapers'));
   return snap.docs.map((d) => d.data().paperPath).filter(Boolean);
 }
 
-/**
- * Fetches all completed papers for a user and returns a Map<paperPath, { grade, completedAt }>.
- * If a paperPath was completed multiple times, keeps the most recent entry.
- */
+// keeps the most recent entry per paperPath if it was done more than once
 export async function getCoverageData(userId) {
   const snap = await getDocs(collection(db, 'users', userId, 'completedPapers'));
   const map = new Map();
@@ -126,7 +110,7 @@ export async function getRecentCompletedPapers(userId, beforeDate, weeksBack = 3
 }
 
 export async function recordCompletion(userId, paperData) {
-  // Check if there's an existing completion record for this paper (to prevent XP farming)
+  // don't re-award XP if this completion was already recorded once (stops XP farming via re-edits)
   let existingXpAwarded = false;
   if (paperData.existingDocId) {
     try {
@@ -137,7 +121,6 @@ export async function recordCompletion(userId, paperData) {
     } catch (e) { console.error('[papers] best-effort op failed:', e); }
   }
 
-  // Atomically write completed paper record + public stats in a single batch
   const batch = writeBatch(db);
 
   const paperRef = paperData.existingDocId
@@ -178,15 +161,12 @@ export async function recordCompletion(userId, paperData) {
 
   await batch.commit();
 
-  // If XP was already awarded for this paper, skip awarding again
   if (existingXpAwarded) {
     return { xpEarned: 0, newBadges: [] };
   }
 
-  // Streak update needs a read first, so it runs separately
   await updateStreak(userId);
 
-  // Award XP + badges (read updated stats first)
   let xpResult = { xpEarned: 0, newBadges: [] };
   const updatedSnap = await getDoc(doc(db, 'userPublicStats', userId));
   const updatedStats = updatedSnap.exists() ? updatedSnap.data() : {};
@@ -195,7 +175,6 @@ export async function recordCompletion(userId, paperData) {
     : paperData.timeTaken;
   xpResult = await awardXpAndBadges(userId, { ...paperData, timeTaken: effectiveTimeTaken }, updatedStats);
 
-  // Update personal best
   let isPB = false;
   if (paperData.actualDurationSeconds && paperData.subject && paperData.paperPath) {
     isPB = await maybeUpdatePB(userId, paperData.subject, paperData.paperPath, paperData.actualDurationSeconds);
@@ -204,12 +183,8 @@ export async function recordCompletion(userId, paperData) {
   return { ...xpResult, isPB };
 }
 
-/**
- * Log an ad-hoc paper (outside of scheduled timetable).
- * Enforces a daily cap of 3 ad-hoc papers that award XP.
- */
+// caps at 3 XP-earning ad-hoc papers per day
 export async function logAdhocPaper(userId, paperData) {
-  // Count today's ad-hoc completions
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 
@@ -239,7 +214,7 @@ export async function logAdhocPaper(userId, paperData) {
     reviewTopics: Array.isArray(paperData.reviewTopics) ? paperData.reviewTopics : [],
   });
 
-  // Only count real timer/entered time. No duration → 0 (don't fabricate study time).
+  // no duration means 0, we don't fabricate study time
   const studyMinutesAdd = paperData.actualDurationSeconds != null
     ? Math.round(paperData.actualDurationSeconds / 60)
     : 0;
@@ -259,7 +234,6 @@ export async function logAdhocPaper(userId, paperData) {
 
   await batch.commit();
 
-  // Daily cap: only award XP for first 3 ad-hoc papers per day
   if (todayCount >= 3) {
     return { xpEarned: 0, newBadges: [], capReached: true };
   }
@@ -282,12 +256,6 @@ export async function logAdhocPaper(userId, paperData) {
   return { ...xpResult, capReached: false, isPB };
 }
 
-/**
- * Paginated fetch of completed papers.
- * @param {string} userId
- * @param {{ limit?: number, startAfter?: import('firebase/firestore').QueryDocumentSnapshot | null }} options
- * @returns {{ papers: object[], lastDoc: object|null, hasMore: boolean }}
- */
 export async function getAllCompletedPapers(userId, { limit: limitCount = 50, startAfter: startAfterDoc = null } = {}) {
   let q = query(
     collection(db, 'users', userId, 'completedPapers'),
@@ -312,10 +280,7 @@ export async function getAllCompletedPapers(userId, { limit: limitCount = 50, st
   };
 }
 
-// ─── Custom Papers ───────────────────────────────────────────────────────────
-// Subcollection: users/{uid}/customPapers/{familyId}
-// Schema: { familyName, subject, yearStart, yearEnd, duration }
-
+// users/{uid}/customPapers/{familyId} — { familyName, subject, yearStart, yearEnd, duration }
 export async function getCustomPapers(userId) {
   const snap = await getDocs(collection(db, 'users', userId, 'customPapers'));
   const result = {};
@@ -329,7 +294,6 @@ export async function saveCustomPaper(userId, familyId, data) {
 
 export async function deleteCustomPaper(userId, familyId, yearStart, yearEnd) {
   await deleteDoc(doc(db, 'users', userId, 'customPapers', familyId));
-  // Clean up durations for all years in range
   const durRef = doc(db, 'users', userId, 'settings', 'durations');
   const snap = await getDoc(durRef);
   if (snap.exists()) {
@@ -341,9 +305,7 @@ export async function deleteCustomPaper(userId, familyId, yearStart, yearEnd) {
   }
 }
 
-// ─── Personal Bests ───────────────────────────────────────────────────────────
-// Stored in userPublicStats/{uid}.personalBests map: { "${subject}-${paperPath}": seconds }
-
+// userPublicStats/{uid}.personalBests map: { "${subject}-${paperPath}": seconds }
 export function pbKey(subject, paperPath) {
   return `${subject}-${paperPath}`;
 }
