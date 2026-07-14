@@ -8,7 +8,7 @@ import Toast from './Toast';
 import FullscreenTimer from './FullscreenTimer';
 import QuickLogFab from './QuickLogFab';
 
-// ─── SVG Icon set (Heroicons outline 20x20) ──────────────────────────────────
+// SVG Icon set (Heroicons outline 20x20)
 const Icons = {
   Dashboard: (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-[18px] h-[18px] flex-shrink-0">

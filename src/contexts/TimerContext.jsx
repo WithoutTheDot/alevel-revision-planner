@@ -141,7 +141,7 @@ export function TimerProvider({ children }) {
     if (uid) await clearActiveSession(uid).catch(() => {});
   }
 
-  // ─── Backward-compat API (mirrors old useTimer hook) ─────────────────────
+ // Backward-compat API (mirrors old useTimer hook)
   // Keys are in format: timer_${weekId}_${paperIndex}
 
   function _matchesKey(key) {

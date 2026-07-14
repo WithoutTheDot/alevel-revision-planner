@@ -18,7 +18,7 @@ import { db } from '../config';
 import { BADGE_DEFS, xpToLevel } from '../../lib/badges';
 import { calculateXp, computeNextStreak } from '../../lib/xpUtils';
 
-// ─── Streaks ─────────────────────────────────────────────────────────────────
+// Streaks
 
 export async function updateStreak(uid) {
   const ref = doc(db, 'userPublicStats', uid);
@@ -39,7 +39,7 @@ export async function updateStreak(uid) {
   }, { merge: true });
 }
 
-// ─── XP & Badges ─────────────────────────────────────────────────────────────
+// XP & Badges
 
 /**
  * Awards XP and unlocks any newly earned badges.
@@ -106,7 +106,7 @@ export async function getUserBadges(uid) {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-// ─── Public Stats ────────────────────────────────────────────────────────────
+// Public Stats
 
 export async function updateDisplayName(uid, displayName) {
   await Promise.all([
@@ -164,7 +164,7 @@ export async function rebuildSubjectStats(uid) {
   await setDoc(statsRef, { subjectPapersCompleted }, { mergeFields });
 }
 
-// ─── Classes ─────────────────────────────────────────────────────────────────
+// Classes
 
 export function generateClassCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -253,7 +253,7 @@ export async function getClassLeaderboard(classId) {
   };
 }
 
-// ─── Nudges ──────────────────────────────────────────────────────────────────
+// Nudges
 
 export async function sendNudge(toUid, fromDisplayName) {
   await addDoc(collection(db, 'users', toUid, 'nudges'), {

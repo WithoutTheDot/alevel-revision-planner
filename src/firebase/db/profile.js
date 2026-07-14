@@ -14,7 +14,7 @@ import {
 import { db } from '../config';
 import { DEFAULT_SUBJECTS } from '../../lib/allSubjects';
 
-// ─── User Profile ────────────────────────────────────────────────────────────
+// User Profile
 // Schema: { subjects: [{ id, label, color, text, light }], onboardingComplete: boolean }
 
 export async function getUserProfile(userId) {
@@ -37,7 +37,7 @@ export async function initDefaultProfile(userId) {
   }
 }
 
-// ─── Exam Timetable ──────────────────────────────────────────────────────────
+// Exam Timetable
 // Subcollection: users/{uid}/examTimetable/{autoId}
 // Schema: { subject, paperLabel, date, time, durationMins }
 
@@ -60,7 +60,7 @@ export async function deleteExamEntry(userId, id) {
   await deleteDoc(doc(db, 'users', userId, 'examTimetable', id));
 }
 
-// ─── User Settings ─────────────────────────────────────────────────────────
+// User Settings
 
 export async function getUserSettings(userId) {
   const snap = await getDoc(doc(db, 'users', userId, 'settings', 'main'));
@@ -76,7 +76,7 @@ export async function updateUserSettings(userId, data) {
   await setDoc(doc(db, 'users', userId, 'settings', 'main'), data, { merge: true });
 }
 
-// ─── Paper Durations ────────────────────────────────────────────────────────
+// Paper Durations
 // Stored as a single map doc: { paperPath: minutes, _default: 90 }
 // Individual overrides are merged in; _default is the fallback.
 
@@ -104,7 +104,7 @@ export async function initDefaultDurations(userId) {
   }
 }
 
-// ─── Active Session (Live Timer State) ───────────────────────────────────────
+// Active Session (Live Timer State)
 // Subcollection: users/{uid}/profile/activeSession
 
 export async function getActiveSession(userId) {

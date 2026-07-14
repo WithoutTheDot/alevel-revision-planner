@@ -1,4 +1,4 @@
-// ─── Badge definitions ───────────────────────────────────────────────────────
+// Badge definitions
 
 export const BADGE_DEFS = [
   {
@@ -67,7 +67,7 @@ export const BADGE_DEFS = [
   },
 ];
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+// Icons
 // Inline SVG components (Heroicons outline style, 20x20)
 
 function DocumentTextIcon({ className }) {
@@ -106,7 +106,7 @@ export const BADGE_ICONS = {
   'subject-mastery': AcademicCapIcon,
 };
 
-// ─── XP helpers ──────────────────────────────────────────────────────────────
+// XP helpers
 
 export function xpToLevel(xp) {
   return Math.floor((xp ?? 0) / 500) + 1;

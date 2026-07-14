@@ -7,7 +7,7 @@ const path = require('path');
 initializeApp();
 const db = getFirestore();
 
-// ── MCP protocol constants ────────────────────────────────────────────────────
+// MCP protocol constants
 
 const SERVER_INFO = { name: 'pastpapers-mcp', version: '1.0.0' };
 const PROTOCOL_VERSION = '2024-11-05';
@@ -131,7 +131,7 @@ const PROMPTS = [
   },
 ];
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// Auth
 
 async function resolveUid(req) {
   const auth = req.headers['authorization'] || '';
@@ -143,7 +143,7 @@ async function resolveUid(req) {
   return snap.docs[0].ref.parent.parent?.id || null;
 }
 
-// ── Tool implementations ──────────────────────────────────────────────────────
+// Tool implementations
 
 async function getRevisionHistory(uid, args) {
   const limit = Math.min(Number(args?.limit) || 20, 50);
@@ -367,7 +367,7 @@ function formatText(text) {
   return { content: [{ type: 'text', text }] };
 }
 
-// ── Prompt templates ──────────────────────────────────────────────────────────
+// Prompt templates
 
 const PROMPT_MESSAGES = {
   revision_overview: [
@@ -480,7 +480,7 @@ Output ONLY the raw HTML — no markdown fences, no explanation before or after.
   ],
 };
 
-// ── JSON-RPC router ───────────────────────────────────────────────────────────
+// JSON-RPC router
 
 async function handleRpc(method, params, uid) {
   if (method === 'initialize') {
@@ -549,7 +549,7 @@ function rpcError(code, message) {
   return e;
 }
 
-// ── Cloud Function ────────────────────────────────────────────────────────────
+// Cloud Function
 
 exports.mcp = onRequest({ cors: true, region: 'europe-west2' }, async (req, res) => {
   if (req.method === 'OPTIONS') {

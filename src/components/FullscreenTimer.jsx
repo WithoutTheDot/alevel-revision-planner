@@ -77,7 +77,7 @@ export default function FullscreenTimer() {
   const isOvertime = expectedSecs > 0 && elapsedSecs > expectedSecs;
   const progressPct = expectedSecs > 0 ? Math.min((elapsedSecs / expectedSecs) * 100, 100) : 0;
 
-  // ── Minimised pill → hover-expanded card ──────────────────────────────────
+ // Minimised pill → hover-expanded card
   if (!isFullscreen) {
     const gradientClass = isOvertime ? 'from-rose-500 to-red-600' : 'from-indigo-500 to-violet-600';
     const minsLeft = Math.floor((expectedSecs - elapsedSecs) / 60);
@@ -139,7 +139,7 @@ export default function FullscreenTimer() {
     );
   }
 
-  // ── Completion handler (called from CompletionDetailsModal) ────────────────────
+ // Completion handler (called from CompletionDetailsModal)
   async function handleComplete(paperIndex, updates) {
     setError('');
     try {
@@ -181,7 +181,7 @@ export default function FullscreenTimer() {
     ? 'from-rose-500 to-red-600'
     : 'from-indigo-500 to-violet-600';
 
-  // ── Fullscreen overlay ─────────────────────────────────────────────────────
+ // Fullscreen overlay
   return (
     <>
       <div className={`fixed inset-0 z-[60] bg-gradient-to-br ${gradientClass} flex flex-col items-center justify-center text-white transition-all duration-500 overflow-y-auto py-8`}>

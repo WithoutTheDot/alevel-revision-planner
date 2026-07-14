@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// ── Firebase init (safe for hot-reload / multiple invocations) ───────────────
+// Firebase init (safe for hot-reload / multiple invocations)
 
 function getDb() {
   if (!getApps().length) {
@@ -15,12 +15,12 @@ function getDb() {
   return getFirestore();
 }
 
-// ── Guide (loaded once at cold start) ────────────────────────────────────────
+// Guide (loaded once at cold start)
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const GUIDE = readFileSync(join(__dirname, '../functions/CLAUDE_GUIDE.md'), 'utf8');
 
-// ── MCP constants ─────────────────────────────────────────────────────────────
+// MCP constants
 
 const SERVER_INFO = { name: 'pastpapers-mcp', version: '1.0.0' };
 const PROTOCOL_VERSION = '2024-11-05';
@@ -138,7 +138,7 @@ Requirements for the HTML:
 Output ONLY the raw HTML — no markdown fences, no explanation before or after. Just the HTML starting with <!DOCTYPE html>.` } }],
 };
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// Auth
 
 async function resolveUid(req) {
   const auth = req.headers['authorization'] || '';
@@ -151,7 +151,7 @@ async function resolveUid(req) {
   return snap.docs[0].ref.parent.parent?.id || null;
 }
 
-// ── Tool implementations ──────────────────────────────────────────────────────
+// Tool implementations
 
 function fmt(text) {
   return { content: [{ type: 'text', text }] };
@@ -291,7 +291,7 @@ async function getReviewQueue(uid) {
   return fmt(lines.join('\n'));
 }
 
-// ── JSON-RPC router ───────────────────────────────────────────────────────────
+// JSON-RPC router
 
 function rpcErr(code, message) {
   const e = new Error(message);
@@ -337,7 +337,7 @@ async function handleRpc(method, params, uid) {
   throw rpcErr(-32601, `Method not found: ${method}`);
 }
 
-// ── Vercel handler ────────────────────────────────────────────────────────────
+// Vercel handler
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

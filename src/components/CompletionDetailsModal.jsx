@@ -144,7 +144,7 @@ export default function CompletionDetailsModal({
   const [reviewTopics, setReviewTopics] = useState(Array.isArray(paper?.reviewTopics) ? paper.reviewTopics : []);
   const [saving, setSaving] = useState(false);
 
-  // ── Family picker state (adhoc only) ──────────────────────────────────────
+ // Family picker state (adhoc only)
   const [useFamily, setUseFamily] = useState(false);
   const [allFamilies, setAllFamilies] = useState([]);
   const [selectedFamilyId, setSelectedFamilyId] = useState('');
@@ -259,7 +259,7 @@ export default function CompletionDetailsModal({
     }
   }
 
-  // ── Year validation ────────────────────────────────────────────────────────
+ // Year validation
   const yearNum = parseInt(yearInput);
   const yearInRange = selectedFamily?.yearStart !== null
     ? (yearInput && !isNaN(yearNum) && yearNum >= selectedFamily.yearStart && yearNum <= selectedFamily.yearEnd)

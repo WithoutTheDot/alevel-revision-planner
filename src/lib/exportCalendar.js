@@ -5,7 +5,7 @@
  *   npm install jspdf jspdf-autotable --legacy-peer-deps
  */
 
-// ─── ICS Export ──────────────────────────────────────────────────────────────
+// ICS Export
 
 function pad(n) {
   return String(n).padStart(2, '0');
@@ -85,7 +85,7 @@ export function downloadIcs(schedule, weekId) {
   URL.revokeObjectURL(url);
 }
 
-// ─── PDF Export ───────────────────────────────────────────────────────────────
+// PDF Export
 
 /**
  * Generate and download a PDF table of the week schedule.

@@ -9,7 +9,7 @@ import { formatTime } from '../lib/timeUtils';
 
 const TABS = ['Overview', 'Users', 'Classes', 'Membership', 'Override'];
 
-// ─── Shared ───────────────────────────────────────────────────────────────────
+// Shared
 
 function StatCard({ label, value }) {
   return (
@@ -20,7 +20,7 @@ function StatCard({ label, value }) {
   );
 }
 
-// ─── User Detail Modal ────────────────────────────────────────────────────────
+// User Detail Modal
 
 function UserDetailModal({ user, onClose, onDeleted }) {
   const [completions, setCompletions] = useState(null);
@@ -147,7 +147,7 @@ function UserDetailModal({ user, onClose, onDeleted }) {
   );
 }
 
-// ─── Class Detail Modal ───────────────────────────────────────────────────────
+// Class Detail Modal
 
 function ClassDetailModal({ cls, allUsers, onClose, onUpdate }) {
   const [addUid, setAddUid] = useState('');
@@ -262,7 +262,7 @@ function ClassDetailModal({ cls, allUsers, onClose, onUpdate }) {
   );
 }
 
-// ─── Tab: Overview ────────────────────────────────────────────────────────────
+// Tab: Overview
 
 function OverviewTab({ stats, classes }) {
   const totalUsers = stats.length;
@@ -278,7 +278,7 @@ function OverviewTab({ stats, classes }) {
   );
 }
 
-// ─── Tab: Users ───────────────────────────────────────────────────────────────
+// Tab: Users
 
 function UsersTab({ stats }) {
   const [search, setSearch] = useState('');
@@ -343,7 +343,7 @@ function UsersTab({ stats }) {
   );
 }
 
-// ─── Tab: Classes ─────────────────────────────────────────────────────────────
+// Tab: Classes
 
 function ClassesTab({ classes, allUsers, onUpdate }) {
   const [viewClass, setViewClass] = useState(null);
@@ -394,7 +394,7 @@ function ClassesTab({ classes, allUsers, onUpdate }) {
   );
 }
 
-// ─── Tab: Membership ─────────────────────────────────────────────────────────
+// Tab: Membership
 
 function MembershipTab({ classes, allUsers, onUpdate }) {
   const [selectedClassId, setSelectedClassId] = useState('');
@@ -479,7 +479,7 @@ function MembershipTab({ classes, allUsers, onUpdate }) {
   );
 }
 
-// ─── Tab: Override ────────────────────────────────────────────────────────────
+// Tab: Override
 
 function OverrideTab({ stats }) {
   const [selectedUid, setSelectedUid] = useState('');
@@ -585,7 +585,7 @@ function OverrideTab({ stats }) {
   );
 }
 
-// ─── Main AdminPage ────────────────────────────────────────────────────────────
+// Main AdminPage
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('Overview');

@@ -293,7 +293,7 @@ export default function GeneratePage() {
 
       {error && <div className="mb-4 p-3 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] rounded-[var(--radius-md)] text-sm">{error}</div>}
 
-      {/* ── Step 1: Select week ─────────────────────────────── */}
+ {/* Step 1: Select week */}
       {step === 'select' && (
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-5 space-y-5">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -386,7 +386,7 @@ export default function GeneratePage() {
         </div>
       )}
 
-      {/* ── Step 2: Preview ─────────────────────────────────── */}
+ {/* Step 2: Preview */}
       {step === 'preview' && preview && (
         <div className="space-y-4">
           {warnings.length > 0 && (
@@ -478,7 +478,7 @@ export default function GeneratePage() {
         </div>
       )}
 
-      {/* ── Step 3: Saved ────────────────────────────────────── */}
+ {/* Step 3: Saved */}
       {step === 'saved' && (
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-8 text-center">
           <div className="w-10 h-10 rounded-full bg-[var(--color-success-bg)] text-[var(--color-success-text)] flex items-center justify-center mx-auto mb-3">

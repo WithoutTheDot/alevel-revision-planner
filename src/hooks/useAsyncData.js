@@ -1,10 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
 
-/**
- * useAsyncData(loader, deps)
- * Runs `loader()` on mount and whenever `deps` change.
- * Returns { data, loading, error, reload }.
- */
 export function useAsyncData(loader, deps = []) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

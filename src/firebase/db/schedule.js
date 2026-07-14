@@ -11,7 +11,7 @@ import {
 import { db } from '../config';
 import { cleanDisplayName } from '../../lib/paperPaths';
 
-// ─── Week Templates ─────────────────────────────────────────────────────────
+// Week Templates
 // Schema per plan:
 // { templateName, maxPapersPerSubject, mostCommonPapersPerSubject, maxTotalPapers,
 //   breakDuration, subjects, timeBlocks: [{ day, startTime, endTime }] }
@@ -99,7 +99,7 @@ export async function initDefaultTemplates(userId) {
   }
 }
 
-// ─── Term Calendar ──────────────────────────────────────────────────────────
+// Term Calendar
 // Subcollection: users/{userId}/termCalendar/{mondayDateStr}
 // Each doc: { weekStart: string, weekType: string, templateId: string }
 
@@ -122,7 +122,7 @@ export async function clearWeekType(userId, mondayDateStr) {
   await deleteDoc(doc(db, 'users', userId, 'termCalendar', mondayDateStr));
 }
 
-// ─── Weekly Schedules ───────────────────────────────────────────────────────
+// Weekly Schedules
 
 /** Strip legacy "Foreign ..." display names from a raw weekly schedule object. */
 export function cleanScheduleData(data) {

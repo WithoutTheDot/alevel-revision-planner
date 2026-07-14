@@ -351,7 +351,7 @@ export default function SettingsPage() {
     }
   }
 
-  // ── Family CRUD ─────────────────────────────────────────────────────────────
+ // Family CRUD
 
   function openNewFamily() {
     setFamilyModal({ id: null, isBuiltIn: false, data: { ...EMPTY_FAMILY } });
@@ -431,7 +431,7 @@ export default function SettingsPage() {
     }
   }
 
-  // ── Derived display data ────────────────────────────────────────────────────
+ // Derived display data
 
   const allFamilies = buildDisplayFamilies(firestoreFamilies);
   const familiesBySubject = subjects.map(({ id }) => ({
@@ -439,7 +439,7 @@ export default function SettingsPage() {
     families: allFamilies.filter((f) => f.subject === id),
   }));
 
-  // ── Exam CRUD ────────────────────────────────────────────────────────────────
+ // Exam CRUD
 
   const EMPTY_EXAM = { subject: subjects[0]?.id || '', paperLabel: '', date: '', time: '09:00', durationMins: 120 };
 
@@ -534,7 +534,7 @@ export default function SettingsPage() {
 
       {loading ? <p className="text-[var(--color-text-muted)] text-sm">Loading...</p> : (
         <>
-          {/* ── General ── */}
+ {/* General */}
           {tab === 'General' && (
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
               {durations._default < 75 && (
@@ -598,7 +598,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Papers ── */}
+ {/* Papers */}
           {tab === 'Papers' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -668,7 +668,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Subjects ── */}
+ {/* Subjects */}
           {tab === 'Subjects' && (
             <div className="space-y-4">
               <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
@@ -694,7 +694,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Exams ── */}
+ {/* Exams */}
           {tab === 'Exams' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -723,7 +723,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Account ── */}
+ {/* Account */}
           {tab === 'Account' && (
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4">
               <p className="text-sm text-[var(--color-text-secondary)]">Signed in as <strong className="text-[var(--color-text-primary)]">{currentUser.email}</strong></p>
@@ -967,7 +967,7 @@ export default function SettingsPage() {
         </>
       )}
 
-      {/* ── Exam modal ── */}
+ {/* Exam modal */}
       <Modal
         open={!!examModal}
         onClose={() => setExamModal(null)}
@@ -1012,7 +1012,7 @@ export default function SettingsPage() {
         )}
       </Modal>
 
-      {/* ── Family modal ── */}
+ {/* Family modal */}
       <Modal
         open={!!familyModal}
         onClose={() => setFamilyModal(null)}
